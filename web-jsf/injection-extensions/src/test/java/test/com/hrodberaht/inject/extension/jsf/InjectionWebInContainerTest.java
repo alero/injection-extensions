@@ -1,0 +1,66 @@
+package test.com.hrodberaht.inject.extension.jsf;
+
+import com.hrodberaht.inject.extension.jsf.JsfInjectionProvider;
+import com.sun.faces.spi.InjectionProvider;
+import com.sun.faces.spi.InjectionProviderException;
+import org.hrodberaht.inject.InjectContainer;
+import org.hrodberaht.inject.InjectionRegisterJava;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Simple Java Utils
+ *
+ * @author Robert Alexandersson
+ *         2010-jul-28 01:30:53
+ * @version 1.0
+ * @since 1.0
+ */
+public class InjectionWebInContainerTest {
+
+
+    @BeforeClass
+    public static void beforeClass() {
+        
+    }
+
+    @Test
+    public void testJsfInjectionContainerProgrammaticRegistration() throws InjectionProviderException {
+
+        // We can not force the registration to happen before startup so this must be done statically
+        InjectionRegisterJava registerJava = new InjectionRegisterJava();
+        registerJava.activateContainerJavaXInject();
+        registerJava.register(ServiceInject.class, ServiceInjectBean.class);
+        InjectContainer container = registerJava.getInjectContainer();
+        JsfInjectionProvider.setInjector(container);
+
+        // This is basically what JSF will do
+        InjectionProvider injectionProvider = new JsfInjectionProvider();
+        WebInjectBean bean = new WebInjectBean();
+        injectionProvider.inject(bean);
+
+        assertNotNull(bean.getServiceInject());
+
+        assertTrue(bean.getServiceInject() instanceof ServiceInjectBean);
+    }
+
+    @Test
+    public void testJsfInjectionContainerBaseClassInheritance() throws InjectionProviderException {
+
+        // We can not force the registration to happen before startup so this must be done statically
+                
+
+        // This is basically what JSF will do
+        InjectionProvider injectionProvider = new TestJsfInjectionProvider();
+        WebInjectBean bean = new WebInjectBean();        
+        injectionProvider.inject(bean);
+
+        assertNotNull(bean.getServiceInject());
+
+        assertTrue(bean.getServiceInject() instanceof ServiceInjectBean);
+    }
+
+}
