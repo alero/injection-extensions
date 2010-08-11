@@ -15,6 +15,14 @@
             <name>Jboss</name>
             <url>https://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>Sonatype Snapshot</id>
+            <name>Sonatype Snapshot</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
     <properties>
         <hibernate-core-version>3.5.3-Final</hibernate-core-version>
