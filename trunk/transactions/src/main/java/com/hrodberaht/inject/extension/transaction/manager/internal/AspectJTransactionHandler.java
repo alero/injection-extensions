@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.hrodberaht.inject.Container;
 
 import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 /**
  * Simple Java Utils
@@ -20,50 +21,60 @@ import javax.ejb.TransactionAttribute;
 @Aspect
 public class AspectJTransactionHandler {
 
+    
+
     private static Container container = null;
 
     public static void setTransactedContainer(Container container) {
         AspectJTransactionHandler.container = container;
+        // The container is not initialized in this phase as it will register itself soon after.
+        // No controls on the container can be done due to this.
     }
 
-    @Pointcut("execution(@javax.ejb.TransactionAttribute * *(..)) ")
+    @Pointcut("execution(@javax.ejb.TransactionAttribute * *(..)) && @annotation(transactionAttribute)")
     public void transactionalPointCut(TransactionAttribute transactionAttribute) {
 
     }
 
     @Around("transactionalPointCut(transactionAttribute)")
-    public Object transactional(ProceedingJoinPoint thisJoinPoint, TransactionAttribute transactionAttribute) throws Throwable {
+    public Object transactional(ProceedingJoinPoint thisJoinPoint, TransactionAttribute transactionAttribute)
+            throws Throwable {
+
+        TransactionAttributeType transactionAttributeType = findTransactionType(transactionAttribute);
+
         TransactionManager transactionManager = container.get(TransactionManager.class);
         if(transactionManager == null){
-            throw new IllegalAccessError("transactionManager is null");    
+            throw new TransactionHandlingError("transactionManager is null");
         }
-        try {
-            if (!transactionManager.isActive()) {
-                System.out.println("Begin Transactional call");
-                transactionManager.begin();
-            } else {
-                System.out.println("Added depth for Transactional call");
-                transactionManager.addTransactionDepth();
-            }
-            Object proceed = thisJoinPoint.proceed();
-            if (transactionManager.isActive() && transactionManager.isLastActive()) {
-                System.out.println("Commit/Close Transactional call");
-                transactionManager.commit();
-                transactionManager.close();
-            }
-            return proceed;
-        } catch (Throwable error) {
-            System.out.println("Error Transactional call");
-            if (transactionManager.isActive()) {
-                transactionManager.rollback();
-            }
-            throw error;
-        } finally {
-
-            System.out.println("Removed depth for Transactional call");
-            transactionManager.removeTransactionDepth();
+        if(transactionAttributeType == TransactionAttributeType.REQUIRED){
+            return new TransactionRequired().transactionHandling(thisJoinPoint, transactionManager);
+        } else if(transactionAttributeType == TransactionAttributeType.SUPPORTS){
+            return new TransactionRequired().transactionHandling(thisJoinPoint, transactionManager);
+        } else if(transactionAttributeType == TransactionAttributeType.REQUIRES_NEW){
+            return new TransactionRequiresNew().transactionHandling(thisJoinPoint, transactionManager);
+        } else if(transactionAttributeType == TransactionAttributeType.MANDATORY){
+            return new TransactionMandatory().transactionHandling(thisJoinPoint, transactionManager);
+        } else if(transactionAttributeType == TransactionAttributeType.NOT_SUPPORTED){
+            return new TransactionNotSupported().transactionHandling(thisJoinPoint, transactionManager);
         }
+        // If nothing found
+        throw new TransactionHandlingError(
+                "transactionManager has no supported transactionAttributeType: "+transactionAttributeType
+        );
 
+    }
+
+   
+
+    private TransactionAttributeType findTransactionType(TransactionAttribute transactionAttribute) {
+        TransactionAttributeType transactionAttributeType = null;
+        if(transactionAttribute == null){
+            TransactionLogging.transactionLogging("Annotation not found ");
+            transactionAttributeType = TransactionAttributeType.REQUIRED;
+        }else{
+            transactionAttributeType = transactionAttribute.value();
+        }
+        return transactionAttributeType;
     }
 
 
