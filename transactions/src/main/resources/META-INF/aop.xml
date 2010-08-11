@@ -2,7 +2,7 @@
 
     <aspects options="-verbose">
         <!-- declare two existing aspects to the weaver -->
-        <aspect name="com.hrodberaht.inject.extension.transaction.manager.AspectJTransactionHandler"/>
+        <aspect name="com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler"/>
 
 
 
