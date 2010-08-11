@@ -1,10 +1,11 @@
-package com.hrodberaht.inject.extension.transaction.manager;
+package com.hrodberaht.inject.extension.transaction.manager.internal;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.hrodberaht.inject.Container;
 
 import javax.ejb.TransactionAttribute;
 
@@ -19,14 +20,10 @@ import javax.ejb.TransactionAttribute;
 @Aspect
 public class AspectJTransactionHandler {
 
-    private static TransactionManager transactionManager = null;
+    private static Container container = null;
 
-    public static TransactionManager getTransactionManager() {
-        return transactionManager;
-    }
-
-    public static void setTransactionManager(TransactionManager transactionManager) {
-        AspectJTransactionHandler.transactionManager = transactionManager;
+    public static void setTransactedContainer(Container container) {
+        AspectJTransactionHandler.container = container;
     }
 
     @Pointcut("execution(@javax.ejb.TransactionAttribute * *(..)) ")
@@ -36,6 +33,10 @@ public class AspectJTransactionHandler {
 
     @Around("transactionalPointCut(transactionAttribute)")
     public Object transactional(ProceedingJoinPoint thisJoinPoint, TransactionAttribute transactionAttribute) throws Throwable {
+        TransactionManager transactionManager = container.get(TransactionManager.class);
+        if(transactionManager == null){
+            throw new IllegalAccessError("transactionManager is null");    
+        }
         try {
             if (!transactionManager.isActive()) {
                 System.out.println("Begin Transactional call");

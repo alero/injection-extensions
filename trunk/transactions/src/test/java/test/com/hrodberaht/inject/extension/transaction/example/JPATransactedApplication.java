@@ -1,11 +1,10 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
-import com.hrodberaht.inject.extension.transaction.manager.AspectJTransactionHandler;
 import com.hrodberaht.inject.extension.transaction.manager.JPATransactionManager;
 
 import javax.ejb.TransactionAttribute;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 
 /**
  * Simple Java Utils
@@ -17,13 +16,9 @@ import javax.persistence.Persistence;
  */
 public class JPATransactedApplication {
 
-    private static JPATransactionManager transactionManager = null;
-    static{
-        transactionManager =
-                new JPATransactionManager(Persistence.createEntityManagerFactory("example-jpa"));
-        AspectJTransactionHandler.setTransactionManager(transactionManager);
-    }
 
+    @Inject
+    private JPATransactionManager transactionManager;
 
 
     @TransactionAttribute
