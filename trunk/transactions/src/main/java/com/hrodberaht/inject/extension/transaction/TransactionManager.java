@@ -15,4 +15,11 @@ public interface TransactionManager {
     void rollback();
     boolean isActive();
 
+    boolean isLastActive();
+
+    void close();
+
+    void addTransactionDepth();
+
+    void removeTransactionDepth();
 }
