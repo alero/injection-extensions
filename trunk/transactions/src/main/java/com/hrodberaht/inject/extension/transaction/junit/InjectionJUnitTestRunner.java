@@ -2,6 +2,7 @@ package com.hrodberaht.inject.extension.transaction.junit;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import org.hrodberaht.inject.InjectContainer;
+import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -40,15 +41,15 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
             Class testClass = getTestClass().getJavaClass();
             Annotation[] annotations = testClass.getAnnotations();
             for (Annotation annotation : annotations) {
-                if (annotation.annotationType() == TransactionContainer.class) {
-                    TransactionContainer transactionContainer = (TransactionContainer) annotation;
-                    Class<? extends TransactionContainerCreator> transactionclass = transactionContainer.value();
-                    TransactionContainerCreator creator = transactionclass.newInstance();
+                if (annotation.annotationType() == InjectionContainerContext.class) {
+                    InjectionContainerContext transactionContainer = (InjectionContainerContext) annotation;
+                    Class<? extends InjectionContainerCreator> transactionclass = transactionContainer.value();
+                    InjectionContainerCreator creator = transactionclass.newInstance();
                     theContainer = creator.createContainer();
                     verifyContainerTransactions(theContainer, creator);
                 }
                 if (annotation.annotationType() == TransactionAttribute.class) {
-                    allMethodsTransacted = true;    
+                    allMethodsTransacted = true;
                 }
             }
         } catch (InstantiationException e) {
@@ -58,33 +59,34 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         }
     }
 
-    private void verifyContainerTransactions(InjectContainer theContainer, TransactionContainerCreator creator) {
-        transactionManager = theContainer.get(TransactionManager.class);
-        if(transactionManager == null){
+    private void verifyContainerTransactions(InjectContainer theContainer, com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator creator) {
+        try {
+            transactionManager = theContainer.get(TransactionManager.class);            
             System.out.println("InjectionJUnitTestRunner: " +
-                    "TransactionManager not wired for Container from creator: "+creator.getClass().getName());
-        }else {
+                    "TransactionManager (" + transactionManager.getClass().getSimpleName() + ") " +
+                    "successfully wired from creator: " + creator.getClass().getSimpleName());
+
+        } catch (InjectRuntimeException exception) {
             System.out.println("InjectionJUnitTestRunner: " +
-                    "TransactionManager ("+transactionManager.getClass().getSimpleName()+") " +
-                    "successfully wired from creator: "+creator.getClass().getSimpleName());
+                    "TransactionManager not wired for Container from creator: " + creator.getClass().getName());
         }
     }
 
     @Override
-	protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
-        if(hasTransaction(frameworkMethod)){
+    protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
+        if (hasTransaction(frameworkMethod)) {
             transactionManager.begin();
         }
         System.out.println("InjectionJUnitTestRunner: " +
-                    " running child " +frameworkMethod.getName());
+                " running child " + frameworkMethod.getName());
         try {
             super.runChild(frameworkMethod, notifier);
-        } finally{
+        } finally {
 
-            if(hasTransaction(frameworkMethod)){
-                if(transactionManager.isActive()){
+            if (hasTransaction(frameworkMethod)) {
+                if (transactionManager.isActive()) {
                     transactionManager.rollback();
-                }                
+                }
             }
         }
     }
@@ -95,14 +97,14 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
     }
 
     private boolean hasMethodTransactionDisabled(FrameworkMethod frameworkMethod) {
-        if(frameworkMethod.getAnnotation(TransactionDisabled.class) != null){
-            return true;    
+        if (frameworkMethod.getAnnotation(TransactionDisabled.class) != null) {
+            return true;
         }
         return false;
     }
 
     private boolean hasMethodTransactionAnnotation(FrameworkMethod frameworkMethod) {
-        
+
         return false;
     }
 
@@ -115,5 +117,5 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         Object testInstance = super.createTest();
         theContainer.injectDependencies(testInstance);
         return testInstance;
-	}
+    }
 }

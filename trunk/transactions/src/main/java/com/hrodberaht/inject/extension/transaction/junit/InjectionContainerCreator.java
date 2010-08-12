@@ -10,6 +10,6 @@ import org.hrodberaht.inject.InjectContainer;
  * @version 1.0
  * @since 1.0
  */
-public interface TransactionContainerCreator {
+public interface InjectionContainerCreator {
     InjectContainer createContainer();
 }

@@ -17,6 +17,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-public @interface TransactionContainer {
-    Class<? extends TransactionContainerCreator> value();
+public @interface InjectionContainerContext {
+    Class<? extends InjectionContainerCreator> value();
 }
