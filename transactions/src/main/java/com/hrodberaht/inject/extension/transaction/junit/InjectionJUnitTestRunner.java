@@ -18,6 +18,17 @@ import java.lang.annotation.Annotation;
  *         2010-aug-10 20:29:06
  * @version 1.0
  * @since 1.0
+ *
+ * TransactionAttribute will enable the class or a method to be "TestCase-Transactional"
+ * The no need for a type, they will all be REQUIRED with rollback as the end call.
+ * The BEGIN/ROLLBACK will always be enforced if the test is classified as "TestCase-Transactional"
+ *
+ * TIP1: To make an entire class transactional use @TransactionAttribute as a class type annotation
+ * TIP1a: If the class is transactional, to disable a single test to be non transactional
+ *        use the @TransactionDisabled annotation for that method.
+ *
+ * TIP2: To enable transaction support for a single method just use the @TransactionAttribute for that method.
+ *
  */
 public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
 
@@ -59,19 +70,16 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         }
     }
 
-    private void verifyContainerTransactions(InjectContainer theContainer, com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator creator) {
-        try {
-            transactionManager = theContainer.get(TransactionManager.class);            
-            System.out.println("InjectionJUnitTestRunner: " +
-                    "TransactionManager (" + transactionManager.getClass().getSimpleName() + ") " +
-                    "successfully wired from creator: " + creator.getClass().getSimpleName());
-
-        } catch (InjectRuntimeException exception) {
-            System.out.println("InjectionJUnitTestRunner: " +
-                    "TransactionManager not wired for Container from creator: " + creator.getClass().getName());
-        }
-    }
-
+    /**
+     * Each test is verified for transaction support.
+     * To enable a single methods for transaction use the @TransactionAttribute
+     * Disabled TransactionDisabled comes first and will always disable (even if a TransactionAttribute exists)
+     *
+     * @param frameworkMethod
+     * @param notifier
+     * @see TransactionDisabled
+     * @see TransactionAttribute
+     */
     @Override
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
         if (hasTransaction(frameworkMethod)) {
@@ -91,6 +99,18 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         }
     }
 
+    /**
+     * Delegates to the parent implementation for creating the test instance and
+     * then allows the container to prepare the test instance before returning it.
+     */
+    @Override
+    protected Object createTest() throws Exception {
+        Object testInstance = super.createTest();
+        theContainer.injectDependencies(testInstance);
+        return testInstance;
+    }
+
+
     private boolean hasTransaction(FrameworkMethod frameworkMethod) {
         return !hasMethodTransactionDisabled(frameworkMethod) &&
                 (allMethodsTransacted || hasMethodTransactionAnnotation(frameworkMethod));
@@ -108,14 +128,16 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         return false;
     }
 
-    /**
-     * Delegates to the parent implementation for creating the test instance and
-     * then allows the container to prepare the test instance before returning it.
-     */
-    @Override
-    protected Object createTest() throws Exception {
-        Object testInstance = super.createTest();
-        theContainer.injectDependencies(testInstance);
-        return testInstance;
+    private void verifyContainerTransactions(InjectContainer theContainer, com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator creator) {
+        try {
+            transactionManager = theContainer.get(TransactionManager.class);
+            System.out.println("InjectionJUnitTestRunner: " +
+                    "TransactionManager (" + transactionManager.getClass().getSimpleName() + ") " +
+                    "successfully wired from creator: " + creator.getClass().getSimpleName());
+
+        } catch (InjectRuntimeException exception) {
+            System.out.println("InjectionJUnitTestRunner: " +
+                    "TransactionManager not wired for Container from creator: " + creator.getClass().getName());
+        }
     }
 }
