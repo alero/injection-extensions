@@ -18,7 +18,7 @@ public class TransactionRequired {
                 transactionManager.addTransactionDepth();
             }
             Object proceed = thisJoinPoint.proceed();
-            if (transactionManager.isActive() && transactionManager.isLastActive()) {
+            if (transactionManager.isLastActive() && transactionManager.isActive()) {
                 TransactionLogging.transactionLogging("Commit/Close Transactional call : {0}", thisJoinPoint.getSignature().getName());
                 transactionManager.commit();
                 transactionManager.close();
@@ -31,8 +31,10 @@ public class TransactionRequired {
             }
             throw error;
         } finally {
-            TransactionLogging.transactionLogging("Removed depth for Transactional call : {0}", thisJoinPoint.getSignature().getName());
-            transactionManager.removeTransactionDepth();
+            if(!transactionManager.isClosed()){
+                TransactionLogging.transactionLogging("Removed depth for Transactional call : {0}", thisJoinPoint.getSignature().getName());
+                transactionManager.removeTransactionDepth();
+            }
         }
     }
 

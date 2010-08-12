@@ -15,7 +15,7 @@
             <name>Jboss</name>
             <url>https://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
-        
+
     </repositories>
     <properties>
         <hibernate-core-version>3.5.3-Final</hibernate-core-version>
@@ -45,16 +45,16 @@
             <artifactId>inject</artifactId>
             <version>1.1-M1-SNAPSHOT</version>
         </dependency>
+        <!-- Damn JPA 2.0 does not exist in maven repos -->
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0</version>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.0.Final</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -128,7 +128,7 @@
                         <version>1.3</version>
                         <configuration>
                             <complianceLevel>1.5</complianceLevel>
-                            <verbose>true</verbose>                            
+                            <verbose>true</verbose>
                         </configuration>
                         <executions>
                             <execution>

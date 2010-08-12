@@ -1,11 +1,13 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
-import com.hrodberaht.inject.extension.transaction.manager.JPATransactionManager;
+import com.hrodberaht.inject.extension.transaction.manager.impl.JPATransactionManager;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import java.util.Collection;
 
 /**
  * Simple Java Utils
@@ -56,26 +58,38 @@ public class JPATransactedApplication {
 
     @TransactionAttribute
     public Person depthyTransactions(Person person){
+        // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPerson(person);
         return findPerson(person.getId());        
     }
 
     @TransactionAttribute
     public Person depthyTransactionsMandatory(Person person){
+        // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPersonMandatory(person);
         return findPerson(person.getId());
     }
 
     @TransactionAttribute
     public Person depthyTransactionsNewTx(Person person){
+        // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPersonNewTx(person);
         return findPerson(person.getId());        
     }
 
     @TransactionAttribute
     public Person depthyTransactionsNotSupported(Person person){
+        // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPerson(person);
         return somethingNonTransactional(person.getId());
     }
 
+    @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
+    public Collection<Person> findAllPersons() {
+        EntityManager em = transactionManager.getEntityManager();
+        TypedQuery<Person> typedQuery = em.createQuery("from Person", Person.class);
+
+
+        return typedQuery.getResultList();
+    }
 }

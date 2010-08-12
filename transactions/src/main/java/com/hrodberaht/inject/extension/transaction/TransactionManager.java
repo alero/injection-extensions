@@ -23,4 +23,5 @@ public interface TransactionManager {
 
     void removeTransactionDepth();
 
+    boolean isClosed();
 }
