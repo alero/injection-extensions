@@ -1,19 +1,22 @@
 package test.com.hrodberaht.inject.extension.transaction;
 
-import com.hrodberaht.inject.extension.transaction.manager.JPATransactionManager;
-import com.hrodberaht.inject.extension.transaction.manager.RegistrationTransactionManager;
+import com.hrodberaht.inject.extension.transaction.junit.InjectionJUnitTestRunner;
+import com.hrodberaht.inject.extension.transaction.junit.TransactionContainer;
+import com.hrodberaht.inject.extension.transaction.junit.TransactionDisabled;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionHandlingError;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
 import org.hrodberaht.inject.Container;
-import org.hrodberaht.inject.InjectionRegisterModule;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import test.com.hrodberaht.inject.extension.transaction.example.JPATransactedApplication;
 import test.com.hrodberaht.inject.extension.transaction.example.Person;
 
 import javax.ejb.TransactionAttribute;
-import javax.persistence.Persistence;
+import javax.inject.Inject;
+import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,14 +28,21 @@ import static org.junit.Assert.assertEquals;
  * @version 1.0
  * @since 1.0
  */
+@TransactionContainer(ModuleContainerForTests.class)
+@RunWith(InjectionJUnitTestRunner.class)
 @TransactionAttribute
 public class TestJPATransactionManager {
 
     /**
+     * To run these tests with load time weaving add the weaver to the JRE like this.
      * -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
      */
 
     private static long id = 1L;
+
+    @Inject
+    private JPATransactedApplication application;
+
     private static synchronized long getNextId(){
         return id++;
     }
@@ -42,12 +52,19 @@ public class TestJPATransactionManager {
         TransactionLogging.enableLogging = true;
     }
 
+    @AfterClass
+    public static void destroy(){
+        Container container = new ModuleContainerForTests().createContainer();
+        JPATransactedApplication application = container.get(JPATransactedApplication.class);
+        Collection<Person> collection = application.findAllPersons();
+
+        // Verify that all values are cleared automatically from the test being transactional and calling rollback.
+        assertEquals(0, collection.size());
+
+    }
+
     @Test
     public void testCreateManager() {
-
-        Container container = createTransactionSupportingContainer();
-
-        JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
         person.setId(getNextId());
@@ -62,10 +79,6 @@ public class TestJPATransactionManager {
     @Test
     public void testCreateManagerInOneTransaction() {
 
-        Container container = createTransactionSupportingContainer();
-
-        JPATransactedApplication application = container.get(JPATransactedApplication.class);
-
         Person person = new Person();
         person.setId(getNextId());
         person.setName("Dude");
@@ -76,11 +89,8 @@ public class TestJPATransactionManager {
     }
 
     @Test(expected = TransactionHandlingError.class)
+    @TransactionDisabled
     public void testCreateManagerMandatoryFail() {
-
-        Container container = createTransactionSupportingContainer();
-
-        JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
         person.setId(getNextId());
@@ -90,11 +100,9 @@ public class TestJPATransactionManager {
     }
 
     @Test
-    public void testCreateManagerInOneTransactionMandatory() {        
+    public void testCreateManagerInOneTransactionMandatory() {
 
-        Container container = createTransactionSupportingContainer();
 
-        JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
         person.setId(getNextId());
@@ -109,10 +117,6 @@ public class TestJPATransactionManager {
     @Ignore // This still needs fixing before it works
     public void testCreateManagerInOneTransactionRequiresNew() {
 
-        Container container = createTransactionSupportingContainer();
-
-        JPATransactedApplication application = container.get(JPATransactedApplication.class);
-
         Person person = new Person();
         person.setId(getNextId());
         person.setName("Dude");
@@ -125,10 +129,6 @@ public class TestJPATransactionManager {
     @Test(expected = TransactionHandlingError.class)    
     public void testCreateManagerInOneTransactionNotSupported() {
 
-        Container container = createTransactionSupportingContainer();
-
-        JPATransactedApplication application = container.get(JPATransactedApplication.class);
-
         Person person = new Person();
         person.setId(getNextId());
         person.setName("Dude");
@@ -137,11 +137,8 @@ public class TestJPATransactionManager {
     }
 
     @Test
+    @TransactionDisabled
     public void testCreateManagerNotSupported() {
-
-        Container container = createTransactionSupportingContainer();
-
-        JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
         person.setId(55L);
@@ -154,20 +151,6 @@ public class TestJPATransactionManager {
 
     }
 
-    private Container createTransactionSupportingContainer() {
-        InjectionRegisterModule register = new InjectionRegisterModule();
-        register.activateContainerJavaXInject();
-        register.register(JPATransactedApplication.class);
-        // Create the JPA transaction manager, different managers will need different objects in their construct.
-        final JPATransactionManager transactionManager =
-                new JPATransactionManager(Persistence.createEntityManagerFactory("example-jpa"));
-        // Use the special RegistrationModule named TransactionManager,
-        // this registers all needed for the container and the service
-        // and does a setup for the AspectJTransactionHandler.
-        register.register(new RegistrationTransactionManager(transactionManager, register));
-
-        Container container = register.getContainer();
-        return container;
-    }
+    
 
 }

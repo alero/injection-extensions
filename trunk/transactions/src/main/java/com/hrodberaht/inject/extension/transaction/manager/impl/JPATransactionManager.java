@@ -1,4 +1,4 @@
-package com.hrodberaht.inject.extension.transaction.manager;
+package com.hrodberaht.inject.extension.transaction.manager.impl;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
 
@@ -75,6 +75,14 @@ public class JPATransactionManager implements TransactionManager {
         if(managerHolder != null){
             managerHolder.removeTransactionDepth();
         }
+    }
+
+    public boolean isClosed() {
+        EntityManagerHolder managerHolder = entityManagerScopeThreadLocal.get();
+        if(managerHolder != null){
+            return false;
+        }
+        return true;
     }
 
     public EntityManager getEntityManager() {

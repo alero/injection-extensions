@@ -8,19 +8,11 @@ public class TransactionMandatory {
     public TransactionMandatory() {
     }
 
-    Object transactionHandling(ProceedingJoinPoint thisJoinPoint, TransactionManager transactionManager) throws Throwable {
-        try {
-            if (!transactionManager.isActive()) {
-                throw new TransactionHandlingError("TransactionMandatory has no active transaction");                
-            }
-            return thisJoinPoint.proceed();
-        } catch (Throwable error) {            
-            TransactionLogging.transactionLogging("Error Transactional call : {0}", thisJoinPoint.getSignature().getName());
-            if (transactionManager.isActive()) {
-                transactionManager.rollback();
-            }
-            throw error;
-        } 
+    Object transactionHandling(ProceedingJoinPoint thisJoinPoint, TransactionManager transactionManager) throws Throwable {        
+        if (!transactionManager.isActive()) {
+            throw new TransactionHandlingError("has no active transaction");
+        }
+        return thisJoinPoint.proceed();
     }
 
     
