@@ -28,6 +28,15 @@ import static org.junit.Assert.assertEquals;
 @TransactionAttribute
 public class TestJPATransactionManager {
 
+    /**
+     * -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+     */
+
+    private static long id = 1L;
+    private static synchronized long getNextId(){
+        return id++;
+    }
+
     @BeforeClass
     public static void init() {
         TransactionLogging.enableLogging = true;
@@ -41,11 +50,11 @@ public class TestJPATransactionManager {
         JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
-        person.setId(1L);
+        person.setId(getNextId());
         person.setName("Dude");
         application.createPerson(person);
 
-        Person foundPerson = application.findPerson(1L);
+        Person foundPerson = application.findPerson(person.getId());
         assertEquals(foundPerson.getName(), person.getName());
 
     }
@@ -58,7 +67,7 @@ public class TestJPATransactionManager {
         JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
-        person.setId(1L);
+        person.setId(getNextId());
         person.setName("Dude");
         Person foundPerson = application.depthyTransactions(person);
 
@@ -74,7 +83,7 @@ public class TestJPATransactionManager {
         JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
-        person.setId(1L);
+        person.setId(getNextId());
         person.setName("Dude");
         application.createPersonMandatory(person);
 
@@ -88,7 +97,7 @@ public class TestJPATransactionManager {
         JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
-        person.setId(1L);
+        person.setId(getNextId());
         person.setName("Dude");
         Person foundPerson = application.depthyTransactionsMandatory(person);
 
@@ -105,7 +114,7 @@ public class TestJPATransactionManager {
         JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
-        person.setId(1L);
+        person.setId(getNextId());
         person.setName("Dude");
         Person foundPerson = application.depthyTransactionsNewTx(person);
 
@@ -113,7 +122,7 @@ public class TestJPATransactionManager {
 
     }
 
-    @Test(expected = TransactionHandlingError.class)
+    @Test(expected = TransactionHandlingError.class)    
     public void testCreateManagerInOneTransactionNotSupported() {
 
         Container container = createTransactionSupportingContainer();
@@ -121,7 +130,7 @@ public class TestJPATransactionManager {
         JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
-        person.setId(1L);
+        person.setId(getNextId());
         person.setName("Dude");
         application.depthyTransactionsNotSupported(person);        
 
@@ -135,11 +144,11 @@ public class TestJPATransactionManager {
         JPATransactedApplication application = container.get(JPATransactedApplication.class);
 
         Person person = new Person();
-        person.setId(1L);
+        person.setId(55L);
         person.setName("Dude");
         application.createPerson(person);
         
-        Person foundPerson = application.somethingNonTransactional(1L);
+        Person foundPerson = application.somethingNonTransactional(person.getId());
 
         assertEquals(foundPerson.getName(), person.getName());
 

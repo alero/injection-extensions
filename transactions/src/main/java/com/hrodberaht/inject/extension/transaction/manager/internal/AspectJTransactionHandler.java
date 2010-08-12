@@ -5,10 +5,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.hrodberaht.inject.Container;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Simple Java Utils
@@ -22,14 +23,9 @@ import javax.ejb.TransactionAttributeType;
 public class AspectJTransactionHandler {
 
     
+    @Inject
+    private Provider<TransactionManager> transactionManagerProvider;
 
-    private static Container container = null;
-
-    public static void setTransactedContainer(Container container) {
-        AspectJTransactionHandler.container = container;
-        // The container is not initialized in this phase as it will register itself soon after.
-        // No controls on the container can be done due to this.
-    }
 
     @Pointcut("execution(@javax.ejb.TransactionAttribute * *(..)) && @annotation(transactionAttribute)")
     public void transactionalPointCut(TransactionAttribute transactionAttribute) {
@@ -42,7 +38,7 @@ public class AspectJTransactionHandler {
 
         TransactionAttributeType transactionAttributeType = findTransactionType(transactionAttribute);
 
-        TransactionManager transactionManager = container.get(TransactionManager.class);
+        TransactionManager transactionManager = transactionManagerProvider.get();
         if(transactionManager == null){
             throw new TransactionHandlingError("transactionManager is null");
         }

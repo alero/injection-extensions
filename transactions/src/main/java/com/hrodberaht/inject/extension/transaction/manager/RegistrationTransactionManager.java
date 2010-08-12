@@ -2,6 +2,8 @@ package com.hrodberaht.inject.extension.transaction.manager;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler;
+import org.aspectj.lang.Aspects;
+import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterBase;
 import org.hrodberaht.inject.register.RegistrationModule;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
@@ -17,7 +19,9 @@ import java.util.Collection;
  * @since 1.0
  */
 public class RegistrationTransactionManager extends RegistrationModuleAnnotation implements RegistrationModule {
+
     RegistrationModuleAnnotation registration = null;
+    InjectContainer theContainer = null;
 
     public RegistrationTransactionManager(final TransactionManager transactionManager
             , InjectionRegisterBase register) {
@@ -26,11 +30,19 @@ public class RegistrationTransactionManager extends RegistrationModuleAnnotation
             public void registrations() {
                 // the withInstance will automatically create a singleton with that instance
                 register(TransactionManager.class).withInstance(transactionManager);
+                // This will make the registration to the correct implementation as well
+                // for usage in the application that needs to know the implementation
                 register(transactionManager.getClass()).withInstance(transactionManager);
             }
         };
         registration.registrations();
-        AspectJTransactionHandler.setTransactedContainer(register.getContainer());
+        theContainer = register.getInjectContainer();
+    }
+
+    @Override
+    public void postRegistration() {
+        AspectJTransactionHandler aspectJTransactionHandler = Aspects.aspectOf(AspectJTransactionHandler.class);
+        theContainer.injectDependencies(aspectJTransactionHandler);
     }
 
     public Collection getRegistrations() {

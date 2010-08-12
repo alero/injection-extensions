@@ -27,7 +27,7 @@ public class TransactionRequired {
         } catch (Throwable error) {
             TransactionLogging.transactionLogging("Error Transactional call : {0}", thisJoinPoint.getSignature().getName());
             if (transactionManager.isActive()) {
-                transactionManager.rollback();
+                transactionManager.rollback();                
             }
             throw error;
         } finally {
