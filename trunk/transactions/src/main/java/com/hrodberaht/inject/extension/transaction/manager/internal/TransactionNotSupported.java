@@ -11,6 +11,7 @@ public class TransactionNotSupported {
     Object transactionHandling(ProceedingJoinPoint thisJoinPoint, TransactionManager transactionManager) throws Throwable {
 
             if (transactionManager.isActive()) {
+                // transactionManager.error();
                 throw new TransactionHandlingError("TransactionNotSupported has active transaction");
             }
             return thisJoinPoint.proceed();

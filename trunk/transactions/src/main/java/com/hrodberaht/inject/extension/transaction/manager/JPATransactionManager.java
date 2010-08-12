@@ -45,6 +45,8 @@ public class JPATransactionManager implements TransactionManager {
     public void rollback() {
         EntityManager em = findCreateManager();
         em.getTransaction().rollback();
+        // After rollback the transaction needs cleanup, nothing more can be done
+        close();
     }
 
     public boolean isActive() {
