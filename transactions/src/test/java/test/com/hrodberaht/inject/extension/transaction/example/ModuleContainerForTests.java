@@ -1,23 +1,20 @@
-package test.com.hrodberaht.inject.extension.transaction;
+package test.com.hrodberaht.inject.extension.transaction.example;
 
-import com.hrodberaht.inject.extension.transaction.junit.TransactionContainerCreator;
 import com.hrodberaht.inject.extension.transaction.manager.RegistrationTransactionManager;
 import com.hrodberaht.inject.extension.transaction.manager.impl.JPATransactionManager;
-import org.hrodberaht.inject.Container;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
-import test.com.hrodberaht.inject.extension.transaction.example.JPATransactedApplication;
 
 import javax.persistence.Persistence;
 
-public class ModuleContainerForTests implements TransactionContainerCreator {
+public class ModuleContainerForTests implements com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator {
     public ModuleContainerForTests() {
     }
 
     public InjectContainer createContainer() {
         InjectionRegisterModule register = new InjectionRegisterModule();
         register.activateContainerJavaXInject();
-        register.register(JPATransactedApplication.class);
+        register.register(JPATransactedApplication.class);        
         // Create the JPA transaction manager, different managers will need different objects in their construct.
         final JPATransactionManager transactionManager =
                 new JPATransactionManager(Persistence.createEntityManagerFactory("example-jpa"));

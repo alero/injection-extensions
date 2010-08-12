@@ -1,7 +1,7 @@
 package test.com.hrodberaht.inject.extension.transaction;
 
+import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerContext;
 import com.hrodberaht.inject.extension.transaction.junit.InjectionJUnitTestRunner;
-import com.hrodberaht.inject.extension.transaction.junit.TransactionContainer;
 import com.hrodberaht.inject.extension.transaction.junit.TransactionDisabled;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionHandlingError;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
@@ -12,6 +12,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import test.com.hrodberaht.inject.extension.transaction.example.JPATransactedApplication;
+import test.com.hrodberaht.inject.extension.transaction.example.ModuleContainerForTests;
 import test.com.hrodberaht.inject.extension.transaction.example.Person;
 
 import javax.ejb.TransactionAttribute;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertEquals;
  * @version 1.0
  * @since 1.0
  */
-@TransactionContainer(ModuleContainerForTests.class)
+@InjectionContainerContext(ModuleContainerForTests.class)
 @RunWith(InjectionJUnitTestRunner.class)
 @TransactionAttribute
 public class TestJPATransactionManager {
