@@ -18,17 +18,16 @@ import java.lang.annotation.Annotation;
  *         2010-aug-10 20:29:06
  * @version 1.0
  * @since 1.0
- *
- * TransactionAttribute will enable the class or a method to be "TestCase-Transactional"
- * The no need for a type, they will all be REQUIRED with rollback as the end call.
- * The BEGIN/ROLLBACK will always be enforced if the test is classified as "TestCase-Transactional"
- *
- * TIP1: To make an entire class transactional use @TransactionAttribute as a class type annotation
- * TIP1a: If the class is transactional, to disable a single test to be non transactional
+ *        <p/>
+ *        TransactionAttribute will enable the class or a method to be "TestCase-Transactional"
+ *        The no need for a type, they will all be REQUIRED with rollback as the end call.
+ *        The BEGIN/ROLLBACK will always be enforced if the test is classified as "TestCase-Transactional"
+ *        <p/>
+ *        TIP1: To make an entire class transactional use @TransactionAttribute as a class type annotation
+ *        TIP1a: If the class is transactional, to disable a single test to be non transactional
  *        use the @TransactionDisabled annotation for that method.
- *
- * TIP2: To enable transaction support for a single method just use the @TransactionAttribute for that method.
- *
+ *        <p/>
+ *        TIP2: To enable transaction support for a single method just use the @TransactionAttribute for that method.
  */
 public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
 
@@ -82,20 +81,25 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
-        if (hasTransaction(frameworkMethod)) {
-            transactionManager.begin();
+        boolean transactionNew = false;
+        boolean hasTransaction = hasTransaction(frameworkMethod);
+        if (hasTransaction) {
+            transactionNew = transactionManager.begin();
         }
         System.out.println("InjectionJUnitTestRunner: " +
                 " running child " + frameworkMethod.getName());
         try {
             super.runChild(frameworkMethod, notifier);
         } finally {
-
-            if (hasTransaction(frameworkMethod)) {
+            if (hasTransaction) {
                 if (transactionManager.isActive()) {
                     transactionManager.rollback();
                 }
+                if (transactionNew) {
+                    transactionManager.close();
+                }
             }
+
         }
     }
 

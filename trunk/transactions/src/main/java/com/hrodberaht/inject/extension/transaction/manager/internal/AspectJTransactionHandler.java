@@ -1,6 +1,7 @@
 package com.hrodberaht.inject.extension.transaction.manager.internal;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
+import org.aspectj.lang.Aspects;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -20,9 +21,21 @@ import javax.inject.Provider;
  * @since 1.0
  */
 @Aspect
-public class AspectJTransactionHandler {
+public class AspectJTransactionHandler extends Aspects {
 
-    
+    private static AspectJTransactionHandler singleton;
+
+    public AspectJTransactionHandler() {
+        singleton = this;
+    }
+
+    public static AspectJTransactionHandler aspectOf(){
+        if(singleton==null){
+            singleton = new AspectJTransactionHandler();
+        }
+        return singleton;
+    }
+
     @Inject
     private Provider<TransactionManager> transactionManagerProvider;
 
@@ -35,8 +48,10 @@ public class AspectJTransactionHandler {
     @Around("transactionalPointCut(transactionAttribute)")
     public Object transactional(ProceedingJoinPoint thisJoinPoint, TransactionAttribute transactionAttribute)
             throws Throwable {
-
+        
         TransactionAttributeType transactionAttributeType = findTransactionType(transactionAttribute);
+        System.out.println("transactional begin "+transactionAttributeType.name());
+
 
         TransactionManager transactionManager = transactionManagerProvider.get();
         if(transactionManager == null){
@@ -45,7 +60,7 @@ public class AspectJTransactionHandler {
         if(transactionAttributeType == TransactionAttributeType.REQUIRED){
             return new TransactionRequired().transactionHandling(thisJoinPoint, transactionManager);
         } else if(transactionAttributeType == TransactionAttributeType.SUPPORTS){
-            return new TransactionRequired().transactionHandling(thisJoinPoint, transactionManager);
+            return new TransactionSupports().transactionHandling(thisJoinPoint, transactionManager);
         } else if(transactionAttributeType == TransactionAttributeType.REQUIRES_NEW){
             return new TransactionRequiresNew().transactionHandling(thisJoinPoint, transactionManager);
         } else if(transactionAttributeType == TransactionAttributeType.MANDATORY){
@@ -65,7 +80,7 @@ public class AspectJTransactionHandler {
     private TransactionAttributeType findTransactionType(TransactionAttribute transactionAttribute) {
         TransactionAttributeType transactionAttributeType = null;
         if(transactionAttribute == null){
-            TransactionLogging.transactionLogging("Annotation not found ");
+            TransactionLogging.log("Annotation not found ");
             transactionAttributeType = TransactionAttributeType.REQUIRED;
         }else{
             transactionAttributeType = transactionAttribute.value();

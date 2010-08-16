@@ -1,6 +1,8 @@
 package com.hrodberaht.inject.extension.transaction.manager;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
+import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPA;
+import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPAImpl;
 import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler;
 import org.aspectj.lang.Aspects;
 import org.hrodberaht.inject.InjectContainer;
@@ -18,12 +20,12 @@ import java.util.Collection;
  * @version 1.0
  * @since 1.0
  */
-public class RegistrationTransactionManager extends RegistrationModuleAnnotation implements RegistrationModule {
+public class TransactionManagerModule extends RegistrationModuleAnnotation implements RegistrationModule {
 
     RegistrationModuleAnnotation registration = null;
     InjectContainer theContainer = null;
 
-    public RegistrationTransactionManager(final TransactionManager transactionManager
+    public TransactionManagerModule(final TransactionManager transactionManager
             , InjectionRegisterBase register) {
         registration = new RegistrationModuleAnnotation(){
             @Override
@@ -33,10 +35,23 @@ public class RegistrationTransactionManager extends RegistrationModuleAnnotation
                 // This will make the registration to the correct implementation as well
                 // for usage in the application that needs to know the implementation
                 register(transactionManager.getClass()).withInstance(transactionManager);
+
+                // This will make the registration to the specific implementation interface as well
+                // for usage in the application that has a very limited method set
+                register(getInterface(transactionManager)).withInstance(transactionManager);
             }
+
+
         };
         registration.registrations();
         theContainer = register.getInjectContainer();
+    }
+
+    private Class getInterface(TransactionManager transactionManager) {
+        if(transactionManager instanceof TransactionManagerJPAImpl){
+            return TransactionManagerJPA.class;
+        }
+        throw new IllegalArgumentException("transactionManager does not have a specific interface");
     }
 
     @Override

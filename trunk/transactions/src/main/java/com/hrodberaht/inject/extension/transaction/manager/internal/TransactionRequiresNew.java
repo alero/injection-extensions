@@ -1,6 +1,7 @@
 package com.hrodberaht.inject.extension.transaction.manager.internal;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
+import com.hrodberaht.inject.extension.transaction.manager.RequiresNewTransactionManager;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 public class TransactionRequiresNew {
@@ -8,25 +9,37 @@ public class TransactionRequiresNew {
     public TransactionRequiresNew() {
     }
 
-    Object transactionHandling(ProceedingJoinPoint thisJoinPoint, TransactionManager transactionManager) throws Throwable {
+    Object transactionHandling(ProceedingJoinPoint thisJoinPoint, TransactionManager transactionManager)
+            throws Throwable {
+
+        if(!(transactionManager instanceof RequiresNewTransactionManager)){
+            throw new IllegalAccessError("transaction manager does not support requires new: "
+                    +transactionManager.getClass());
+        }
+        RequiresNewTransactionManager newTransactionManager = (RequiresNewTransactionManager)transactionManager;
         try {
-            // TODO: this needs to be rewritten totally to somehow support depth withing transaction managers
-            TransactionLogging.transactionLogging("Begin Transactional call : {0}", thisJoinPoint.getSignature().getName());
-            transactionManager.begin();
+            TransactionLogging.log("TransactionRequiresNew: Begin Transactional call : {0}",
+                    thisJoinPoint.getSignature().getName());
+            newTransactionManager.newBegin();
 
             Object proceed = thisJoinPoint.proceed();
 
-            TransactionLogging.transactionLogging("Commit/Close Transactional call : {0}", thisJoinPoint.getSignature().getName());
-            transactionManager.commit();
-            transactionManager.close();
+            TransactionLogging.log("TransactionRequiresNew: Commit/Close Transactional call : {0}",
+                    thisJoinPoint.getSignature().getName());
+            if(newTransactionManager.newIsActive()){
+                newTransactionManager.newCommit();
+            }
 
             return proceed;
         } catch (Throwable error) {
-            TransactionLogging.transactionLogging("Error Transactional call : {0}", thisJoinPoint.getSignature().getName());
-            if (transactionManager.isActive()) {
-                transactionManager.rollback();                
+            TransactionLogging.log("TransactionRequiresNew: Error Transactional call : {0}",
+                    thisJoinPoint.getSignature().getName());
+            if (newTransactionManager.newIsActive()) {
+                newTransactionManager.newRollback();
             }
             throw error;
+        } finally{
+            newTransactionManager.newClose();
         }
     }
 

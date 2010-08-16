@@ -7,15 +7,21 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
         <properties>
+
             <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver"/>
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
             <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:web-example"/>
 
+            <!--
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.jdbc2.optional.MysqlDataSource"/>
+            <property name="javax.persistence.jdbc.user" value="root"/>
+            <property name="javax.persistence.jdbc.password" value="root"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/transactional"/>
+             -->
+            
             <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
-            <property name="current_session_context_class" value="thread"/>
-            <property name="hibernate.transaction.factory_class"
-                      value="org.hibernate.transaction.JDBCTransactionFactory"/>
+            
             <property name="hibernate.cache.use_second_level_cache" value="false"/>
             <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
             <property name="hibernate.show_sql" value="true"/>

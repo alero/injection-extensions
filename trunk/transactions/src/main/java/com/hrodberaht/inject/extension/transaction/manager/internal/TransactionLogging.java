@@ -11,7 +11,7 @@ package com.hrodberaht.inject.extension.transaction.manager.internal;
 public class TransactionLogging {
     public static boolean enableLogging = false;
     
-    public static void transactionLogging(String message, Object... args) {
+    public static void log(String message, Object... args) {
         if(enableLogging){
             System.out.println(java.text.MessageFormat.format(message, args));
         }

@@ -8,36 +8,37 @@ public class TransactionRequired {
     public TransactionRequired() {
     }
 
-    Object transactionHandling(ProceedingJoinPoint thisJoinPoint, TransactionManager transactionManager) throws Throwable {
+    Object transactionHandling(ProceedingJoinPoint thisJoinPoint, TransactionManager transactionManager)
+            throws Throwable {
+        boolean isTransactionNew = false;
         try {
             if (!transactionManager.isActive()) {
-                TransactionLogging.transactionLogging("Begin Transactional call : {0}", thisJoinPoint.getSignature().getName());
-                transactionManager.begin();
-            } else {
-                TransactionLogging.transactionLogging("Added depth for Transactional call : {0}", thisJoinPoint.getSignature().getName());
-                transactionManager.addTransactionDepth();
+                TransactionLogging.log("TransactionRequired: Begin Transactional call : {0}",
+                        thisJoinPoint.getSignature().getName());
+                isTransactionNew = transactionManager.begin();
             }
             Object proceed = thisJoinPoint.proceed();
-            if (transactionManager.isLastActive() && transactionManager.isActive()) {
-                TransactionLogging.transactionLogging("Commit/Close Transactional call : {0}", thisJoinPoint.getSignature().getName());
+            if (isTransactionNew && transactionManager.isActive()) {
+                TransactionLogging.log("TransactionRequired: Commit/Close Transactional call : {0}",
+                        thisJoinPoint.getSignature().getName());
                 transactionManager.commit();
-                transactionManager.close();
             }
             return proceed;
         } catch (Throwable error) {
-            TransactionLogging.transactionLogging("Error Transactional call : {0}", thisJoinPoint.getSignature().getName());
+            TransactionLogging.log("TransactionRequired: Error Transactional call : {0}",
+                    thisJoinPoint.getSignature().getName());
             if (transactionManager.isActive()) {
-                transactionManager.rollback();                
+                transactionManager.rollback();
             }
             throw error;
         } finally {
-            if(!transactionManager.isClosed()){
-                TransactionLogging.transactionLogging("Removed depth for Transactional call : {0}", thisJoinPoint.getSignature().getName());
-                transactionManager.removeTransactionDepth();
+            if (isTransactionNew) {
+                TransactionLogging.log("TransactionRequired: Close : {0}",
+                        thisJoinPoint.getSignature().getName());
+                transactionManager.close();
             }
         }
     }
 
-    
 
 }

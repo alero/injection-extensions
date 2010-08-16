@@ -34,6 +34,15 @@
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <useSystemClassLoader>true</useSystemClassLoader>
+
+                </configuration>
+            </plugin>
             <!--
             
             -->
@@ -81,6 +90,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.9</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.4</version>
@@ -96,51 +111,15 @@
             <dependencies>
                 <dependency>
                     <groupId>org.aspectj</groupId>
-                    <artifactId>aspectjrt</artifactId>
+                    <artifactId>aspectjweaver</artifactId>
                     <version>1.6.9</version>
                 </dependency>
                 <dependency>
                     <groupId>org.aspectj</groupId>
-                    <artifactId>aspectjtools</artifactId>
+                    <artifactId>aspectjrt</artifactId>
                     <version>1.6.9</version>
                 </dependency>
             </dependencies>
-        </profile>
-        <profile>
-            <id>Compile time Weaver Maven</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.aspectj</groupId>
-                    <artifactId>aspectjrt</artifactId>
-                    <version>1.6.7</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.aspectj</groupId>
-                    <artifactId>aspectjtools</artifactId>
-                    <version>1.6.7</version>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>aspectj-maven-plugin</artifactId>
-                        <version>1.3</version>
-                        <configuration>
-                            <complianceLevel>1.5</complianceLevel>
-                            <verbose>true</verbose>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>compile</goal>
-                                    <goal>test-compile</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>
