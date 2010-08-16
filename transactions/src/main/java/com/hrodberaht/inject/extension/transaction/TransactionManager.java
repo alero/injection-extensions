@@ -10,18 +10,12 @@ package com.hrodberaht.inject.extension.transaction;
  */
 public interface TransactionManager {
 
-    void begin();
+    boolean begin();
     void commit();
     void rollback();
     boolean isActive();
 
-    boolean isLastActive();
-
     void close();
-
-    void addTransactionDepth();
-
-    void removeTransactionDepth();
-
-    boolean isClosed();
+          
+    boolean initTransactionHolder();
 }

@@ -8,12 +8,12 @@ import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionL
 import org.hrodberaht.inject.Container;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import test.com.hrodberaht.inject.extension.transaction.example.JPATransactedApplication;
 import test.com.hrodberaht.inject.extension.transaction.example.ModuleContainerForTests;
 import test.com.hrodberaht.inject.extension.transaction.example.Person;
+import test.com.hrodberaht.inject.extension.transaction.example.TransactedApplication;
 
 import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
@@ -37,16 +37,17 @@ public class TestJPATransactionManager {
     /**
      * To run these tests with load time weaving add the weaver to the JRE like this.
      * -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+     * If the path contains a space do it like this
+     * -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
      */
 
-    private static long id = 1L;
+
+
 
     @Inject
-    private JPATransactedApplication application;
+    private TransactedApplication application;
 
-    private static synchronized long getNextId(){
-        return id++;
-    }
+
 
     @BeforeClass
     public static void init() {
@@ -67,9 +68,7 @@ public class TestJPATransactionManager {
     @Test
     public void testCreateManager() {
 
-        Person person = new Person();
-        person.setId(getNextId());
-        person.setName("Dude");
+        Person person = StubUtil.createPerson();
         application.createPerson(person);
 
         Person foundPerson = application.findPerson(person.getId());
@@ -77,12 +76,12 @@ public class TestJPATransactionManager {
 
     }
 
+
+
     @Test
     public void testCreateManagerInOneTransaction() {
 
-        Person person = new Person();
-        person.setId(getNextId());
-        person.setName("Dude");
+        Person person = StubUtil.createPerson();
         Person foundPerson = application.depthyTransactions(person);
 
         assertEquals(foundPerson.getName(), person.getName());
@@ -92,11 +91,10 @@ public class TestJPATransactionManager {
     @Test(expected = TransactionHandlingError.class)
     @TransactionDisabled
     public void testCreateManagerMandatoryFail() {
-
-        Person person = new Person();
-        person.setId(getNextId());
-        person.setName("Dude");
+        System.out.println(Thread.currentThread().getContextClassLoader().getClass().getName());
+        Person person = StubUtil.createPerson();
         application.createPersonMandatory(person);
+
 
     }
 
@@ -104,23 +102,17 @@ public class TestJPATransactionManager {
     public void testCreateManagerInOneTransactionMandatory() {
 
 
-
-        Person person = new Person();
-        person.setId(getNextId());
-        person.setName("Dude");
+        Person person = StubUtil.createPerson();
         Person foundPerson = application.depthyTransactionsMandatory(person);
 
         assertEquals(foundPerson.getName(), person.getName());
 
     }
 
-    @Test
-    @Ignore // This still needs fixing before it works
+    @Test    
     public void testCreateManagerInOneTransactionRequiresNew() {
 
-        Person person = new Person();
-        person.setId(getNextId());
-        person.setName("Dude");
+        Person person = StubUtil.createPerson();
         Person foundPerson = application.depthyTransactionsNewTx(person);
 
         assertEquals(foundPerson.getName(), person.getName());
@@ -130,9 +122,7 @@ public class TestJPATransactionManager {
     @Test(expected = TransactionHandlingError.class)    
     public void testCreateManagerInOneTransactionNotSupported() {
 
-        Person person = new Person();
-        person.setId(getNextId());
-        person.setName("Dude");
+        Person person = StubUtil.createPerson();
         application.depthyTransactionsNotSupported(person);        
 
     }
