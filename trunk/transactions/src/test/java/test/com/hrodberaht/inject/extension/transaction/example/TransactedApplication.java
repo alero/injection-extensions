@@ -25,6 +25,8 @@ public interface TransactedApplication {
     Person depthyTransactionsNewTx(Person person);
     Person depthyTransactionsNotSupported(Person person);
 
+    void fakeOperationForPerformanceTest();
+
     Person complexTransactionsNewTx(Person person, Logging log);
 
     void createLog(Logging log);

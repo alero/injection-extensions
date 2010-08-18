@@ -11,6 +11,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Simple Java Utils
@@ -24,6 +25,8 @@ import javax.inject.Provider;
 public class AspectJTransactionHandler extends Aspects {
 
     private static AspectJTransactionHandler singleton;
+
+    
 
     public AspectJTransactionHandler() {
         singleton = this;
@@ -50,7 +53,7 @@ public class AspectJTransactionHandler extends Aspects {
             throws Throwable {
         
         TransactionAttributeType transactionAttributeType = findTransactionType(transactionAttribute);
-        System.out.println("transactional begin "+transactionAttributeType.name());
+        TransactionLogging.log ("transactional begin {0}", transactionAttributeType.name());
 
 
         TransactionManager transactionManager = transactionManagerProvider.get();

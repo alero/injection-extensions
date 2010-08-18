@@ -84,6 +84,8 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
+        System.out.println("InjectionJUnitTestRunner: " +
+                " running child " + frameworkMethod.getName());
         if(disableRequiresNewTransaction){
             ((TransactionManagerTest)transactionManager).disableRequiresNew();            
         }
@@ -92,8 +94,7 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         if (hasTransaction) {
             transactionNew = transactionManager.begin();
         }
-        System.out.println("InjectionJUnitTestRunner: " +
-                " running child " + frameworkMethod.getName());
+
         try {
             super.runChild(frameworkMethod, notifier);
         } finally {
@@ -106,7 +107,9 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
                     transactionManager.close();
                 }
             }
-
+            if(disableRequiresNewTransaction){
+                ((TransactionManagerTest)transactionManager).enableRequiresNew();            
+            }
         }
     }
 

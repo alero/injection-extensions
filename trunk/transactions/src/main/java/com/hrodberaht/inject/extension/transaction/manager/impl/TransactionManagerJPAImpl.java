@@ -27,6 +27,7 @@ public class TransactionManagerJPAImpl
     private EntityManagerFactory emf = null;
     private static final InheritableThreadLocal<EntityManagerHolder> entityManagerScope =
             new InheritableThreadLocal<EntityManagerHolder>();
+    private static final ThreadLocal<Boolean> requiresNewDisabled = new ThreadLocal<Boolean>();
 
 
     private EntityManagerHolder findCreateManagerHolder(){
@@ -66,6 +67,7 @@ public class TransactionManagerJPAImpl
         }
         emh.entityManager.getTransaction().begin();
         TransactionLogging.log("TransactionManagerJPAImpl: Tx Begin for session {0}", emh.entityManager);
+        StatisticsJPA.addBeginCount();
         return emh.isNew;
     }
 
@@ -73,12 +75,14 @@ public class TransactionManagerJPAImpl
         EntityManager em = findCreateManagerHolder().entityManager;
         em.getTransaction().commit();
         TransactionLogging.log("TransactionManagerJPAImpl: Tx Commit for session {0}", em);
+        StatisticsJPA.addCommitCount();
     }
 
     public void rollback() {
         EntityManager em = findCreateManagerHolder().entityManager;
         rollbackEntityManager(em);
         TransactionLogging.log("TransactionManagerJPAImpl: Tx Rollback for session {0}", em);
+        StatisticsJPA.addRollbackCount();
     }
 
     private void rollbackEntityManager(EntityManager em) {
@@ -102,6 +106,7 @@ public class TransactionManagerJPAImpl
             closeEntityManager(emh.entityManager);
             emh.entityManager = null;
             entityManagerScope.set(null);
+            StatisticsJPA.addCloseCount();
         }
     }
 
@@ -135,6 +140,7 @@ public class TransactionManagerJPAImpl
         EntityManagerHolder holder = findAndInitDeepestHolder();
         holder.entityManager.getTransaction().begin();
         TransactionLogging.log("TransactionManagerJPAImpl: NewTx Begin for session {0}", holder.entityManager);
+        StatisticsJPA.addBeginCount();
 
     }
 
@@ -143,6 +149,7 @@ public class TransactionManagerJPAImpl
         holder.entityManager.getTransaction().commit();
         // cleanupTransactionHolder(holder);
         TransactionLogging.log("TransactionManagerJPAImpl: NewTx Commit for session {0}", holder.entityManager);
+        StatisticsJPA.addCommitCount();
     }
 
     public void newRollback() {
@@ -150,6 +157,7 @@ public class TransactionManagerJPAImpl
         rollbackEntityManager(holder.entityManager);
         // cleanupTransactionHolder(holder);
         TransactionLogging.log("TransactionManagerJPAImpl: NewTx Rollback for session {0}", holder.entityManager);
+        StatisticsJPA.addRollbackCount();
     }
 
     public void newClose() {
@@ -157,10 +165,11 @@ public class TransactionManagerJPAImpl
         TransactionLogging.log("TransactionManagerJPAImpl: NewTX closing session {0}", holder.entityManager);
         closeEntityManager(holder.entityManager);
         cleanupTransactionHolder(holder);
+        StatisticsJPA.addCloseCount();
     }
 
     public boolean requiresNewDisabled() {
-        return findCreateManagerHolder().disableRequiresNew;
+        return requiresNewDisabled.get() != null;
     }
 
     private void cleanupTransactionHolder(EntityManagerHolder holder) {        
@@ -220,7 +229,11 @@ public class TransactionManagerJPAImpl
     }
 
     public void disableRequiresNew() {
-        findCreateManagerHolder().disableRequiresNew = true;
+        requiresNewDisabled.set(true);
+    }
+
+    public void enableRequiresNew() {
+        requiresNewDisabled.set(null);
     }
 
     public EntityManager getInstance() {
