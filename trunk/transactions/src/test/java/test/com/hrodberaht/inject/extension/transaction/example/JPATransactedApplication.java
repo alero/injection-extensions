@@ -1,11 +1,11 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPA;
-import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPAImpl;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -23,7 +23,7 @@ public class JPATransactedApplication implements TransactedApplication{
 
 
     @Inject
-    private TransactionManagerJPA transactionManager;
+    private Provider<EntityManager> entityManager;
 
 
     public void createPerson(Person person){
@@ -35,7 +35,7 @@ public class JPATransactedApplication implements TransactedApplication{
         if(fakeException){
             throw new RuntimeException("Bad call, rollbacktime");
         }
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         em.persist(person);
         em.flush();
 
@@ -43,7 +43,7 @@ public class JPATransactedApplication implements TransactedApplication{
 
     @TransactionAttribute
     public void deletePerson(Person person){
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         // Delete must be attached entity, this makes sure that it is (otherwise the entire method must be transactional)
         person = em.find(Person.class, person.getId());
         em.remove(person);
@@ -52,26 +52,26 @@ public class JPATransactedApplication implements TransactedApplication{
 
     @TransactionAttribute
     public void clearLogs() {
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         Query query = em.createQuery("delete from Logging");
         query.executeUpdate();
     }
 
     @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
     public Person findPerson(Long id){
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         return em.find(Person.class, id);
     }
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
     public Person findPersonReqNew(Long id){
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         return em.find(Person.class, id);
     }
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
     public void createLog(Logging log){
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         em.persist(log);
         // This is just for the test program, not needed as TransactionManager will perform flush when needed.
         // ITs only here to verify that the transaction manager actually performs creates the TX as intended.
@@ -79,26 +79,26 @@ public class JPATransactedApplication implements TransactedApplication{
     }
 
     public Logging getLog(Long id) {
-        EntityManager em = transactionManager.getEntityManager();
-        return em.find(Logging.class, id);        
+        EntityManager em = entityManager.get();
+        return em.find(Logging.class, id);
     }
 
     @TransactionAttribute(value = TransactionAttributeType.NOT_SUPPORTED)
     public Person somethingNonTransactional(Long id){
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         return em.find(Person.class, id);
     }
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
     public void createPersonNewTx(Person person){
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         em.persist(person);
         em.flush();
     }
 
     @TransactionAttribute(value = TransactionAttributeType.MANDATORY)
-    public void createPersonMandatory(Person person){        
-        EntityManager em = transactionManager.getEntityManager();
+    public void createPersonMandatory(Person person){
+        EntityManager em = entityManager.get();
         em.persist(person);
         em.flush();
     }
@@ -146,7 +146,7 @@ public class JPATransactedApplication implements TransactedApplication{
 
     @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
     public Collection<Person> findAllPersons() {
-        EntityManager em = transactionManager.getEntityManager();
+        EntityManager em = entityManager.get();
         TypedQuery<Person> typedQuery = em.createQuery("from Person", Person.class);
 
 

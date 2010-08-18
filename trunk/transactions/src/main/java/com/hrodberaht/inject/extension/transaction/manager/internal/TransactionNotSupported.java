@@ -13,6 +13,8 @@ public class TransactionNotSupported {
         if (transactionManager.isActive()) {            
             throw new TransactionHandlingError("has active transaction");
         }
+        // So a TransactionHolder (not a transaction) can be used
+        transactionManager.initTransactionHolder();
         return thisJoinPoint.proceed();
 
     }

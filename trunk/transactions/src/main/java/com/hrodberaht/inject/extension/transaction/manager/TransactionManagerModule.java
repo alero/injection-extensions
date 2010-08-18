@@ -7,9 +7,11 @@ import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTrans
 import org.aspectj.lang.Aspects;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterBase;
+import org.hrodberaht.inject.register.InjectionFactory;
 import org.hrodberaht.inject.register.RegistrationModule;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 
+import javax.persistence.EntityManager;
 import java.util.Collection;
 
 /**
@@ -39,6 +41,10 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
                 // This will make the registration to the specific implementation interface as well
                 // for usage in the application that has a very limited method set
                 register(getInterface(transactionManager)).withInstance(transactionManager);
+
+                if(transactionManager instanceof InjectionFactory){
+                    register(EntityManager.class).withFactory((InjectionFactory)transactionManager);
+                }
             }
 
 

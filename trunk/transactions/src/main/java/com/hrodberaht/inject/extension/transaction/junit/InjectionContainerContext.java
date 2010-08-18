@@ -19,4 +19,5 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface InjectionContainerContext {
     Class<? extends InjectionContainerCreator> value();
+    boolean disableRequiresNewTransaction() default false;
 }

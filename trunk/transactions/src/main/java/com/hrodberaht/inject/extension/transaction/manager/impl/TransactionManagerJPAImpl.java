@@ -1,8 +1,10 @@
 package com.hrodberaht.inject.extension.transaction.manager.impl;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
+import com.hrodberaht.inject.extension.transaction.junit.TransactionManagerTest;
 import com.hrodberaht.inject.extension.transaction.manager.RequiresNewTransactionManager;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
+import org.hrodberaht.inject.register.InjectionFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -15,11 +17,17 @@ import javax.persistence.EntityManagerFactory;
  * @version 1.0
  * @since 1.0
  */
-public class TransactionManagerJPAImpl implements TransactionManagerJPA, TransactionManager, RequiresNewTransactionManager {
+public class TransactionManagerJPAImpl
+        implements TransactionManagerJPA,
+        TransactionManager,
+        RequiresNewTransactionManager,
+        TransactionManagerTest,
+        InjectionFactory<EntityManager> {
 
     private EntityManagerFactory emf = null;
     private static final InheritableThreadLocal<EntityManagerHolder> entityManagerScope =
             new InheritableThreadLocal<EntityManagerHolder>();
+
 
     private EntityManagerHolder findCreateManagerHolder(){
         EntityManagerHolder manager = entityManagerScope.get();
@@ -148,8 +156,11 @@ public class TransactionManagerJPAImpl implements TransactionManagerJPA, Transac
         EntityManagerHolder holder = findDeepestHolder();
         TransactionLogging.log("TransactionManagerJPAImpl: NewTX closing session {0}", holder.entityManager);
         closeEntityManager(holder.entityManager);
-
         cleanupTransactionHolder(holder);
+    }
+
+    public boolean requiresNewDisabled() {
+        return findCreateManagerHolder().disableRequiresNew;
     }
 
     private void cleanupTransactionHolder(EntityManagerHolder holder) {        
@@ -202,10 +213,28 @@ public class TransactionManagerJPAImpl implements TransactionManagerJPA, Transac
         return holder;
     }
 
+    public void forceFlush() {
+        EntityManagerHolder holder = entityManagerScope.get();
+        holder.entityManager.flush();
+        holder.entityManager.clear();
+    }
+
+    public void disableRequiresNew() {
+        findCreateManagerHolder().disableRequiresNew = true;
+    }
+
+    public EntityManager getInstance() {
+        return getEntityManager();
+    }
+
+    public Class getInstanceType() {
+        return EntityManager.class;
+    }
+
     private class EntityManagerHolder {
         private boolean isNew = true;
         private EntityManager entityManager = null;
-        private int transactionDepth = 0;
+        private boolean disableRequiresNew = false;
 
         private EntityManagerHolder childTransaction = null;
         private EntityManagerHolder parentTransaction = null;
@@ -222,12 +251,5 @@ public class TransactionManagerJPAImpl implements TransactionManagerJPA, Transac
             this.parentTransaction = holder;
         }
 
-        public void removeTransactionDepth(){
-            transactionDepth--;
-        }
-
-        public void addTransactionDepth(){
-            transactionDepth++;   
-        }
     }
 }

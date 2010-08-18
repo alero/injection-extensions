@@ -12,11 +12,16 @@ public class TransactionRequiresNew {
     Object transactionHandling(ProceedingJoinPoint thisJoinPoint, TransactionManager transactionManager)
             throws Throwable {
 
+
         if(!(transactionManager instanceof RequiresNewTransactionManager)){
             throw new IllegalAccessError("transaction manager does not support requires new: "
                     +transactionManager.getClass());
         }
         RequiresNewTransactionManager newTransactionManager = (RequiresNewTransactionManager)transactionManager;
+        if(newTransactionManager.requiresNewDisabled()){
+            return new TransactionRequired().transactionHandling(thisJoinPoint, transactionManager);        
+        }
+
         try {
             TransactionLogging.log("TransactionRequiresNew: Begin Transactional call : {0}",
                     thisJoinPoint.getSignature().getName());

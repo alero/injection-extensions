@@ -34,6 +34,7 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
     private InjectContainer theContainer = null;
     private TransactionManager transactionManager = null;
     private boolean allMethodsTransacted = false;
+    private boolean disableRequiresNewTransaction = false;
 
     /**
      * Creates a BlockJUnit4ClassRunner to run {@code klass}
@@ -53,10 +54,12 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
             for (Annotation annotation : annotations) {
                 if (annotation.annotationType() == InjectionContainerContext.class) {
                     InjectionContainerContext transactionContainer = (InjectionContainerContext) annotation;
-                    Class<? extends InjectionContainerCreator> transactionclass = transactionContainer.value();
-                    InjectionContainerCreator creator = transactionclass.newInstance();
+                    Class<? extends InjectionContainerCreator> transactionClass = transactionContainer.value();
+                    InjectionContainerCreator creator = transactionClass.newInstance();
                     theContainer = creator.createContainer();
                     verifyContainerTransactions(theContainer, creator);
+
+                    disableRequiresNewTransaction = transactionContainer.disableRequiresNewTransaction();
                 }
                 if (annotation.annotationType() == TransactionAttribute.class) {
                     allMethodsTransacted = true;
@@ -81,6 +84,9 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
+        if(disableRequiresNewTransaction){
+            ((TransactionManagerTest)transactionManager).disableRequiresNew();            
+        }
         boolean transactionNew = false;
         boolean hasTransaction = hasTransaction(frameworkMethod);
         if (hasTransaction) {
@@ -93,6 +99,7 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         } finally {
             if (hasTransaction) {
                 if (transactionManager.isActive()) {
+                    ((TransactionManagerTest)transactionManager).forceFlush();
                     transactionManager.rollback();
                 }
                 if (transactionNew) {

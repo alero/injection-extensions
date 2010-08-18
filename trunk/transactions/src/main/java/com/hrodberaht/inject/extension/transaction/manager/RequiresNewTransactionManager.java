@@ -15,4 +15,6 @@ public interface RequiresNewTransactionManager {
     boolean newIsActive();
 
     void newClose();
+
+    boolean requiresNewDisabled();
 }
