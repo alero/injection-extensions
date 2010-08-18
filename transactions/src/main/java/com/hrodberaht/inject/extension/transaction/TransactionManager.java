@@ -1,5 +1,7 @@
 package com.hrodberaht.inject.extension.transaction;
 
+import org.hrodberaht.inject.register.InjectionFactory;
+
 /**
  * Simple Java Utils
  *
@@ -8,7 +10,7 @@ package com.hrodberaht.inject.extension.transaction;
  * @version 1.0
  * @since 1.0
  */
-public interface TransactionManager {
+public interface TransactionManager  {
 
     boolean begin();
     void commit();
