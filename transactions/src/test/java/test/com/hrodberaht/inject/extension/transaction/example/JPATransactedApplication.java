@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Simple Java Utils
@@ -142,6 +143,23 @@ public class JPATransactedApplication implements TransactedApplication{
         // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPerson(person);
         return somethingNonTransactional(person.getId());
+    }
+
+
+    public static AtomicLong performanceCount = new AtomicLong(0L);
+    public static int performanceSleeptime = 2;
+    @TransactionAttribute
+    public void fakeOperationForPerformanceTest() {
+        try {
+            EntityManager em = entityManager.get();
+            // Do something ... something
+            em.getTransaction().isActive();
+            // A classic DB call takes about 5 ms
+            Thread.sleep(performanceSleeptime);
+            performanceCount.incrementAndGet();
+        } catch (InterruptedException e) {
+
+        }
     }
 
     @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)

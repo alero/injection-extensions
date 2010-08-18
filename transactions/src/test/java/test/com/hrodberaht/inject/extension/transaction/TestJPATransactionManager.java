@@ -28,25 +28,20 @@ import static org.junit.Assert.assertEquals;
  *         2010-aug-06 18:33:12
  * @version 1.0
  * @since 1.0
+ *  <p/>
+ *  To run these tests with load time weaving add the weaver to the JRE like this.
+ *  -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+ *   If the path contains a space do it like this
+ *  -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
  */
 @InjectionContainerContext(ModuleContainerForTests.class)
 @RunWith(InjectionJUnitTestRunner.class)
 @TransactionAttribute
 public class TestJPATransactionManager {
 
-    /**
-     * To run these tests with load time weaving add the weaver to the JRE like this.
-     * -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
-     * If the path contains a space do it like this
-     * -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
-     */
-
-
-
 
     @Inject
     private TransactedApplication application;
-
 
 
     @BeforeClass
@@ -55,7 +50,7 @@ public class TestJPATransactionManager {
     }
 
     @AfterClass
-    public static void destroy(){
+    public static void destroy() {
         Container container = new ModuleContainerForTests().createContainer();
         JPATransactedApplication application = container.get(JPATransactedApplication.class);
         Collection<Person> collection = application.findAllPersons();
@@ -75,7 +70,6 @@ public class TestJPATransactionManager {
         assertEquals(foundPerson.getName(), person.getName());
 
     }
-
 
 
     @Test
@@ -109,7 +103,7 @@ public class TestJPATransactionManager {
 
     }
 
-    @Test    
+    @Test
     public void testCreateManagerInOneTransactionRequiresNew() {
 
         Person person = StubUtil.createPerson();
@@ -119,11 +113,11 @@ public class TestJPATransactionManager {
 
     }
 
-    @Test(expected = TransactionHandlingError.class)    
+    @Test(expected = TransactionHandlingError.class)
     public void testCreateManagerInOneTransactionNotSupported() {
 
         Person person = StubUtil.createPerson();
-        application.depthyTransactionsNotSupported(person);        
+        application.depthyTransactionsNotSupported(person);
 
     }
 
@@ -135,13 +129,12 @@ public class TestJPATransactionManager {
         person.setId(55L);
         person.setName("Dude");
         application.createPerson(person);
-        
+
         Person foundPerson = application.somethingNonTransactional(person.getId());
 
         assertEquals(foundPerson.getName(), person.getName());
 
     }
 
-    
 
 }

@@ -27,7 +27,13 @@ import static org.junit.Assert.*;
  * Date: 2010-aug-15
  * Time: 20:06:34
  * To change this template use File | Settings | File Templates.
+ *  <p/>
+ *  To run these tests with load time weaving add the weaver to the JRE like this.
+ *  -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+ *   If the path contains a space do it like this
+ *  -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
  */
+
 @InjectionContainerContext(value = ModuleContainerForTests.class, disableRequiresNewTransaction = true)
 @RunWith(InjectionJUnitTestRunner.class)
 @TransactionAttribute

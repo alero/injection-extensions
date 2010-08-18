@@ -10,4 +10,5 @@ package com.hrodberaht.inject.extension.transaction.junit;
 public interface TransactionManagerTest {
     void forceFlush();
     void disableRequiresNew();
+    void enableRequiresNew();
 }
