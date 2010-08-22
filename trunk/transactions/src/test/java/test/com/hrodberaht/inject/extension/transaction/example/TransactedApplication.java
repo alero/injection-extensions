@@ -3,11 +3,12 @@ package test.com.hrodberaht.inject.extension.transaction.example;
 import java.util.Collection;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Robert Work
- * Date: 2010-aug-15
- * Time: 19:49:35
- * To change this template use File | Settings | File Templates.
+ * Injection Transaction Extension
+ *
+ * @author Robert Alexandersson
+ *         2010-aug-11 22:58:13
+ * @version 1.0
+ * @since 1.0
  */
 public interface TransactedApplication {
 

@@ -3,6 +3,8 @@ package com.hrodberaht.inject.extension.transaction.junit;
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
+import org.junit.runner.Description;
+import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -12,7 +14,7 @@ import javax.ejb.TransactionAttribute;
 import java.lang.annotation.Annotation;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-10 20:29:06
@@ -84,32 +86,39 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
-        System.out.println("InjectionJUnitTestRunner: " +
-                " running child " + frameworkMethod.getName());
-        if(disableRequiresNewTransaction){
-            ((TransactionManagerTest)transactionManager).disableRequiresNew();            
-        }
-        boolean transactionNew = false;
-        boolean hasTransaction = hasTransaction(frameworkMethod);
-        if (hasTransaction) {
-            transactionNew = transactionManager.begin();
-        }
-
-        try {
-            super.runChild(frameworkMethod, notifier);
-        } finally {
-            if (hasTransaction) {
-                if (transactionManager.isActive()) {
-                    ((TransactionManagerTest)transactionManager).forceFlush();
-                    transactionManager.rollback();
-                }
-                if (transactionNew) {
-                    transactionManager.close();
-                }
-            }
+        try{
+            System.out.println("InjectionJUnitTestRunner: " +
+                    " running child " + frameworkMethod.getName());
             if(disableRequiresNewTransaction){
-                ((TransactionManagerTest)transactionManager).enableRequiresNew();            
+                ((TransactionManagerTest)transactionManager).disableRequiresNew();
             }
+            boolean transactionNew = false;
+            boolean hasTransaction = hasTransaction(frameworkMethod);
+            if (hasTransaction) {
+                transactionNew = transactionManager.begin();
+            }
+
+            try {
+                super.runChild(frameworkMethod, notifier);
+            } finally {
+                if (hasTransaction) {
+                    if (transactionManager.isActive()) {
+                        ((TransactionManagerTest)transactionManager).forceFlush();
+                        transactionManager.rollback();
+                    }
+                    if (transactionNew) {
+                        transactionManager.close();
+                    }
+                }
+                if(disableRequiresNewTransaction){
+                    ((TransactionManagerTest)transactionManager).enableRequiresNew();
+                }
+            }
+        } catch (Throwable e){
+            Description description= describeChild(frameworkMethod);
+            notifier.fireTestFailure(new Failure(description, e));
+            notifier.fireTestFinished(description);
+
         }
     }
 
@@ -138,7 +147,9 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
     }
 
     private boolean hasMethodTransactionAnnotation(FrameworkMethod frameworkMethod) {
-
+        if (frameworkMethod.getAnnotation(TransactionAttribute.class) != null) {
+            return true;
+        }
         return false;
     }
 

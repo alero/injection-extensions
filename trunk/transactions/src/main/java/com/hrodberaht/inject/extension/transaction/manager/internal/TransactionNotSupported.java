@@ -1,7 +1,7 @@
 package com.hrodberaht.inject.extension.transaction.manager.internal;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
-import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPA;
+import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPA;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 public class TransactionNotSupported {
@@ -13,7 +13,7 @@ public class TransactionNotSupported {
 
         if (transactionManager.isActive()) {
             TransactionLogging.log("Transaction Not supported error on {0}",
-                ((TransactionManagerJPA)transactionManager).getEntityManager()        
+                transactionManager       
             );
             throw new TransactionHandlingError("has active transaction");
         }

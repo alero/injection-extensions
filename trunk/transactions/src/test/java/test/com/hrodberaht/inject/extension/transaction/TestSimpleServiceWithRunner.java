@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-12 21:02:15

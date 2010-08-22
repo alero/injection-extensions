@@ -1,7 +1,5 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
-import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPA;
-
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
@@ -13,7 +11,7 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-10 18:29:58

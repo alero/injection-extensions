@@ -1,14 +1,23 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
+import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator;
 import com.hrodberaht.inject.extension.transaction.manager.TransactionManagerModule;
-import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPAImpl;
+import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPAImpl;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
 
 import javax.persistence.Persistence;
 
-public class ModuleContainerForTests implements com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator {
+/**
+ * Injection Transaction Extension
+ *
+ * @author Robert Alexandersson
+ *         2010-aug-11 22:58:13
+ * @version 1.0
+ * @since 1.0
+ */
+public class ModuleContainerForTests implements InjectionContainerCreator {
 
     public static InjectContainer container;
 

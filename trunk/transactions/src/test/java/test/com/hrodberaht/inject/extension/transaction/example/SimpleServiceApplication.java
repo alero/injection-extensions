@@ -1,7 +1,7 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-12 21:01:09
