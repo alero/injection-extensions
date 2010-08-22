@@ -1,6 +1,8 @@
 package com.hrodberaht.inject.extension.transaction.junit;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
+import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler;
+import org.aspectj.lang.Aspects;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
 import org.junit.runner.Description;
@@ -86,15 +88,23 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
-        try{
-            System.out.println("InjectionJUnitTestRunner: " +
-                    " running child " + frameworkMethod.getName());
-            if(disableRequiresNewTransaction){
-                ((TransactionManagerTest)transactionManager).disableRequiresNew();
+        boolean hasTransaction = hasTransaction(frameworkMethod);
+        // Need to re-init the TransactionAspect (Junit and AspectJ does not play well)
+        if (hasTransaction) {
+            injectAspectJTransactionHandler();
+        }
+        try {
+            System.out.println("---  InjectionJUnitTestRunner: " +
+                    " running child " + frameworkMethod.getName() + " in thread " + Thread.currentThread());
+            if (disableRequiresNewTransaction) {
+                ((TransactionManagerTest) transactionManager).disableRequiresNew();
             }
             boolean transactionNew = false;
-            boolean hasTransaction = hasTransaction(frameworkMethod);
+
             if (hasTransaction) {
+                if (transactionManager.isActive()) {
+                    throw new RuntimeException("Transaction is already active");
+                }
                 transactionNew = transactionManager.begin();
             }
 
@@ -103,23 +113,29 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
             } finally {
                 if (hasTransaction) {
                     if (transactionManager.isActive()) {
-                        ((TransactionManagerTest)transactionManager).forceFlush();
+                        ((TransactionManagerTest) transactionManager).forceFlush();
                         transactionManager.rollback();
                     }
                     if (transactionNew) {
                         transactionManager.close();
                     }
                 }
-                if(disableRequiresNewTransaction){
-                    ((TransactionManagerTest)transactionManager).enableRequiresNew();
+                if (disableRequiresNewTransaction) {
+                    ((TransactionManagerTest) transactionManager).enableRequiresNew();
                 }
             }
-        } catch (Throwable e){
-            Description description= describeChild(frameworkMethod);
+        } catch (Throwable e) {
+            Description description = describeChild(frameworkMethod);
             notifier.fireTestFailure(new Failure(description, e));
             notifier.fireTestFinished(description);
-
         }
+        System.out.println("---  InjectionJUnitTestRunner: " +
+                " done running child " + frameworkMethod.getName() + " in thread " + Thread.currentThread());
+    }
+
+    private void injectAspectJTransactionHandler() {
+        AspectJTransactionHandler aspectJTransactionHandler = Aspects.aspectOf(AspectJTransactionHandler.class);
+        theContainer.injectDependencies(aspectJTransactionHandler);
     }
 
     /**
