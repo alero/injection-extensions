@@ -11,7 +11,6 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Injection Transaction Extension
@@ -24,16 +23,15 @@ import java.util.concurrent.atomic.AtomicLong;
 @Aspect
 public class AspectJTransactionHandler extends Aspects {
 
-    private static AspectJTransactionHandler singleton;
+    private static AspectJTransactionHandler singleton = new AspectJTransactionHandler();
 
-    
 
     public AspectJTransactionHandler() {
         singleton = this;
     }
 
-    public static AspectJTransactionHandler aspectOf(){
-        if(singleton==null){
+    public static AspectJTransactionHandler aspectOf() {
+        if (singleton == null) {
             singleton = new AspectJTransactionHandler();
         }
         return singleton;
@@ -51,41 +49,40 @@ public class AspectJTransactionHandler extends Aspects {
     @Around("transactionalPointCut(transactionAttribute)")
     public Object transactional(ProceedingJoinPoint thisJoinPoint, TransactionAttribute transactionAttribute)
             throws Throwable {
-        
+
         TransactionAttributeType transactionAttributeType = findTransactionType(transactionAttribute);
-        TransactionLogging.log ("transactional begin {0}", transactionAttributeType.name());
+        TransactionLogging.log("transactional begin {0}", transactionAttributeType.name());
 
 
         TransactionManager transactionManager = transactionManagerProvider.get();
-        if(transactionManager == null){
+        if (transactionManager == null) {
             throw new TransactionHandlingError("transactionManager is null");
         }
-        if(transactionAttributeType == TransactionAttributeType.REQUIRED){
+        if (transactionAttributeType == TransactionAttributeType.REQUIRED) {
             return new TransactionRequired().transactionHandling(thisJoinPoint, transactionManager);
-        } else if(transactionAttributeType == TransactionAttributeType.SUPPORTS){
+        } else if (transactionAttributeType == TransactionAttributeType.SUPPORTS) {
             return new TransactionSupports().transactionHandling(thisJoinPoint, transactionManager);
-        } else if(transactionAttributeType == TransactionAttributeType.REQUIRES_NEW){
+        } else if (transactionAttributeType == TransactionAttributeType.REQUIRES_NEW) {
             return new TransactionRequiresNew().transactionHandling(thisJoinPoint, transactionManager);
-        } else if(transactionAttributeType == TransactionAttributeType.MANDATORY){
+        } else if (transactionAttributeType == TransactionAttributeType.MANDATORY) {
             return new TransactionMandatory().transactionHandling(thisJoinPoint, transactionManager);
-        } else if(transactionAttributeType == TransactionAttributeType.NOT_SUPPORTED){
+        } else if (transactionAttributeType == TransactionAttributeType.NOT_SUPPORTED) {
             return new TransactionNotSupported().transactionHandling(thisJoinPoint, transactionManager);
         }
         // If nothing found
         throw new TransactionHandlingError(
-                "transactionManager has no supported transactionAttributeType: "+transactionAttributeType
+                "transactionManager has no supported transactionAttributeType: " + transactionAttributeType
         );
 
     }
 
-   
 
     private TransactionAttributeType findTransactionType(TransactionAttribute transactionAttribute) {
         TransactionAttributeType transactionAttributeType = null;
-        if(transactionAttribute == null){
+        if (transactionAttribute == null) {
             TransactionLogging.log("Annotation not found ");
             transactionAttributeType = TransactionAttributeType.REQUIRED;
-        }else{
+        } else {
             transactionAttributeType = transactionAttribute.value();
         }
         return transactionAttributeType;

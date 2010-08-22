@@ -17,7 +17,6 @@ import org.hrodberaht.inject.register.InjectionFactory;
 import org.hrodberaht.inject.register.RegistrationModule;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 
-import javax.persistence.EntityManager;
 import java.util.Collection;
 
 /**
@@ -35,7 +34,7 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
 
     public TransactionManagerModule(final TransactionManager transactionManager
             , InjectionRegisterBase register) {
-        registration = new RegistrationModuleAnnotation(){
+        registration = new RegistrationModuleAnnotation() {
             @Override
             public void registrations() {
                 // the withInstance will automatically create a singleton with that instance
@@ -45,15 +44,15 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
                 register(transactionManager.getClass()).withInstance(transactionManager);
 
                 // This will make the registration to the specific implementation interface as well
-                // for usage in the application that has a very limited method set
+                // for usage in an application that needs implementation specific information
                 register(getInterface(transactionManager)).withInstance(transactionManager);
 
-                if(transactionManager instanceof InjectionFactory){
-                    InjectionFactory injectionFactory = (InjectionFactory)transactionManager;
+                if (transactionManager instanceof InjectionFactory) {
+                    InjectionFactory injectionFactory = (InjectionFactory) transactionManager;
                     register(injectionFactory.getInstanceType()).withFactory(injectionFactory);
                 }
 
-                if(transactionManager instanceof TransactionManagerJDBCImpl){
+                if (transactionManager instanceof TransactionManagerJDBCImpl) {
                     // Connect the the JDBC Services
                     register(JDBCService.class).with(JDBCServiceImpl.class);
                     register(InsertOrUpdater.class).with(InsertOrUpdaterImpl.class);
@@ -69,9 +68,9 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
     }
 
     private Class getInterface(TransactionManager transactionManager) {
-        if(transactionManager instanceof TransactionManagerJPAImpl){
+        if (transactionManager instanceof TransactionManagerJPAImpl) {
             return TransactionManagerJPA.class;
-        }else if(transactionManager instanceof TransactionManagerJDBCImpl){
+        } else if (transactionManager instanceof TransactionManagerJDBCImpl) {
             return TransactionManagerJDBC.class;
         }
         throw new IllegalArgumentException("transactionManager does not have a specific interface");
@@ -80,6 +79,10 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
     @Override
     public void postRegistration() {
         AspectJTransactionHandler aspectJTransactionHandler = Aspects.aspectOf(AspectJTransactionHandler.class);
+        TransactionManager transactionManager = theContainer.get(TransactionManager.class);
+        System.out.println("Thread " + Thread.currentThread() +
+                " Connecting the aspect " + aspectJTransactionHandler.toString()
+                + " to transaction manager " + transactionManager);
         theContainer.injectDependencies(aspectJTransactionHandler);
     }
 
@@ -89,7 +92,7 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
 
     @Override
     public void registrations() {
-       // just do nothing
+        // just do nothing
     }
 
 

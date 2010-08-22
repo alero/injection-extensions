@@ -19,15 +19,15 @@ import javax.persistence.EntityManagerFactory;
  * @since 1.0
  */
 public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityManager>
-        implements TransactionManagerJPA,                
+        implements TransactionManagerJPA,
         TransactionManagerTest,
         InjectionFactory<EntityManager> {
 
-    protected static final TransactionScopeHandler entityManagerScope = new TransactionScopeHandler();
+    protected static final TransactionScopeHandler entityManagerThread = new TransactionScopeHandler();
     protected static final ThreadLocal<Boolean> requiresNewDisabled = new ThreadLocal<Boolean>();
-    
+
     private EntityManagerFactory emf = null;
-    
+
     public TransactionManagerJPAImpl(EntityManagerFactory emf) {
         this.emf = emf;
     }
@@ -35,7 +35,7 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
     protected EntityManager createNativeManager() {
         return emf.createEntityManager();
     }
-    
+
     protected EntityManagerHolder createTransactionHolder(TransactionHolder<EntityManager> holder) {
         return new EntityManagerHolder(createNativeManager(), holder);
     }
@@ -53,7 +53,7 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
 
     public boolean begin() {
         TransactionHolder<EntityManager> emh = findCreateManagerHolder();
-        if(emh.getNativeManager().getTransaction().isActive()){
+        if (emh.getNativeManager().getTransaction().isActive()) {
             throw new IllegalStateException("Transaction already active");
         }
         emh.getNativeManager().getTransaction().begin();
@@ -82,36 +82,41 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
     }
 
     public boolean isActive() {
-       TransactionHolder<EntityManager> emh = getEntityManagerScope();
-        if(emh == null){
+        TransactionHolder<EntityManager> emh = getEntityManagerScope();
+        if (emh == null) {
             return false;
         }
         EntityManager em = emh.getNativeManager();
+        if (em == null) {
+            return false;
+        }
         return em.getTransaction().isActive();
     }
 
     public void close() {
-        if(!isClosed()){
+        if (!isClosed()) {
             TransactionHolder<EntityManager> emh = getEntityManagerScope();
             TransactionLogging.log("TransactionManagerJPAImpl: Tx Close for session {0}", emh.getNativeManager());
             closeEntityManager(emh.getNativeManager());
             emh.setNativeManager(null);
-            entityManagerScope.set(null);
+            entityManagerThread.set(null);
             StatisticsJPA.addCloseCount();
         }
     }
 
     private void closeEntityManager(EntityManager em) {
-        //em.flush();
-        //em.clear();
-        em.close();
+        if (em != null) {
+            //em.flush();
+            //em.clear();
+            em.close();
+        }
     }
 
     public boolean initTransactionHolder() {
         TransactionHolder<EntityManager> managerHolder = getEntityManagerScope();
-        if(managerHolder == null){
+        if (managerHolder == null) {
             managerHolder = new EntityManagerHolder();
-            entityManagerScope.set(managerHolder);
+            entityManagerThread.set(managerHolder);
             return true;
         }
         return false;
@@ -119,12 +124,11 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
 
     private boolean isClosed() {
         TransactionHolder<EntityManager> managerHolder = getEntityManagerScope();
-        if(managerHolder != null){
+        if (managerHolder != null) {
             return false;
         }
         return true;
     }
-
 
 
     public void newBegin() {
@@ -165,10 +169,8 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
     }
 
 
-    
-
     private EntityManagerHolder getEntityManagerScope() {
-        return (EntityManagerHolder) entityManagerScope.get();
+        return (EntityManagerHolder) entityManagerThread.get();
     }
 
     public void forceFlush() {
@@ -204,6 +206,6 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
 
     @Override
     public TransactionScopeHandler getTransactionScopeHandler() {
-        return entityManagerScope;
+        return entityManagerThread;
     }
 }

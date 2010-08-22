@@ -18,20 +18,20 @@ import java.util.concurrent.atomic.AtomicLong;
  * @version 1.0
  * @since 1.0
  */
-public class JPATransactedApplication implements TransactedApplication{
+public class JPATransactedApplication implements TransactedApplication {
 
 
     @Inject
     private Provider<EntityManager> entityManager;
 
 
-    public void createPerson(Person person){
-        createPerson(person, false);    
+    public void createPerson(Person person) {
+        createPerson(person, false);
     }
 
     @TransactionAttribute
-    public void createPerson(Person person, boolean fakeException){
-        if(fakeException){
+    public void createPerson(Person person, boolean fakeException) {
+        if (fakeException) {
             throw new RuntimeException("Bad call, rollbacktime");
         }
         EntityManager em = entityManager.get();
@@ -41,7 +41,7 @@ public class JPATransactedApplication implements TransactedApplication{
     }
 
     @TransactionAttribute
-    public void deletePerson(Person person){
+    public void deletePerson(Person person) {
         EntityManager em = entityManager.get();
         // Delete must be attached entity, this makes sure that it is (otherwise the entire method must be transactional)
         person = em.find(Person.class, person.getId());
@@ -57,19 +57,19 @@ public class JPATransactedApplication implements TransactedApplication{
     }
 
     @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
-    public Person findPerson(Long id){
+    public Person findPerson(Long id) {
         EntityManager em = entityManager.get();
         return em.find(Person.class, id);
     }
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
-    public Person findPersonReqNew(Long id){
+    public Person findPersonReqNew(Long id) {
         EntityManager em = entityManager.get();
         return em.find(Person.class, id);
     }
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
-    public void createLog(Logging log){
+    public void createLog(Logging log) {
         EntityManager em = entityManager.get();
         em.persist(log);
         // This is just for the test program, not needed as TransactionManager will perform flush when needed.
@@ -83,53 +83,53 @@ public class JPATransactedApplication implements TransactedApplication{
     }
 
     @TransactionAttribute(value = TransactionAttributeType.NOT_SUPPORTED)
-    public Person somethingNonTransactional(Long id){
+    public Person somethingNonTransactional(Long id) {
         EntityManager em = entityManager.get();
         return em.find(Person.class, id);
     }
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
-    public void createPersonNewTx(Person person){
+    public void createPersonNewTx(Person person) {
         EntityManager em = entityManager.get();
         em.persist(person);
         em.flush();
     }
 
     @TransactionAttribute(value = TransactionAttributeType.MANDATORY)
-    public void createPersonMandatory(Person person){
+    public void createPersonMandatory(Person person) {
         EntityManager em = entityManager.get();
         em.persist(person);
         em.flush();
     }
 
     @TransactionAttribute
-    public Person depthyTransactions(Person person){
+    public Person depthyTransactions(Person person) {
         // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPerson(person);
-        return findPerson(person.getId());        
+        return findPerson(person.getId());
     }
 
     @TransactionAttribute
-    public Person depthyTransactionsMandatory(Person person){
+    public Person depthyTransactionsMandatory(Person person) {
         // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPersonMandatory(person);
         return findPerson(person.getId());
     }
 
-    @TransactionAttribute
-    public Person depthyTransactionsNewTx(Person person){
+    @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
+    public Person depthyTransactionsNewTx(Person person) {
         // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPersonNewTx(person);
-        return findPerson(person.getId());        
+        return findPerson(person.getId());
     }
 
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
-    public Person complexTransactionsNewTx(Person person, Logging log){
+    public Person complexTransactionsNewTx(Person person, Logging log) {
         // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
-        try{
+        try {
             createPerson(person, true);
-        }catch (Exception e){
+        } catch (Exception e) {
             createLog(log);
             // A classic log and ignore, should be shot for using this as demo ...
         }
@@ -137,7 +137,7 @@ public class JPATransactedApplication implements TransactedApplication{
     }
 
     @TransactionAttribute
-    public Person depthyTransactionsNotSupported(Person person){
+    public Person depthyTransactionsNotSupported(Person person) {
         // This only works for AspectJ, most AOP frameworks need "lookup" the service again.
         createPerson(person);
         return somethingNonTransactional(person.getId());
@@ -146,6 +146,7 @@ public class JPATransactedApplication implements TransactedApplication{
 
     public static AtomicLong performanceCount = new AtomicLong(0L);
     public static int performanceSleeptime = 2;
+
     @TransactionAttribute
     public void fakeOperationForPerformanceTest() {
         try {

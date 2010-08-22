@@ -10,7 +10,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import test.com.hrodberaht.inject.extension.transaction.example.*;
+import test.com.hrodberaht.inject.extension.transaction.example.ModuleContainerForJDBCTests;
+import test.com.hrodberaht.inject.extension.transaction.example.Person;
+import test.com.hrodberaht.inject.extension.transaction.example.TransactedApplication;
 
 import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
@@ -26,11 +28,11 @@ import static org.junit.Assert.assertNotNull;
  *         2010-aug-06 18:33:12
  * @version 1.0
  * @since 1.0
- *  <p/>
- *  To run these tests with load time weaving add the weaver to the JRE like this.
- *  -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
- *   If the path contains a space do it like this
- *  -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
+ *        <p/>
+ *        To run these tests with load time weaving add the weaver to the JRE like this.
+ *        -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+ *        If the path contains a space do it like this
+ *        -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
  */
 @InjectionContainerContext(ModuleContainerForJDBCTests.class)
 @RunWith(InjectionJUnitTestRunner.class)
@@ -49,14 +51,14 @@ public class TestJDBCTransactionManager {
 
     @AfterClass
     public static void destroy() {
-        Container container =  ModuleContainerForJDBCTests.container;
+        Container container = ModuleContainerForJDBCTests.container;
         TransactedApplication application = container.get(TransactedApplication.class);
         Collection<Person> collection = application.findAllPersons();
 
         // Verify that all values are cleared automatically from the test being transactional and calling rollback.
         assertNotNull(collection);
-        for(Person person:collection){
-            application.deletePerson(person);   
+        for (Person person : collection) {
+            application.deletePerson(person);
         }
         System.out.println("TestJDBCTransactionManager performed successfully");
 
@@ -123,7 +125,7 @@ public class TestJDBCTransactionManager {
 
     }
 
-    @Test
+    @Test(expected = TransactionHandlingError.class)
     @TransactionDisabled
     public void testCreateManagerNotSupported() {
 

@@ -5,7 +5,6 @@ import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerConte
 import com.hrodberaht.inject.extension.transaction.junit.InjectionJUnitTestRunner;
 import com.hrodberaht.inject.extension.transaction.junit.TransactionDisabled;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
-import org.hrodberaht.inject.Container;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,8 +16,6 @@ import test.com.hrodberaht.inject.extension.transaction.example.TransactedApplic
 
 import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
-
-
 import java.util.Collection;
 
 import static org.junit.Assert.*;
@@ -30,11 +27,11 @@ import static org.junit.Assert.*;
  *         2010-aug-11 22:58:13
  * @version 1.0
  * @since 1.0
- *  <p/>
- *  To run these tests with load time weaving add the weaver to the JRE like this.
- *  -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
- *   If the path contains a space do it like this
- *  -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
+ *        <p/>
+ *        To run these tests with load time weaving add the weaver to the JRE like this.
+ *        -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+ *        If the path contains a space do it like this
+ *        -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
  */
 
 @InjectionContainerContext(ModuleContainerForTests.class)
@@ -49,28 +46,19 @@ public class TestJPANewTransactionScope {
     private TransactionManager transactionManager;
 
     @BeforeClass
-    public static void initClass(){
+    public static void initClass() {
         TransactionLogging.enableLogging = true;
     }
 
     @AfterClass
-    public static void destroy(){
+    public static void destroy() {
         TransactionLogging.enableLogging = false;
 
-        Container container = ModuleContainerForTests.container;
-        TransactedApplication application = container.get(TransactedApplication.class);
-        Collection<Person> persons = application.findAllPersons();
-
-        assertTrue(persons.size() > 0);
-        for(Person person:persons){
-            application.deletePerson(person);   
-        }
-        application.clearLogs();
     }
 
 
     @Test
-    public void testSingleTransactionWithOpenMainTx(){
+    public void testSingleTransactionWithOpenMainTx() {
 
         Person person = StubUtil.createPerson();
         application.createPersonNewTx(person);
@@ -88,23 +76,35 @@ public class TestJPANewTransactionScope {
 
     @Test
     @TransactionDisabled
-    public void testSingleTransaction(){
+    public void testSingleTransaction() {
 
         Person person = StubUtil.createPerson();
-        Person foundPerson =  application.depthyTransactionsNewTx(person);
+        Person foundPerson = application.depthyTransactionsNewTx(person);
 
         assertEquals(foundPerson.getName(), person.getName());
 
         assertFalse(transactionManager.isActive());
+        // Cleanup
+        cleanUp(true);
+    }
 
+    private void cleanUp(boolean verifyPersons) {
+        Collection<Person> persons = application.findAllPersons();
+        if (verifyPersons) {
+            assertTrue(persons.size() > 0);
+        }
+        for (Person persona : persons) {
+            application.deletePerson(persona);
+        }
+        application.clearLogs();
     }
 
     @Test
-    public void testSingleTransactionWithErrorAndLogging(){
+    public void testSingleTransactionWithErrorAndLogging() {
 
         Person person = StubUtil.createPerson();
         Logging log = StubUtil.createLogg("A log message");
-        Person foundPerson =  application.complexTransactionsNewTx(person, log);
+        Person foundPerson = application.complexTransactionsNewTx(person, log);
 
         Logging storedLog = application.getLog(log.getId());
 
@@ -115,6 +115,8 @@ public class TestJPANewTransactionScope {
         assertEquals(storedLog.getMessage(), log.getMessage());
 
         assertFalse(transactionManager.isActive());
+        // Cleanup
+        cleanUp(false);
 
     }
 

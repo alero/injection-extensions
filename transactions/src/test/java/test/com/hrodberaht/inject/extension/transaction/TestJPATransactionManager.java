@@ -5,19 +5,16 @@ import com.hrodberaht.inject.extension.transaction.junit.InjectionJUnitTestRunne
 import com.hrodberaht.inject.extension.transaction.junit.TransactionDisabled;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionHandlingError;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
-import org.hrodberaht.inject.Container;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import test.com.hrodberaht.inject.extension.transaction.example.JPATransactedApplication;
 import test.com.hrodberaht.inject.extension.transaction.example.ModuleContainerForTests;
 import test.com.hrodberaht.inject.extension.transaction.example.Person;
 import test.com.hrodberaht.inject.extension.transaction.example.TransactedApplication;
 
 import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
-import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,11 +25,11 @@ import static org.junit.Assert.assertEquals;
  *         2010-aug-06 18:33:12
  * @version 1.0
  * @since 1.0
- *  <p/>
- *  To run these tests with load time weaving add the weaver to the JRE like this.
- *  -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
- *   If the path contains a space do it like this
- *  -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
+ *        <p/>
+ *        To run these tests with load time weaving add the weaver to the JRE like this.
+ *        -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+ *        If the path contains a space do it like this
+ *        -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.6.9\aspectjweaver-1.6.9.jar"
  */
 @InjectionContainerContext(ModuleContainerForTests.class)
 @RunWith(InjectionJUnitTestRunner.class)
@@ -51,13 +48,7 @@ public class TestJPATransactionManager {
 
     @AfterClass
     public static void destroy() {
-        Container container = ModuleContainerForTests.container;
-        TransactedApplication application = container.get(TransactedApplication.class);
-        Collection<Person> collection = application.findAllPersons();
-
-        for(Person person:collection){
-            application.deletePerson(person);    
-        }
+        TransactionLogging.enableLogging = false;
 
     }
 
@@ -122,7 +113,7 @@ public class TestJPATransactionManager {
 
     }
 
-    @Test
+    @Test(expected = TransactionHandlingError.class)
     @TransactionDisabled
     public void testCreateManagerNotSupported() {
 
