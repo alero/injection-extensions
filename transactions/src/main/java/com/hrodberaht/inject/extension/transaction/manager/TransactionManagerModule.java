@@ -1,8 +1,14 @@
 package com.hrodberaht.inject.extension.transaction.manager;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
-import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPA;
-import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerJPAImpl;
+import com.hrodberaht.inject.extension.transaction.jdbc.InsertOrUpdater;
+import com.hrodberaht.inject.extension.transaction.jdbc.InsertOrUpdaterImpl;
+import com.hrodberaht.inject.extension.transaction.jdbc.JDBCService;
+import com.hrodberaht.inject.extension.transaction.jdbc.JDBCServiceImpl;
+import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.TransactionManagerJDBC;
+import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.TransactionManagerJDBCImpl;
+import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPA;
+import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPAImpl;
 import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler;
 import org.aspectj.lang.Aspects;
 import org.hrodberaht.inject.InjectContainer;
@@ -15,7 +21,7 @@ import javax.persistence.EntityManager;
 import java.util.Collection;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-11 21:09:52
@@ -43,12 +49,21 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
                 register(getInterface(transactionManager)).withInstance(transactionManager);
 
                 if(transactionManager instanceof InjectionFactory){
-                    register(EntityManager.class).withFactory((InjectionFactory)transactionManager);
+                    InjectionFactory injectionFactory = (InjectionFactory)transactionManager;
+                    register(injectionFactory.getInstanceType()).withFactory(injectionFactory);
                 }
+
+                if(transactionManager instanceof TransactionManagerJDBCImpl){
+                    // Connect the the JDBC Services
+                    register(JDBCService.class).with(JDBCServiceImpl.class);
+                    register(InsertOrUpdater.class).with(InsertOrUpdaterImpl.class);
+                }
+
             }
 
 
         };
+        // Actually performs the registrations to this module
         registration.registrations();
         theContainer = register.getInjectContainer();
     }
@@ -56,6 +71,8 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
     private Class getInterface(TransactionManager transactionManager) {
         if(transactionManager instanceof TransactionManagerJPAImpl){
             return TransactionManagerJPA.class;
+        }else if(transactionManager instanceof TransactionManagerJDBCImpl){
+            return TransactionManagerJDBC.class;
         }
         throw new IllegalArgumentException("transactionManager does not have a specific interface");
     }

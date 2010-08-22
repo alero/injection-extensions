@@ -1,15 +1,16 @@
-package com.hrodberaht.inject.extension.transaction.manager.impl;
+package com.hrodberaht.inject.extension.transaction.manager.impl.jdbc;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Robert Work
- * Date: 2010-aug-18
- * Time: 22:32:22
- * To change this template use File | Settings | File Templates.
+ * Injection Transaction Extension
+ *
+ * @author Robert Alexandersson
+ *         2010-aug-21 20:29:06
+ * @version 1.0
+ * @since 1.0
  */
-public class StatisticsJPA {
+public class StatisticsJDBC {
 
     private static AtomicLong beginCount = new AtomicLong(0L);
     private static AtomicLong commitCount = new AtomicLong(0L);
@@ -20,9 +21,9 @@ public class StatisticsJPA {
 
 
     public static void setEnabled(boolean enabled) {
-        StatisticsJPA.enabled = enabled;
+        StatisticsJDBC.enabled = enabled;
         // Reset
-        if (!StatisticsJPA.enabled) {
+        if (!StatisticsJDBC.enabled) {
             beginCount = new AtomicLong(0L);
             commitCount = new AtomicLong(0L);
             rollbackCount = new AtomicLong(0L);

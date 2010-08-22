@@ -1,7 +1,7 @@
 package javax.ejb;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-10 18:22:59

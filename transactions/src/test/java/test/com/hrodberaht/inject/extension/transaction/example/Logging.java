@@ -4,13 +4,13 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Robert Work
- * Date: 2010-aug-16
- * Time: 15:53:34
- * To change this template use File | Settings | File Templates.
+ * Injection Transaction Extension
+ *
+ * @author Robert Alexandersson
+ *         2010-aug-11 22:58:13
+ * @version 1.0
+ * @since 1.0
  */
-
 @Entity
 public class Logging {
 

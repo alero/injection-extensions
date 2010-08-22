@@ -3,7 +3,7 @@ package com.hrodberaht.inject.extension.transaction;
 import org.hrodberaht.inject.register.InjectionFactory;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-06 18:31:10

@@ -1,7 +1,7 @@
 package com.hrodberaht.inject.extension.transaction.manager.internal;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-11 23:16:00

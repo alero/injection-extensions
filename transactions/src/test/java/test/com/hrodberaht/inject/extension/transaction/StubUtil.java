@@ -6,11 +6,12 @@ import test.com.hrodberaht.inject.extension.transaction.example.Person;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Robert Work
- * Date: 2010-aug-15
- * Time: 20:09:01
- * To change this template use File | Settings | File Templates.
+ * Injection Transaction Extension
+ *
+ * @author Robert Alexandersson
+ *         2010-aug-11 22:58:13
+ * @version 1.0
+ * @since 1.0
  */
 public class StubUtil {
     private static AtomicLong id = new AtomicLong(1L);

@@ -2,10 +2,9 @@ package test.com.hrodberaht.inject.extension.transaction;
 
 import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerContext;
 import com.hrodberaht.inject.extension.transaction.junit.InjectionJUnitTestRunner;
-import com.hrodberaht.inject.extension.transaction.manager.impl.StatisticsJPA;
+import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.StatisticsJPA;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
 import org.hrodberaht.inject.Container;
-import org.hrodberaht.inject.internal.stats.Statistics;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import test.com.hrodberaht.inject.extension.transaction.example.JPATransactedApplication;
@@ -19,11 +18,13 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Robert Work
- * Date: 2010-aug-18
- * Time: 22:16:59
- * To change this template use File | Settings | File Templates.
+/**
+ * Injection Transaction Extension
+ *
+ * @author Robert Alexandersson
+ *         2010-aug-11 22:58:13
+ * @version 1.0
+ * @since 1.0
  *  <p/>
  *  To run these tests with load time weaving add the weaver to the JRE like this.
  *  -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar

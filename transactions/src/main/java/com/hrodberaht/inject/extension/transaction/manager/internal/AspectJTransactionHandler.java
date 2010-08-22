@@ -14,7 +14,7 @@ import javax.inject.Provider;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Simple Java Utils
+ * Injection Transaction Extension
  *
  * @author Robert Alexandersson
  *         2010-aug-10 18:47:12

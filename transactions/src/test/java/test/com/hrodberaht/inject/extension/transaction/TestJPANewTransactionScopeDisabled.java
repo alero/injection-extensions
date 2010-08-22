@@ -22,11 +22,12 @@ import java.util.Collection;
 import static org.junit.Assert.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Robert Work
- * Date: 2010-aug-15
- * Time: 20:06:34
- * To change this template use File | Settings | File Templates.
+ * Injection Transaction Extension
+ *
+ * @author Robert Alexandersson
+ *         2010-aug-11 22:58:13
+ * @version 1.0
+ * @since 1.0
  *  <p/>
  *  To run these tests with load time weaving add the weaver to the JRE like this.
  *  -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
