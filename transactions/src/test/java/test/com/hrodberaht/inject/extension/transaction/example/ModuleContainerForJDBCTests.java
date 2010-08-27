@@ -35,8 +35,7 @@ public class ModuleContainerForJDBCTests implements InjectionContainerCreator {
     }
 
     public InjectContainer createContainer() {
-        InjectionRegisterModule register = new InjectionRegisterModule();
-        register.activateContainerJavaXInject();
+        InjectionRegisterModule register = new InjectionRegisterModule();        
 
         // This is just done to simplify the test application
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("example-jpa");

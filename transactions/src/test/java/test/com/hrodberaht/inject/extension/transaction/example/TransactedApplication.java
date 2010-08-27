@@ -14,6 +14,7 @@ public interface TransactedApplication {
 
     Person findPerson(Long id);
     Person findPersonReqNew(Long id);
+    Person findPersonNative(Long id);
     Collection<Person> findAllPersons();
     Person somethingNonTransactional(Long id);
     void createPerson(Person person);
