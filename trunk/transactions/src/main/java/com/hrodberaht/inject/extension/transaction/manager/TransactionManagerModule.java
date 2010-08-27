@@ -10,7 +10,7 @@ import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.Transaction
 import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPA;
 import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPAImpl;
 import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler;
-import org.aspectj.lang.Aspects;
+import com.hrodberaht.inject.extension.transaction.manager.util.TransactionManagerUtil;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterBase;
 import org.hrodberaht.inject.register.InjectionFactory;
@@ -78,12 +78,7 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
 
     @Override
     public void postRegistration() {
-        AspectJTransactionHandler aspectJTransactionHandler = Aspects.aspectOf(AspectJTransactionHandler.class);
-        TransactionManager transactionManager = theContainer.get(TransactionManager.class);
-        System.out.println("Thread " + Thread.currentThread() +
-                " Connecting the aspect " + aspectJTransactionHandler.toString()
-                + " to transaction manager " + transactionManager);
-        theContainer.injectDependencies(aspectJTransactionHandler);
+        TransactionManagerUtil.registerTransactionManager(theContainer);    
     }
 
     public Collection getRegistrations() {
