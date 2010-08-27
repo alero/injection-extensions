@@ -25,8 +25,7 @@ public class ModuleContainerForTests implements InjectionContainerCreator {
     }
 
     public InjectContainer createContainer() {
-        InjectionRegisterModule register = new InjectionRegisterModule();
-        register.activateContainerJavaXInject();
+        InjectionRegisterModule register = new InjectionRegisterModule();        
         register.register(TransactedApplication.class,  JPATransactedApplication.class);
         // Create the JPA transaction manager, different managers will need different objects in their construct.
         final TransactionManager transactionManager =

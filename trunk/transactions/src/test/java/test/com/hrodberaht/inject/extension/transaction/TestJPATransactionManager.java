@@ -3,6 +3,7 @@ package test.com.hrodberaht.inject.extension.transaction;
 import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerContext;
 import com.hrodberaht.inject.extension.transaction.junit.InjectionJUnitTestRunner;
 import com.hrodberaht.inject.extension.transaction.junit.TransactionDisabled;
+import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPA;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionHandlingError;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
 import org.junit.AfterClass;
@@ -36,10 +37,11 @@ import static org.junit.Assert.assertEquals;
 @TransactionAttribute
 public class TestJPATransactionManager {
 
-
     @Inject
     private TransactedApplication application;
 
+    @Inject
+    private TransactionManagerJPA transactionManager;
 
     @BeforeClass
     public static void init() {
@@ -74,12 +76,17 @@ public class TestJPATransactionManager {
 
     }
 
-    @Test(expected = TransactionHandlingError.class)
+    @Test
     @TransactionDisabled
     public void testCreateManagerMandatoryFail() {
         System.out.println(Thread.currentThread().getContextClassLoader().getClass().getName());
         Person person = StubUtil.createPerson();
-        application.createPersonMandatory(person);
+        try {
+            application.createPersonMandatory(person);
+            assertEquals("Do not reach this", null);
+        } catch (TransactionHandlingError e) {
+            assertEquals("has no active transaction", e.getMessage());
+        }
 
 
     }
@@ -117,8 +124,7 @@ public class TestJPATransactionManager {
     @TransactionDisabled
     public void testCreateManagerNotSupported() {
 
-        Person person = new Person();
-        person.setId(55L);
+        Person person = StubUtil.createPerson();
         person.setName("Dude");
         application.createPerson(person);
 
@@ -126,6 +132,42 @@ public class TestJPATransactionManager {
 
         assertEquals(foundPerson.getName(), person.getName());
 
+    }
+
+    @Test
+    public void testJDBCNativeJPASupport() {
+
+        Person person = StubUtil.createPerson();
+        person.setName("Dude");
+        application.createPerson(person);
+        transactionManager.getNativeManager().flush();
+        
+        Person foundPerson = application.findPersonNative(person.getId());
+
+        assertEquals(foundPerson.getName(), person.getName());
+
+    }
+
+    @Test
+    @TransactionDisabled
+    public void testJDBCNativeJPASupportRestartTransaction() {
+
+        Person person = StubUtil.createPerson();
+        person.setName("Dude");
+        application.createPerson(person);
+        // Connection will be commited/closed here.
+
+
+        // A new connection must be created by the native vendor (JPA to JDBC)
+        Person foundPerson = application.findPersonNative(person.getId());
+
+        assertEquals(foundPerson.getName(), person.getName());
+
+        application.deletePerson(person);
+
+        foundPerson = application.findPersonNative(person.getId());
+
+        assertEquals(null, foundPerson);
     }
 
 

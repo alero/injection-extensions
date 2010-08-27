@@ -1,5 +1,8 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
+import com.hrodberaht.inject.extension.jdbc.JDBCService;
+import com.hrodberaht.inject.extension.jdbc.RowIterator;
+
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
@@ -7,6 +10,8 @@ import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -24,6 +29,8 @@ public class JPATransactedApplication implements TransactedApplication {
     @Inject
     private Provider<EntityManager> entityManager;
 
+    @Inject
+    private JDBCService jdbcService;
 
     public void createPerson(Person person) {
         createPerson(person, false);
@@ -60,6 +67,21 @@ public class JPATransactedApplication implements TransactedApplication {
     public Person findPerson(Long id) {
         EntityManager em = entityManager.get();
         return em.find(Person.class, id);
+    }
+
+    @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
+    public Person findPersonNative(Long id) {
+       String sql = "select * from person where id = "+id;
+        return jdbcService.querySingle(sql, new RowIterator<Person>(){
+
+            public Person iterate(ResultSet rs, int iteration) throws SQLException {
+                Person person = new Person();
+                person.setId(rs.getLong("id"));
+                person.setName(rs.getString("name"));
+                return person;
+            }
+        });
+
     }
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
@@ -164,7 +186,7 @@ public class JPATransactedApplication implements TransactedApplication {
     @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
     public Collection<Person> findAllPersons() {
         EntityManager em = entityManager.get();
-        TypedQuery<Person> typedQuery = em.createQuery("from Person", Person.class);
+        TypedQuery<Person> typedQuery = em.createQuery("select p from Person p", Person.class);
 
 
         return typedQuery.getResultList();

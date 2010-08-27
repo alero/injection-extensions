@@ -1,13 +1,12 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
-import com.hrodberaht.inject.extension.transaction.jdbc.Insert;
-import com.hrodberaht.inject.extension.transaction.jdbc.JDBCService;
-import com.hrodberaht.inject.extension.transaction.jdbc.RowIterator;
+import com.hrodberaht.inject.extension.jdbc.Insert;
+import com.hrodberaht.inject.extension.jdbc.JDBCService;
+import com.hrodberaht.inject.extension.jdbc.RowIterator;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -63,6 +62,10 @@ public class JDBCTransactedApplication implements TransactedApplication {
 
     @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
     public Person findPersonReqNew(Long id) {
+        return findPersonJDBC(id);
+    }
+
+    public Person findPersonNative(Long id) {
         return findPersonJDBC(id);
     }
 
