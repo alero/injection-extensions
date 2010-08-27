@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.hrodberaht.inject</groupId>
-    <artifactId>web-extension</artifactId>
-    <packaging>war</packaging>
-    <version>SNAPSHOT</version>
+    <groupId>org.hrodberaht.inject.extension</groupId>
+    <artifactId>web-jsf</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0</version>
     <name>A collection of extensions to Injection for easier web development</name>
 
     <repositories>
@@ -15,15 +15,35 @@
             <name>Jboss</name>
             <url>https://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
-         <repository>
+        <repository>
             <id>Sonatype Snapshot</id>
             <name>Sonatype Snapshot</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>        
+        <repository>
+            <id>prime-repo</id>
+            <name>Prime Technology Maven Repository</name>
+            <url>http://repository.prime.com.tr</url>
+            <layout>default</layout>
         </repository>
     </repositories>
+    <distributionManagement>
+        <!-- use the following if you're not using a snapshot version. -->
+        <repository>
+            <id>repo1</id>
+            <name>Repository Name</name>
+            <url>file://C:/var/m2</url>
+        </repository>
+        <!-- use the following if you ARE using a snapshot version. -->
+        <snapshotRepository>
+            <id>repo2</id>
+            <name>Repository Name</name>
+            <url>file://C:/var/m2</url>
+        </snapshotRepository>
+    </distributionManagement>
     <build>
         <plugins>
             <plugin>
@@ -46,15 +66,15 @@
             <artifactId>inject</artifactId>
             <version>1.1-M1-SNAPSHOT</version>
         </dependency>
-              <dependency>
+        <dependency>
             <groupId>javax.faces</groupId>
             <artifactId>jsf-api</artifactId>
-            <version>2.0.2-FCS</version>
+            <version>2.0.3</version>
         </dependency>
         <dependency>
             <groupId>javax.faces</groupId>
             <artifactId>jsf-impl</artifactId>
-            <version>2.0.2-FCS</version>
+            <version>2.0.3</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
