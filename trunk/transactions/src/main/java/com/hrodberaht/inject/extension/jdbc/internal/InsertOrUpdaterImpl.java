@@ -1,4 +1,6 @@
-package com.hrodberaht.inject.extension.transaction.jdbc;
+package com.hrodberaht.inject.extension.jdbc.internal;
+
+import com.hrodberaht.inject.extension.jdbc.InsertOrUpdater;
 
 import java.util.HashMap;
 import java.util.Map;

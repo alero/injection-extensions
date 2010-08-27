@@ -1,7 +1,9 @@
-package com.hrodberaht.inject.extension.transaction.jdbc;
+package com.hrodberaht.inject.extension.jdbc.internal;
 
-import com.hrodberaht.inject.extension.transaction.TransactionManager;
-import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.TransactionManagerJDBC;
+import com.hrodberaht.inject.extension.jdbc.Insert;
+import com.hrodberaht.inject.extension.jdbc.InsertOrUpdater;
+import com.hrodberaht.inject.extension.jdbc.JDBCService;
+import com.hrodberaht.inject.extension.jdbc.RowIterator;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -24,9 +26,6 @@ public class JDBCServiceImpl implements JDBCService {
 
     @Inject
     Provider<Connection> connectionProvider;
-
-    @Inject
-    Provider<TransactionManager> managerProvider;
 
     public InsertOrUpdater createInsertOrUpdate(String table) {
         InsertOrUpdater _insertOrUpdater = iouProvider.get();
@@ -61,12 +60,10 @@ public class JDBCServiceImpl implements JDBCService {
                     close(pstmt);
                     // jdbcProvider.get().manuallyClose(connection);
                 }
-
             }
         } catch (SQLException e) {
             throw new JDBCException(e);
         }
-
         throw new RuntimeException("A custom InsertOrUpdater was used, use InsertOrUpdaterImpl is the instance");
 
     }
