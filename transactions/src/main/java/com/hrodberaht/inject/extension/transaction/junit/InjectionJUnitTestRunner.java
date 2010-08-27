@@ -2,6 +2,7 @@ package com.hrodberaht.inject.extension.transaction.junit;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler;
+import com.hrodberaht.inject.extension.transaction.manager.util.TransactionManagerUtil;
 import org.aspectj.lang.Aspects;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
@@ -91,7 +92,7 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         boolean hasTransaction = hasTransaction(frameworkMethod);
         // Need to re-init the TransactionAspect (Junit and AspectJ does not play well)
         if (hasTransaction) {
-            injectAspectJTransactionHandler();
+            injectTransactionHandler();
         }
         try {
             System.out.println("---  InjectionJUnitTestRunner: " +
@@ -133,9 +134,8 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
                 " done running child " + frameworkMethod.getName() + " in thread " + Thread.currentThread());
     }
 
-    private void injectAspectJTransactionHandler() {
-        AspectJTransactionHandler aspectJTransactionHandler = Aspects.aspectOf(AspectJTransactionHandler.class);
-        theContainer.injectDependencies(aspectJTransactionHandler);
+    private void injectTransactionHandler() {
+        TransactionManagerUtil.registerTransactionManager(theContainer);
     }
 
     /**
@@ -179,6 +179,7 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         } catch (InjectRuntimeException exception) {
             System.out.println("InjectionJUnitTestRunner: " +
                     "TransactionManager not wired for Container from creator: " + creator.getClass().getName());
+            exception.printStackTrace(System.err);
         }
     }
 }
