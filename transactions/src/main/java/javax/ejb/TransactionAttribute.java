@@ -16,5 +16,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TransactionAttribute {
-  TransactionAttributeType value() default TransactionAttributeType.REQUIRED;
+  TransactionAttributeType value() default javax.ejb.TransactionAttributeType.REQUIRED;
 }

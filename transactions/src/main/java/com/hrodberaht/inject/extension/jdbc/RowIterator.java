@@ -1,4 +1,4 @@
-package com.hrodberaht.inject.extension.transaction.jdbc;
+package com.hrodberaht.inject.extension.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

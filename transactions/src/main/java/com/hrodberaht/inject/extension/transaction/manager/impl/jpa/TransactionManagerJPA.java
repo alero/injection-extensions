@@ -11,5 +11,5 @@ import javax.persistence.EntityManager;
  * @since 1.0
  */
 public interface TransactionManagerJPA {
-    EntityManager getNativeManager();
+    EntityManager getNativeManager();    
 }
