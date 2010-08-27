@@ -215,6 +215,11 @@
                         </configuration>
                     </plugin>
                 </plugins>
+                <testResources>
+                    <testResource>
+                        <directory>src/main/datanucleusresources</directory>
+                    </testResource>
+                </testResources>
             </build>
             <dependencies>
                 <dependency>
@@ -248,13 +253,6 @@
                     <optional>true</optional>
                 </dependency>
             </dependencies>
-            <build>
-                <testResources>
-                    <testResource>
-                        <directory>src/main/datanucleusresources</directory>
-                    </testResource>
-                </testResources>
-            </build>
         </profile>
 
     </profiles>
