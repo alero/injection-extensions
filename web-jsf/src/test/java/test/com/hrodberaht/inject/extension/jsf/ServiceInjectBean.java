@@ -3,7 +3,7 @@ package test.com.hrodberaht.inject.extension.jsf;
 import javax.inject.Singleton;
 
 /**
- * Simple Java Utils
+ * Injection Extension Web
  *
  * @author Robert Alexandersson
  *         2010-jul-28 22:54:31

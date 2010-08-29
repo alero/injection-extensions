@@ -5,7 +5,7 @@ import javax.faces.bean.RequestScoped;
 import javax.inject.Inject;
 
 /**
- * Simple Java Utils
+ * Injection Extension Web
  *
  * @author Robert Alexandersson
  *         2010-jul-28 22:52:12
