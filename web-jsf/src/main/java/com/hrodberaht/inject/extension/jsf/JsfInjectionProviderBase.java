@@ -32,7 +32,7 @@ public abstract class JsfInjectionProviderBase implements InjectionProvider
     /**
      * Custom injector that will load our module.
      */
-    protected static InjectContainer injector = null;
+    protected InjectContainer injector = null;
 
     public abstract InjectContainer getContainer();
 
