@@ -155,6 +155,9 @@
         </profile>
         <profile>
             <id>TopLink Provider</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <repositories>
                 <repository>
                     <id>Eclipse</id>
@@ -180,6 +183,9 @@
         </profile>
         <profile>
             <id>OpenJPA Provider</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <repositories>
                 <repository>
                     <id>Iblioo</id>
@@ -204,6 +210,9 @@
         </profile>
         <profile>
             <id>Datanucleus Provider</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <repositories>
                 <repository>
                     <id>datanucleus</id>
