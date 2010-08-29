@@ -6,7 +6,7 @@ import com.sun.faces.vendor.WebContainerInjectionProvider;
 import org.hrodberaht.inject.InjectContainer;
 
 /**
- * Simple Java Utils
+ * Injection Extension Web
  *
  * @author Robert Alexandersson
  *         2010-jul-26 22:58:42
@@ -52,7 +52,7 @@ public abstract class JsfInjectionProviderBase implements InjectionProvider
     public void invokePostConstruct( Object managedBean )
             throws InjectionProviderException
     {
-        // don't do anything here for guice, just let the default do its thing
+        // don't do anything here for the container, just let the default do its thing
         con.invokePostConstruct( managedBean );
     }
     

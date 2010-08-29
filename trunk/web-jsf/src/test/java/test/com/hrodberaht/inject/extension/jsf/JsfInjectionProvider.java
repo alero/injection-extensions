@@ -5,7 +5,7 @@ import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterJava;
 
 /**
- * Simple Java Utils
+ * Injection Extension Web
  *
  * @author Robert Alexandersson
  *         2010-jul-26 22:58:42

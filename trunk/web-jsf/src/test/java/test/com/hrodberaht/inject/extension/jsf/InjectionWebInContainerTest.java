@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Simple Java Utils
+ * Injection Extension Web
  *
  * @author Robert Alexandersson
  *         2010-jul-28 01:30:53
@@ -49,9 +49,7 @@ public class InjectionWebInContainerTest {
     @Test
     public void testJsfInjectionContainerBaseClassInheritance() throws InjectionProviderException {
 
-        // We can not force the registration to happen before startup so this must be done statically
-                
-
+ 
         // This is basically what JSF will do
         InjectionProvider injectionProvider = new JsfInjectionProvider();
         WebInjectBean bean = new WebInjectBean();        

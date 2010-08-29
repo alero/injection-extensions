@@ -6,7 +6,7 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>web-jsf</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.0-SNAPSHOT</version>
     <name>A collection of extensions to Injection for easier web development</name>
 
     <repositories>
@@ -35,13 +35,13 @@
         <repository>
             <id>repo1</id>
             <name>Repository Name</name>
-            <url>file://C:/var/m2</url>
+            <url>file://${settings.localRepository}</url>
         </repository>
         <!-- use the following if you ARE using a snapshot version. -->
         <snapshotRepository>
             <id>repo2</id>
             <name>Repository Name</name>
-            <url>file://C:/var/m2</url>
+            <url>file://${settings.localRepository}</url>
         </snapshotRepository>
     </distributionManagement>
     <build>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.hrodberaht</groupId>
             <artifactId>inject</artifactId>
-            <version>1.1-M1-SNAPSHOT</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>javax.faces</groupId>
