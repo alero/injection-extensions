@@ -30,20 +30,6 @@
             <layout>default</layout>
         </repository>
     </repositories>
-    <distributionManagement>
-        <!-- use the following if you're not using a snapshot version. -->
-        <repository>
-            <id>repo1</id>
-            <name>Repository Name</name>
-            <url>file://${settings.localRepository}</url>
-        </repository>
-        <!-- use the following if you ARE using a snapshot version. -->
-        <snapshotRepository>
-            <id>repo2</id>
-            <name>Repository Name</name>
-            <url>file://${settings.localRepository}</url>
-        </snapshotRepository>
-    </distributionManagement>
     <build>
         <plugins>
             <plugin>
