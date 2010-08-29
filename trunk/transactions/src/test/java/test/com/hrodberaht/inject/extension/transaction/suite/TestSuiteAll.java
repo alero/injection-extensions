@@ -1,7 +1,8 @@
-package test.com.hrodberaht.inject.extension.transaction;
+package test.com.hrodberaht.inject.extension.transaction.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import test.com.hrodberaht.inject.extension.transaction.TestJDBCTransactionManager;
 
 /**
  * Injection Transaction Extension

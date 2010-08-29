@@ -1,7 +1,11 @@
-package test.com.hrodberaht.inject.extension.transaction;
+package test.com.hrodberaht.inject.extension.transaction.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import test.com.hrodberaht.inject.extension.transaction.TestJPANewTransactionScope;
+import test.com.hrodberaht.inject.extension.transaction.TestJPANewTransactionScopeDisabled;
+import test.com.hrodberaht.inject.extension.transaction.TestJPATransactionManager;
+import test.com.hrodberaht.inject.extension.transaction.TestSimpleServiceWithRunner;
 
 /**
  * Injection Transaction Extension
