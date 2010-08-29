@@ -6,7 +6,7 @@
     <groupId>org.hrodberaht.inject.pom</groupId>
     <artifactId>web-application</artifactId>
     <packaging>pom</packaging>
-    <version>1.0</version>
+    <version>1.0-SNAPSHOT</version>
     <name>Web-application with Injection</name>
     <repositories>
         <repository>
@@ -16,26 +16,12 @@
             <layout>default</layout>
         </repository>
     </repositories>
-    <distributionManagement>
-        <!-- use the following if you're not using a snapshot version. -->
-        <repository>
-            <id>repo1</id>
-            <name>Repository Name</name>
-            <url>file://C:/var/m2</url>
-        </repository>
-        <!-- use the following if you ARE using a snapshot version. -->
-        <snapshotRepository>
-            <id>repo2</id>
-            <name>Repository Name</name>
-            <url>file://C:/var/m2</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.hrodberaht</groupId>
             <artifactId>inject</artifactId>
-            <version>1.1-M1-SNAPSHOT</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.hrodberaht.directus</groupId>
@@ -45,12 +31,12 @@
         <dependency>
             <groupId>org.hrodberaht.inject.extension</groupId>
             <artifactId>web-jsf</artifactId>
-            <version>1.0</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.hrodberaht.inject.extension</groupId>
             <artifactId>transaction</artifactId>
-            <version>1.0</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.primefaces</groupId>
