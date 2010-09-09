@@ -69,6 +69,10 @@ public class JDBCTransactedApplication implements TransactedApplication {
         return findPersonJDBC(id);
     }
 
+    public Person findPersonNativeNoJoin(Long id) {
+        return findPersonJDBC(id);
+    }
+
     @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
     public Collection<Person> findAllPersons() {
         String sql = "select * from Person";

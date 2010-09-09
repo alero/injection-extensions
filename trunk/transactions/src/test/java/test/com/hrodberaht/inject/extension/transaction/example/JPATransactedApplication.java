@@ -2,6 +2,7 @@ package test.com.hrodberaht.inject.extension.transaction.example;
 
 import com.hrodberaht.inject.extension.jdbc.JDBCService;
 import com.hrodberaht.inject.extension.jdbc.RowIterator;
+import com.hrodberaht.inject.extension.transaction.manager.NotTransactionJoined;
 
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -31,6 +32,10 @@ public class JPATransactedApplication implements TransactedApplication {
 
     @Inject
     private JDBCService jdbcService;
+
+    @Inject
+    @NotTransactionJoined
+    private JDBCService standAloneJdbcService;
 
     public void createPerson(Person person) {
         createPerson(person, false);
@@ -73,6 +78,21 @@ public class JPATransactedApplication implements TransactedApplication {
     public Person findPersonNative(Long id) {
        String sql = "select * from person where id = "+id;
         return jdbcService.querySingle(sql, new RowIterator<Person>(){
+
+            public Person iterate(ResultSet rs, int iteration) throws SQLException {
+                Person person = new Person();
+                person.setId(rs.getLong("id"));
+                person.setName(rs.getString("name"));
+                return person;
+            }
+        });
+
+    }
+
+    @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
+    public Person findPersonNativeNoJoin(Long id) {
+       String sql = "select * from person where id = "+id;
+        return standAloneJdbcService.querySingle(sql, new RowIterator<Person>(){
 
             public Person iterate(ResultSet rs, int iteration) throws SQLException {
                 Person person = new Person();
