@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Injection Transaction Extension
@@ -97,18 +98,15 @@ public class TestJPANewTransactionScopeDisabled {
 
         Person person = StubUtil.createPerson();
         Logging log = StubUtil.createLogg("A log message");
-        Person foundPerson = application.complexTransactionsNewTx(person, log);
+        // This code can not work without REQUIRES_NEW and is just a proof of how the restrictions must be handled.
 
-        Logging storedLog = application.getLog(log.getId());
-
-        // Everything should be rolled-back and the person should not be saved
-        // the log should be there, is its handled in NEW_TX
-        assertNull(foundPerson);
-
-        assertEquals(storedLog.getMessage(), log.getMessage());
-
-        assertTrue(transactionManager.isActive());
-
+        try {
+            Person foundPerson = application.complexTransactionsNewTx(person, log);
+            assertEquals("Expected error", foundPerson.getName());
+        } catch (Exception e) {
+            assertEquals("Transaction is marked for rollback only", e.getMessage());
+            assertFalse(transactionManager.isActive());
+        }         
     }
 
 }

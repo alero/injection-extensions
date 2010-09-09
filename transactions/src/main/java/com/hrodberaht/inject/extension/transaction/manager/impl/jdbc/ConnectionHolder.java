@@ -2,7 +2,6 @@ package com.hrodberaht.inject.extension.transaction.manager.impl.jdbc;
 
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionHolder;
 
-import javax.persistence.EntityManager;
 import java.sql.Connection;
 
 /**
@@ -18,15 +17,17 @@ public class ConnectionHolder extends TransactionHolder<Connection> {
     private boolean active = false;
 
     public ConnectionHolder() {
+        super.currentActiveTransaction = this;
     }
 
     public ConnectionHolder(Connection entityManager) {
         super.nativeManager = entityManager;
+        super.currentActiveTransaction = this;
     }
 
     public ConnectionHolder(Connection entityManager, TransactionHolder<Connection> holder) {
         this.nativeManager = entityManager;
-        this.parentTransaction = holder;
+        this.parentTransaction = holder;        
     }
 
     public boolean isActive() {

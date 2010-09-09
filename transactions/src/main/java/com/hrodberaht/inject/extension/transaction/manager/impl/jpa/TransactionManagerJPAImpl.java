@@ -4,6 +4,7 @@ import com.hrodberaht.inject.extension.transaction.junit.TransactionManagerTest;
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionHolder;
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerBase;
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionScopeHandler;
+import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionHandlingError;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
 import org.hrodberaht.inject.register.InjectionFactory;
 
@@ -51,27 +52,37 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
                 , entityManagerTransactionHolder.getNativeManager());
     }
 
-    public boolean begin() {
+    public void begin() {
         TransactionHolder<EntityManager> emh = findCreateManagerHolder();
+        verifyTransactionHolder(emh);
         if (emh.getNativeManager().getTransaction().isActive()) {
             throw new IllegalStateException("Transaction already active");
         }
         emh.getNativeManager().getTransaction().begin();
         TransactionLogging.log("TransactionManagerJPAImpl: Tx Begin for session {0}", emh.getNativeManager());
-        StatisticsJPA.addBeginCount();
-        return emh.isNew;
+        StatisticsJPA.addBeginCount();        
     }
 
     public void commit() {
-        EntityManager em = findCreateManagerHolder().getNativeManager();
+        TransactionHolder<EntityManager> emh = findCreateManagerHolder();
+        verifyTransactionHolder(emh);
+        EntityManager em = emh.getNativeManager();
         em.getTransaction().commit();
         TransactionLogging.log("TransactionManagerJPAImpl: Tx Commit for session {0}", em);
         StatisticsJPA.addCommitCount();
     }
 
+    private void verifyTransactionHolder(TransactionHolder emh) {
+        if(emh.isRollbackOnly()){
+            throw new TransactionHandlingError("Transaction is marked for rollback only"); 
+        }
+    }
+
     public void rollback() {
-        EntityManager em = findCreateManagerHolder().getNativeManager();
+        TransactionHolder<EntityManager> emh = findCreateManagerHolder();
+        EntityManager em = emh.getNativeManager();
         rollbackEntityManager(em);
+        emh.setRollbackOnly(true);
         TransactionLogging.log("TransactionManagerJPAImpl: Tx Rollback for session {0}", em);
         StatisticsJPA.addRollbackCount();
     }
@@ -157,15 +168,26 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
 
     public void newClose() {
         TransactionHolder<EntityManager> holder = findDeepestHolder();
-        TransactionLogging.log("TransactionManagerJPAImpl: NewTX closing session {0}", holder.getNativeManager());
-        closeEntityManager(holder.getNativeManager());
-        cleanupTransactionHolder(holder);
-        StatisticsJPA.addCloseCount();
+        if(holder != null){
+            TransactionLogging.log("TransactionManagerJPAImpl: NewTX closing session {0}", holder.getNativeManager());
+            closeEntityManager(holder.getNativeManager());
+            cleanupTransactionHolder(holder);
+            StatisticsJPA.addCloseCount();
+        } else {
+            TransactionLogging.log("TransactionManagerJPAImpl: NewTX NOT closing due to null");
+        }
     }
 
     public boolean newIsActive() {
-        TransactionHolder<EntityManager> holder = findDeepestHolder();
-        return holder.getNativeManager().getTransaction().isActive();
+        TransactionHolder<EntityManager> emh = findDeepestHolder();
+        if (emh == null) {
+            return false;
+        }
+        EntityManager em = emh.getNativeManager();
+        if (em == null) {
+            return false;
+        }
+        return em.getTransaction().isActive();
     }
 
 

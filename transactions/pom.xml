@@ -6,7 +6,7 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>transaction</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.0-SNAPSHOT</version>
     <name>A transaction manager extensions to Injection</name>
 
     <repositories>
@@ -22,13 +22,13 @@
         <repository>
             <id>repo1</id>
             <name>Repository Name</name>
-            <url>file://C:/var/m2</url>
+            <url>file://${settings.localRepository}</url>
         </repository>
         <!-- use the following if you ARE using a snapshot version. -->
         <snapshotRepository>
             <id>repo2</id>
             <name>Repository Name</name>
-            <url>file://C:/var/m2</url>
+            <url>file://${settings.localRepository}</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -54,15 +54,17 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
-                    <forkMode>never</forkMode>
-                    <argLine>-javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar</argLine>
+                    <forkMode>once</forkMode>
+                    <argLine>
+                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+                    </argLine>
                     <useSystemClassLoader>true</useSystemClassLoader>
                     <includes>
                         <include>**/transaction/suite/TestSuiteAll*</include>
                     </includes>
                     <excludes>
                         <exclude>**/extension/transaction/example/*java</exclude>
-                        <exclude>**/extension/transaction/*</exclude>                        
+                        <exclude>**/extension/transaction/*</exclude>
                     </excludes>
 
                 </configuration>
@@ -131,48 +133,75 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.6.9</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>1.6.9</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-core</artifactId>
+            <version>2.1.1</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-rdbms</artifactId>
+            <version>2.1.1</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-jpa</artifactId>
+            <version>2.1.1</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-enhancer</artifactId>
+            <version>2.1.0-release</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>javax.jdo</groupId>
+            <artifactId>jdo-api</artifactId>
+            <version>3.0</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>eclipselink</artifactId>
+            <version>2.1.1</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.openjpa</groupId>
+            <artifactId>openjpa</artifactId>
+            <version>2.0.0</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
-            <id>Compile time Weaver Custom</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.aspectj</groupId>
-                    <artifactId>aspectjweaver</artifactId>
-                    <version>1.6.9</version>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.aspectj</groupId>
-                    <artifactId>aspectjrt</artifactId>
-                    <version>1.6.9</version>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>TopLink Provider</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>TopLink-Provider</id>
             <repositories>
                 <repository>
                     <id>Eclipse</id>
                     <url>http://ftp.ing.umu.se/mirror/eclipse/rt/eclipselink/maven.repo/</url>
                 </repository>
             </repositories>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>eclipselink</artifactId>
-                    <version>2.1.1</version>
-                    <optional>true</optional>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
             <build>
                 <testResources>
                     <testResource>
@@ -182,24 +211,13 @@
             </build>
         </profile>
         <profile>
-            <id>OpenJPA Provider</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>OpenJPA-Provider</id>
             <repositories>
                 <repository>
                     <id>Iblioo</id>
                     <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
                 </repository>
             </repositories>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.openjpa</groupId>
-                    <artifactId>openjpa</artifactId>
-                    <version>2.0.0</version>
-                    <optional>true</optional>
-                </dependency>
-            </dependencies>
             <build>
                 <testResources>
                     <testResource>
@@ -209,10 +227,7 @@
             </build>
         </profile>
         <profile>
-            <id>Datanucleus Provider</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>Datanucleus-Provider</id>
             <repositories>
                 <repository>
                     <id>datanucleus</id>
@@ -239,39 +254,69 @@
                     </testResource>
                 </testResources>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-core</artifactId>
-                    <version>2.1.1</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-rdbms</artifactId>
-                    <version>2.1.1</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-jpa</artifactId>
-                    <version>2.1.1</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-enhancer</artifactId>
-                    <version>2.1.0-release</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>javax.jdo</groupId>
-                    <artifactId>jdo-api</artifactId>
-                    <version>3.0</version>
-                    <optional>true</optional>
-                </dependency>
-            </dependencies>
         </profile>
-
+        <profile>
+            <id>release-sign-artifacts-to-sonatype-nexus</id>
+            <activation>
+                <property>
+                    <name>performARelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>sonatype-nexus-staging</id>
+                    <name>Nexus Release Repository</name>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+                </repository>
+                <snapshotRepository>
+                    <id>sonatype-nexus-snapshot</id>
+                    <name>Nexus Snapshot Repository</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

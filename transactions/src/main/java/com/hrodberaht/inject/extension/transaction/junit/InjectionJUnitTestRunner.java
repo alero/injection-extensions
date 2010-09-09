@@ -1,9 +1,7 @@
 package com.hrodberaht.inject.extension.transaction.junit;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
-import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler;
 import com.hrodberaht.inject.extension.transaction.manager.util.TransactionManagerUtil;
-import org.aspectj.lang.Aspects;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
 import org.junit.runner.Description;
@@ -91,9 +89,9 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
         boolean hasTransaction = hasTransaction(frameworkMethod);
         // Need to re-init the TransactionAspect (Junit and AspectJ does not play well)
-        if (hasTransaction) {
-            injectTransactionHandler();
-        }
+
+        injectTransactionHandler();
+
         try {
             System.out.println("---  InjectionJUnitTestRunner: " +
                     " running child " + frameworkMethod.getName() + " in thread " + Thread.currentThread());
@@ -106,7 +104,8 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
                 if (transactionManager.isActive()) {
                     throw new RuntimeException("Transaction is already active");
                 }
-                transactionNew = transactionManager.begin();
+                transactionNew = true;
+                transactionManager.begin();
             }
 
             try {
@@ -135,7 +134,11 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
     }
 
     private void injectTransactionHandler() {
-        TransactionManagerUtil.registerTransactionManager(theContainer);
+        try{
+            TransactionManagerUtil.registerTransactionManager(theContainer);
+        }catch (InjectRuntimeException ignore){
+            // don't care if the transaction manager is not registered
+        }
     }
 
     /**
