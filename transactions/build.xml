@@ -10,6 +10,12 @@
         <tstamp/>
     </target>
 
+    <target name="hibernate_properties" depends="init"
+            description="activate toplink">
+        <copy tofile="${resource}" file="src\test\resources\META-INF\persistence.xml"
+              overwrite="true"/>
+    </target>
+
     <target name="toplink_properties" depends="init"
             description="activate toplink">
         <copy tofile="${resource}" file="src\test\eclipselinkresources\META-INF\persistence.xml"

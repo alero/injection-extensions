@@ -195,7 +195,7 @@
     </dependencies>
     <profiles>
         <profile>
-            <id>TopLink-Provider</id>
+            <id>EclipseLink-Provider</id>
             <repositories>
                 <repository>
                     <id>Eclipse</id>
@@ -205,7 +205,7 @@
             <build>
                 <testResources>
                     <testResource>
-                        <directory>src/main/eclipselinkresources</directory>
+                        <directory>src/test/eclipselinkresources</directory>
                     </testResource>
                 </testResources>
             </build>
@@ -221,7 +221,7 @@
             <build>
                 <testResources>
                     <testResource>
-                        <directory>src/main/openjparesources</directory>
+                        <directory>src/test/openjparesources</directory>
                     </testResource>
                 </testResources>
             </build>
@@ -250,7 +250,7 @@
                 </plugins>
                 <testResources>
                     <testResource>
-                        <directory>src/main/datanucleusresources</directory>
+                        <directory>src/test/datanucleusresources</directory>
                     </testResource>
                 </testResources>
             </build>

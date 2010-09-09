@@ -18,6 +18,7 @@ import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Injection Transaction Extension
@@ -156,7 +157,7 @@ public class TestJPATransactionManager {
         person.setName("Dude");
         application.createPerson(person);
         // Connection will be commited/closed here.
-
+        assertFalse(transactionManager.isActive());
 
         // A new connection must be created by the native vendor (JPA to JDBC)
         Person foundPerson = application.findPersonNative(person.getId());
