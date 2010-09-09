@@ -4,12 +4,10 @@ import com.hrodberaht.inject.extension.transaction.junit.TransactionManagerTest;
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionHolder;
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManagerBase;
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionScopeHandler;
-import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.EntityManagerHolder;
 import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.StatisticsJPA;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
 import org.hrodberaht.inject.register.InjectionFactory;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -127,7 +125,7 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
         StatisticsJPA.addCloseCount();
     }
 
-    public boolean begin() {
+    public void begin() {
         ConnectionHolder emh = (ConnectionHolder) findCreateManagerHolder();
         try {
             emh.getNativeManager().setAutoCommit(false);
@@ -137,7 +135,6 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
         }
         TransactionLogging.log("TransactionManagerJDBCImpl: Tx Begin for Connection {0}", emh.getNativeManager());
         StatisticsJDBC.addBeginCount();
-        return emh.isNew;
 
     }
 
@@ -209,8 +206,7 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
         ConnectionHolder connectionHolder = (ConnectionHolder) connectionTransactionHolder;
         connectionHolder.setActive(true);
     }
-
-    @Override
+    
     public boolean requiresNewDisabled() {
         return requiresNewDisabled.get() != null;
     }
@@ -231,7 +227,11 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
     }
 
     private ConnectionHolder getConnectionHolder() {
-        return (ConnectionHolder) entityManagerScope.get();
+        ConnectionHolder connectionHolder = (ConnectionHolder) entityManagerScope.get();
+        if(connectionHolder == null){
+            return null;
+        }
+        return (ConnectionHolder)connectionHolder.getCurrentActiveTransaction();
     }
 
 }

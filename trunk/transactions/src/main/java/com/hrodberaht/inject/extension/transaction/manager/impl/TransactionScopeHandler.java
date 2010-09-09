@@ -9,15 +9,15 @@ package com.hrodberaht.inject.extension.transaction.manager.impl;
  * @since 1.0
  */
 
-public class TransactionScopeHandler {
+public class TransactionScopeHandler<T> {
     private final InheritableThreadLocal<TransactionHolder> entityManagerScope =
             new InheritableThreadLocal<TransactionHolder>();
 
-    public TransactionHolder get() {
+    public TransactionHolder<T> get() {
         return entityManagerScope.get();
     }
 
-    public void set(TransactionHolder data) {
+    public void set(TransactionHolder<T> data) {
         entityManagerScope.set(data);
     }
 

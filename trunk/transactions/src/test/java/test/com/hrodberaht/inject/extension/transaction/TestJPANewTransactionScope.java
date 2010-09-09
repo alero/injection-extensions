@@ -15,6 +15,7 @@ import test.com.hrodberaht.inject.extension.transaction.example.Person;
 import test.com.hrodberaht.inject.extension.transaction.example.TransactedApplication;
 
 import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import java.util.Collection;
 
@@ -88,6 +89,7 @@ public class TestJPANewTransactionScope {
         cleanUp(true);
     }
 
+    @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
     private void cleanUp(boolean verifyPersons) {
         Collection<Person> persons = application.findAllPersons();
         if (verifyPersons) {
@@ -114,8 +116,8 @@ public class TestJPANewTransactionScope {
 
         assertEquals(storedLog.getMessage(), log.getMessage());
 
-        assertFalse(transactionManager.isActive());
-        // Cleanup
+        assertTrue(transactionManager.isActive());
+
         cleanUp(false);
 
     }

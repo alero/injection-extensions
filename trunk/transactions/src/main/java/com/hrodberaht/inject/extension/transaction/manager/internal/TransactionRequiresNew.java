@@ -52,7 +52,9 @@ public class TransactionRequiresNew {
             }
             throw error;
         } finally{
+            // if (newTransactionManager.newIsActive()) {
             newTransactionManager.newClose();
+            // }
         }
     }
 

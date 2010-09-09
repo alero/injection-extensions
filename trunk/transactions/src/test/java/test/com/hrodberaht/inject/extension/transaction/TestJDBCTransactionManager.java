@@ -50,6 +50,7 @@ public class TestJDBCTransactionManager {
     }
 
     @AfterClass
+    // @TransactionAttribute
     public static void destroy() {
         Container container = ModuleContainerForJDBCTests.container;
         TransactedApplication application = container.get(TransactedApplication.class);
@@ -65,6 +66,18 @@ public class TestJDBCTransactionManager {
     }
 
     @Test
+    @TransactionDisabled
+    public void testFindPersonsWithOnlySupported() {
+
+        Collection<Person> collection = application.findAllPersons();
+
+        // Verify that all values are cleared automatically from the test being transactional and calling rollback.
+        assertEquals(0, collection.size());
+
+    }
+
+
+    @Test
     public void testCreateManager() {
 
         Person person = StubUtil.createPerson();
@@ -74,6 +87,8 @@ public class TestJDBCTransactionManager {
         assertEquals(foundPerson.getName(), person.getName());
 
     }
+
+
 
 
     @Test
@@ -139,6 +154,7 @@ public class TestJDBCTransactionManager {
         assertEquals(foundPerson.getName(), person.getName());
 
     }
+
 
 
 }

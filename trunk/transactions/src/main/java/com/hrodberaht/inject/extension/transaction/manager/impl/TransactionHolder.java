@@ -14,9 +14,12 @@ public class TransactionHolder<T> {
     public boolean isNew = true;
     protected T nativeManager = null;
     protected boolean disableRequiresNew = false;
+    protected boolean rollbackOnly = false;
 
     protected TransactionHolder<T> childTransaction = null;
     protected TransactionHolder<T> parentTransaction = null;
+    protected TransactionHolder<T> currentActiveTransaction = null;
+
 
     public TransactionHolder() {
     }
@@ -51,5 +54,21 @@ public class TransactionHolder<T> {
 
     public void setChildTransaction(TransactionHolder<T> childTransaction) {
         this.childTransaction = childTransaction;
+    }
+
+    public void setRollbackOnly(boolean rollbackOnly) {
+        this.rollbackOnly = rollbackOnly;
+    }
+
+    public boolean isRollbackOnly() {
+        return rollbackOnly;
+    }
+
+    public TransactionHolder<T> getCurrentActiveTransaction() {
+        return currentActiveTransaction;
+    }
+
+    public void setCurrentActiveTransaction(TransactionHolder<T> currentActiveTransaction) {
+        this.currentActiveTransaction = currentActiveTransaction;
     }
 }

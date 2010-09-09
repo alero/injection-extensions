@@ -14,15 +14,17 @@ import javax.persistence.EntityManager;
  */
 public class EntityManagerHolder extends TransactionHolder<EntityManager> {
     public EntityManagerHolder() {
+        super.currentActiveTransaction = this;
     }
 
     public EntityManagerHolder(EntityManager entityManager) {
         super.nativeManager = entityManager;
+        super.currentActiveTransaction = this;
     }
 
     public EntityManagerHolder(EntityManager entityManager, TransactionHolder<EntityManager> holder) {
         this.nativeManager = entityManager;
-        this.parentTransaction = holder;
+        this.parentTransaction = holder;        
     }
 
 

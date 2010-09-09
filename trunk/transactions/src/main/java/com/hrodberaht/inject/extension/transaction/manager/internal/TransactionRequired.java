@@ -21,7 +21,8 @@ public class TransactionRequired {
         boolean isTransactionNew = false;
         try {
             if (!transactionManager.isActive()) {
-                isTransactionNew = transactionManager.begin();
+                isTransactionNew = true;
+                transactionManager.begin();
                 TransactionLogging.log("TransactionRequired: Begin Transactional call : {0}",
                         thisJoinPoint.getSignature().getName() + " isNew:" + isTransactionNew);
             }

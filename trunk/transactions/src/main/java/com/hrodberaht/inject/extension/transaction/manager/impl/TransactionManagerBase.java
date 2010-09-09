@@ -24,13 +24,11 @@ public abstract class TransactionManagerBase<T> implements TransactionManager, R
 
     protected abstract void postInitHolder(TransactionHolder<T> holder);
 
-    public abstract boolean requiresNewDisabled();
-
     public abstract void disableRequiresNew();
 
     public abstract void enableRequiresNew();
 
-    public abstract TransactionScopeHandler getTransactionScopeHandler();
+    public abstract TransactionScopeHandler<T> getTransactionScopeHandler();
 
 
     protected void cleanupTransactionHolder(TransactionHolder<T> holder) {
@@ -40,6 +38,7 @@ public abstract class TransactionManagerBase<T> implements TransactionManager, R
         } else {
             // cleanup self reference
             holder.getParentTransaction().setChildTransaction(null);
+            getTransactionScopeHandler().get().setCurrentActiveTransaction(holder.getParentTransaction());
         }
         closeAllChildren(holder);
     }
@@ -61,15 +60,15 @@ public abstract class TransactionManagerBase<T> implements TransactionManager, R
         } else if (manager.isNew) {
             manager.isNew = false;
         }
-        return manager;
+        return manager.getCurrentActiveTransaction();
     }
 
 
     public T getNativeManager() {
         TransactionHolder<T> holder = findDeepestHolder();
         if (holder == null) {
-            // This can happend when NOT_SUPPORTED tries to lookup a Manager
-            throw new TransactionHandlingError("The EntityManager has not been initialized with a transaction holder");
+            // This can happen when NOT_SUPPORTED tries to lookup a Manager
+            throw new TransactionHandlingError("The transaction holder has not been initialized");
         } else if (holder.getNativeManager() == null) {
             // Late create of manager (for SUPPORTS)
             holder.setNativeManager(createNativeManager());
@@ -80,6 +79,7 @@ public abstract class TransactionManagerBase<T> implements TransactionManager, R
 
     protected TransactionHolder<T> findAndInitDeepestHolder() {
         TransactionHolder<T> holder = getTransactionScopeHandler().get();
+        TransactionHolder<T> baseholder = holder;
         if (holder == null) {
             // If first transaction is REW_NEW, just do as normal.
             holder = createTransactionHolder();
@@ -89,9 +89,11 @@ public abstract class TransactionManagerBase<T> implements TransactionManager, R
         while (holder.getChildTransaction() != null) {
             holder = holder.getChildTransaction();
         }
-
-        holder.setChildTransaction(createTransactionHolder(holder));
-        return holder.getChildTransaction();
+        // Deepest holder is found
+        TransactionHolder<T> newHolder = createTransactionHolder(holder);
+        holder.setChildTransaction(newHolder);
+        baseholder.setCurrentActiveTransaction(newHolder);
+        return newHolder;
     }
 
 
@@ -100,10 +102,7 @@ public abstract class TransactionManagerBase<T> implements TransactionManager, R
         if (holder == null) {
             return null;
         }
-        while (holder.getChildTransaction() != null) {
-            holder = holder.getChildTransaction();
-        }
-        return holder;
+        return holder.getCurrentActiveTransaction();        
     }
 
 }
