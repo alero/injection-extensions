@@ -1,5 +1,7 @@
 package com.hrodberaht.inject.extension.transaction.manager.impl.jpa;
 
+import com.hrodberaht.inject.extension.transaction.TransactionManager;
+
 import javax.persistence.EntityManager;
 
 /**
@@ -10,6 +12,6 @@ import javax.persistence.EntityManager;
  * @version 1.0
  * @since 1.0
  */
-public interface TransactionManagerJPA {
+public interface TransactionManagerJPA extends TransactionManager {
     EntityManager getNativeManager();    
 }

@@ -4,11 +4,6 @@ import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator;
 import com.hrodberaht.inject.extension.transaction.manager.TransactionManagerModule;
 import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.TransactionManagerJDBCImpl;
-import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPAImpl;
-import org.hibernate.SessionFactory;
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.ejb.EntityManagerFactoryImpl;
-import org.hibernate.engine.SessionFactoryImplementor;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
 
@@ -17,7 +12,9 @@ import javax.persistence.Persistence;
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Injection Transaction Extension
@@ -35,14 +32,13 @@ public class ModuleContainerForJDBCTests implements InjectionContainerCreator {
     }
 
     public InjectContainer createContainer() {
-        InjectionRegisterModule register = new InjectionRegisterModule();        
+        InjectionRegisterModule register = new InjectionRegisterModule();
 
         // This is just done to simplify the test application
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("example-jpa");
-        EntityManagerFactoryImpl managerFactory = (EntityManagerFactoryImpl)entityManagerFactory;
-        DataSource dataSource = getDataSource(managerFactory.getSessionFactory());
+        DataSource dataSource = getDataSource(entityManagerFactory);
 
-        register.register(TransactedApplication.class,  JDBCTransactedApplication.class);
+        register.register(TransactedApplication.class, JDBCTransactedApplication.class);
         // Create the JPA transaction manager, different managers will need different objects in their construct.
         TransactionManager transactionManager = new TransactionManagerJDBCImpl(dataSource);
         // Use the special RegistrationModule named TransactionManager,
@@ -55,45 +51,67 @@ public class ModuleContainerForJDBCTests implements InjectionContainerCreator {
     }
 
 
-    public static DataSource getDataSource(SessionFactory sessionFactory) {
-		if (sessionFactory instanceof SessionFactoryImplementor) {
-			final ConnectionProvider cp = ((SessionFactoryImplementor) sessionFactory).getConnectionProvider();
-            DataSource simpleDataSource = new DataSource (){
-                PrintWriter printWriter = null;
-                public Connection getConnection() throws SQLException {
-                    return cp.getConnection();
+    public static DataSource getDataSource(final EntityManagerFactory entityManagerFactory) {
+
+        DataSource simpleDataSource = new DataSource() {
+            PrintWriter printWriter = null;
+
+            public Connection getConnection() throws SQLException {
+                Map<String, Object> props = entityManagerFactory.getProperties();
+                String driver = "javax.persistence.jdbc.driver";
+                String url = "javax.persistence.jdbc.url";
+                String user = "javax.persistence.jdbc.user";
+                String password = "javax.persistence.jdbc.password";
+                if("OpenJPA".equals(props.get("VendorName"))){
+                    driver = "openjpa.ConnectionDriverName";
+                    url = "openjpa.ConnectionURL";
+                    user = "openjpa.ConnectionUserName";
+                    password = "openjpa.ConnectionPassword";
+                }
+                try {
+                    Class.forName((String) props.get(driver));
+                    return DriverManager.getConnection(
+                            (String) props.get(url)
+                            , (String) props.get(user)
+                            , (String) props.get(password)
+                    );
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                    return null;
                 }
 
-                public Connection getConnection(String username, String password) throws SQLException {
-                    return cp.getConnection();
-                }
+            }
 
-                public PrintWriter getLogWriter() throws SQLException {
-                    return printWriter;
-                }
+            public Connection getConnection(String username, String password) throws SQLException {
+                return getConnection();
+            }
 
-                public void setLogWriter(PrintWriter out) throws SQLException {
-                    printWriter = out;
-                }
+            public PrintWriter getLogWriter() throws SQLException {
+                return printWriter;
+            }
 
-                public void setLoginTimeout(int seconds) throws SQLException {
+            public void setLogWriter(PrintWriter out) throws SQLException {
+                printWriter = out;
+            }
 
-                }
+            public void setLoginTimeout(int seconds) throws SQLException {
 
-                public int getLoginTimeout() throws SQLException {
-                    return 600;
-                }
+            }
 
-                public <T> T unwrap(Class<T> iface) throws SQLException {
-                    return null;  //To change body of implemented methods use File | Settings | File Templates.
-                }
+            public int getLoginTimeout() throws SQLException {
+                return 600;
+            }
 
-                public boolean isWrapperFor(Class<?> iface) throws SQLException {
-                    return false;
-                }
-            };
-            return simpleDataSource;
-		}
-		return null;
-	}
+            public <T> T unwrap(Class<T> iface) throws SQLException {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            public boolean isWrapperFor(Class<?> iface) throws SQLException {
+                return false;
+            }
+        };
+        return simpleDataSource;
+
+
+    }
 }
