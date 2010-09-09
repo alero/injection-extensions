@@ -8,6 +8,7 @@ import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionH
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import test.com.hrodberaht.inject.extension.transaction.example.ModuleContainerForTests;
@@ -19,6 +20,7 @@ import javax.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Injection Transaction Extension
@@ -169,6 +171,23 @@ public class TestJPATransactionManager {
         foundPerson = application.findPersonNative(person.getId());
 
         assertEquals(null, foundPerson);
+    }
+
+    @Test
+    @Ignore
+    public void testJDBCNativeJPANoJoinTransaction() {
+
+        Person person = StubUtil.createPerson();
+        person.setName("Dude");
+        application.createPerson(person);
+        // Connection will be commited/closed here.
+        assertTrue(transactionManager.isActive());
+
+        // A new connection is forced by the native vendor (JPA to JDBC)
+        Person foundPerson = application.findPersonNativeNoJoin(person.getId());
+
+        assertEquals(null, foundPerson);
+
     }
 
 
