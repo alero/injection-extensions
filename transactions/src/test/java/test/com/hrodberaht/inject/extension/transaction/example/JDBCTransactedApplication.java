@@ -43,8 +43,8 @@ public class JDBCTransactedApplication implements TransactedApplication {
 
     @TransactionAttribute
     public void deletePerson(Person person) {
-        String sql = "delete from Person where id = "+person.getId();
-        jdbcService.execute(sql);
+        String sql = "delete from Person where id = ?";
+        jdbcService.execute(sql, person.getId());
     }
 
     @TransactionAttribute
@@ -161,8 +161,8 @@ public class JDBCTransactedApplication implements TransactedApplication {
     }
 
     private Person findPersonJDBC(Long id) {
-        String sql = "select * from Person where id = "+id;
-        return jdbcService.querySingle(sql, new PersonIterator());
+        String sql = "select * from Person where id = ?";
+        return jdbcService.querySingle(sql, new PersonIterator(), id);
     }
     private void createPersonJDBC(Person person) {
         Insert insert = jdbcService.createInsert("Person");
@@ -174,7 +174,7 @@ public class JDBCTransactedApplication implements TransactedApplication {
 
     private Logging findLogJDBC(Long id) {
         String sql = "select * from Logging where id = "+id;
-        return jdbcService.querySingle(sql, new LogIterator());
+        return jdbcService.querySingle(sql, new LogIterator(), id);
     }
     private void createLogJDBC(Logging log) {
         Insert insert = jdbcService.createInsert("Logging");

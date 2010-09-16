@@ -18,9 +18,9 @@ public interface JDBCService {
     int insertOrUpdate(InsertOrUpdater insertOrUpdater);
     int insert(Insert insert);
 
-    <T> Collection<T> query(String sql, RowIterator<T> rowIterator); 
-    <T> T querySingle(String sql, RowIterator<T> rowIterator);
+    <T> Collection<T> query(String sql, RowIterator<T> rowIterator, Object... args); 
+    <T> T querySingle(String sql, RowIterator<T> rowIterator, Object... args);
 
 
-    int execute(String sql);
+    int execute(String sql, Object... args);    
 }

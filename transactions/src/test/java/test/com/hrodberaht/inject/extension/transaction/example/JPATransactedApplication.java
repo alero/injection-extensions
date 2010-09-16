@@ -76,8 +76,8 @@ public class JPATransactedApplication implements TransactedApplication {
 
     @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
     public Person findPersonNative(Long id) {
-       String sql = "select * from person where id = "+id;
-        return jdbcService.querySingle(sql, new RowIterator<Person>(){
+        String sql = "select * from person where id = ?";
+        return jdbcService.querySingle(sql, new RowIterator<Person>() {
 
             public Person iterate(ResultSet rs, int iteration) throws SQLException {
                 Person person = new Person();
@@ -85,14 +85,14 @@ public class JPATransactedApplication implements TransactedApplication {
                 person.setName(rs.getString("name"));
                 return person;
             }
-        });
+        }, id);
 
     }
 
     @TransactionAttribute(value = TransactionAttributeType.SUPPORTS)
     public Person findPersonNativeNoJoin(Long id) {
-       String sql = "select * from person where id = "+id;
-        return standAloneJdbcService.querySingle(sql, new RowIterator<Person>(){
+        String sql = "select * from person where id = ?";
+        return standAloneJdbcService.querySingle(sql, new RowIterator<Person>() {
 
             public Person iterate(ResultSet rs, int iteration) throws SQLException {
                 Person person = new Person();
@@ -100,7 +100,7 @@ public class JPATransactedApplication implements TransactedApplication {
                 person.setName(rs.getString("name"));
                 return person;
             }
-        });
+        }, id);
 
     }
 
