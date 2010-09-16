@@ -2,6 +2,7 @@ package com.hrodberaht.inject.extension.transaction.manager.util;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import com.hrodberaht.inject.extension.transaction.manager.internal.AspectJTransactionHandler;
+import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
 import org.hrodberaht.inject.InjectContainer;
 
 /**
@@ -19,8 +20,8 @@ public class TransactionManagerUtil {
             AspectJTransactionHandler aspectJTransactionHandler =
                     org.aspectj.lang.Aspects.aspectOf(AspectJTransactionHandler.class);
             TransactionManager transactionManager = theContainer.get(TransactionManager.class);
-            System.out.println("Connecting the aspect " + aspectJTransactionHandler.toString()
-                    + " to transaction manager " + transactionManager);
+            TransactionLogging.log("Connecting the aspect {0} "
+                    + " to transaction manager {1}", aspectJTransactionHandler.toString(),  transactionManager);
             theContainer.injectDependencies(aspectJTransactionHandler);
         }
     }

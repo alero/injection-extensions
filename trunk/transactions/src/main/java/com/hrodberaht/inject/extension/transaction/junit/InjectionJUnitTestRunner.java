@@ -1,6 +1,7 @@
 package com.hrodberaht.inject.extension.transaction.junit;
 
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
+import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
 import com.hrodberaht.inject.extension.transaction.manager.util.TransactionManagerUtil;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
@@ -93,8 +94,8 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
         injectTransactionHandler();
 
         try {
-            System.out.println("---  InjectionJUnitTestRunner: " +
-                    " running child " + frameworkMethod.getName() + " in thread " + Thread.currentThread());
+            TransactionLogging.log ("---  InjectionJUnitTestRunner: " +
+                    " running child {0} in thread {1}",frameworkMethod.getName(), Thread.currentThread());
             if (disableRequiresNewTransaction) {
                 ((TransactionManagerTest) transactionManager).disableRequiresNew();
             }
@@ -129,8 +130,8 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
             notifier.fireTestFailure(new Failure(description, e));
             notifier.fireTestFinished(description);
         }
-        System.out.println("---  InjectionJUnitTestRunner: " +
-                " done running child " + frameworkMethod.getName() + " in thread " + Thread.currentThread());
+        TransactionLogging.log("---  InjectionJUnitTestRunner: " +
+                " done running child {0} in thread {1}",frameworkMethod.getName(), Thread.currentThread());
     }
 
     private void injectTransactionHandler() {
@@ -175,13 +176,13 @@ public class InjectionJUnitTestRunner extends BlockJUnit4ClassRunner {
     private void verifyContainerTransactions(InjectContainer theContainer, com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator creator) {
         try {
             transactionManager = theContainer.get(TransactionManager.class);
-            System.out.println("InjectionJUnitTestRunner: " +
-                    "TransactionManager (" + transactionManager.getClass().getSimpleName() + ") " +
-                    "successfully wired from creator: " + creator.getClass().getSimpleName());
+            TransactionLogging.log(
+                    "TransactionManager ({0}) " +
+                    "successfully wired from creator: {1}", transactionManager.getClass().getSimpleName(), creator.getClass().getSimpleName());
 
         } catch (InjectRuntimeException exception) {
-            System.out.println("InjectionJUnitTestRunner: " +
-                    "TransactionManager not wired for Container from creator: " + creator.getClass().getName());
+            TransactionLogging.log("InjectionJUnitTestRunner: " +
+                    "TransactionManager not wired for Container from creator: {0}",creator.getClass().getName());
             exception.printStackTrace(System.err);
         }
     }
