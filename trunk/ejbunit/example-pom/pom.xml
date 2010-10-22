@@ -16,8 +16,8 @@
             <url>http://repository.jboss.org/maven2/</url>
         </repository>
         <repository>
-            <id>Jboss</id>
-            <name>Jboss</name>
+            <id>sonatype</id>
+            <name>sonatype</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>        
     </repositories>
