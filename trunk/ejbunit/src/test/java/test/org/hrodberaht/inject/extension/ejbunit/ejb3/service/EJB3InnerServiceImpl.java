@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 19:29:52
@@ -48,6 +48,22 @@ public class EJB3InnerServiceImpl implements EJB3InnerServiceInterface {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }        
+    }
+
+    public void updateSomethingInDataSource(Long id, String name) {
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("update the_table set name = ? where id = ?");
+            preparedStatement.setString(1, name);
+            preparedStatement.setLong(2, id);
+
+            preparedStatement.executeUpdate();
+            // This is not proper socket close handling and will leak in case of errors, but this is a simple test
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

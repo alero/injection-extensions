@@ -4,7 +4,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 19:26:59
@@ -37,5 +37,9 @@ public class EJB3ServiceImpl implements EJB3ServiceInterface{
 
     public String findSomethingDeepWithDataSource(Long id) {
         return innerService.findSomethingFromDataSource(id);
+    }
+
+    public void updateSomethingInDataSource(Long id, String name) {
+        innerService.updateSomethingInDataSource(id, name);
     }
 }

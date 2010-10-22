@@ -5,7 +5,7 @@ import org.mockito.Mockito;
 import test.org.hrodberaht.inject.extension.ejbunit.ejb3.service.EJB3InnerServiceInterface;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-17 02:44:35

@@ -16,7 +16,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 19:45:53

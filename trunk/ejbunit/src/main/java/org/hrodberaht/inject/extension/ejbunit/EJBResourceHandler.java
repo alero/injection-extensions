@@ -3,7 +3,7 @@ package org.hrodberaht.inject.extension.ejbunit;
 import org.hrodberaht.inject.register.RegistrationModule;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-13 00:23:43

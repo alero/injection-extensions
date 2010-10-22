@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import test.org.hrodberaht.inject.extension.ejbunit.ejb3.config.EJBContainerConfigExample;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 20:39:39

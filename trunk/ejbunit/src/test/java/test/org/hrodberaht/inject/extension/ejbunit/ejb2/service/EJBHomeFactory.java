@@ -8,7 +8,7 @@ import javax.naming.NamingException;
 import javax.rmi.PortableRemoteObject;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 21:53:38
