@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import static org.junit.Assert.assertEquals;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 19:31:30
@@ -54,11 +54,22 @@ public class TestEJB3ServiceContext {
     }
 
     @Test
+    public void testEJBResourceInjectionAndUpdate(){
+        String something = ejb3ServiceInterfaceWithInject.findSomethingDeepWithDataSource(12L);
+        assertEquals("The Name", something);
+        ejb3ServiceInterfaceWithInject.updateSomethingInDataSource(12L, "A new Name");
+        something = ejb3ServiceInterfaceWithInject.findSomethingDeepWithDataSource(12L);
+        assertEquals("A new Name", something);
+    }
+
+    @Test
     public void testEJBResourceInjection(){
         String something = ejb3ServiceInterfaceWithInject.findSomethingDeepWithDataSource(12L);
         assertEquals("The Name", something);
         
     }
+
+
 
     @Test
     public void testEJBWiringWithMockito(){

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hrodberaht.inject.extension</groupId>
-    <artifactId>ejb3-junit</artifactId>
+    <artifactId>ejb-junit</artifactId>
     <packaging>jar</packaging>
     <version>SNAPSHOT</version>
     <name>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</name>

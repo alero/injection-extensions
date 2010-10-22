@@ -10,7 +10,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 22:34:53
@@ -68,7 +68,7 @@ public class DataSourceProxy implements DataSource {
         try {
             Class.forName(JDBC_DRIVER);
             final Connection conn = DriverManager.getConnection(JDBC_URL + dbName, JDBC_USERNAME, JDBC_PASSWORD);
-
+            conn.setAutoCommit(false);
             InvocationHandler invocationHandler = new InvocationHandler() {
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                     if (method.getName().equals("close")) {

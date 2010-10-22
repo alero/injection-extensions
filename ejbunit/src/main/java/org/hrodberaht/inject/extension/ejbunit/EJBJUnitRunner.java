@@ -11,7 +11,7 @@ import org.junit.runners.model.InitializationError;
 import java.lang.annotation.Annotation;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 19:32:34

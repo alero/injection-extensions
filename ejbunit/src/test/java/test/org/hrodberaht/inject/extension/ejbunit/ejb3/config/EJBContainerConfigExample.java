@@ -5,7 +5,7 @@ import org.hrodberaht.inject.extension.ejbunit.EJBContainerConfigBase;
 import org.hrodberaht.inject.extension.ejbunit.ResourceCreator;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 19:37:42

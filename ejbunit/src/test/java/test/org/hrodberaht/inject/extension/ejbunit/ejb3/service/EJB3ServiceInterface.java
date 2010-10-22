@@ -3,7 +3,7 @@ package test.org.hrodberaht.inject.extension.ejbunit.ejb3.service;
 import javax.ejb.Local;
 
 /**
- * ¤Projectname¤
+ * Unit Test EJB (using @Inject)
  *
  * @author Robert Alexandersson
  *         2010-okt-11 19:24:39
@@ -18,4 +18,6 @@ public interface EJB3ServiceInterface {
     String findSomethingDeep(Long id);
 
     String findSomethingDeepWithDataSource(Long id);
+
+    void updateSomethingInDataSource(Long id, String name);
 }
