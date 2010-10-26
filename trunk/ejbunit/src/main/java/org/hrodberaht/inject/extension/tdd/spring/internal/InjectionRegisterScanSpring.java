@@ -1,11 +1,12 @@
-package org.hrodberaht.inject.extension.tdd.ejb.internal;
+package org.hrodberaht.inject.extension.tdd.spring.internal;
 
 import org.hrodberaht.inject.ScopeContainer;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -18,12 +19,12 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public class InjectionRegisterScanEJB extends InjectionRegisterScanBase {
+public class InjectionRegisterScanSpring extends InjectionRegisterScanBase {
 
 
     @Override
-    public InjectionRegisterScanEJB clone() {
-        InjectionRegisterScanEJB clone = new InjectionRegisterScanEJB();
+    public InjectionRegisterScanSpring clone() {
+        InjectionRegisterScanSpring clone = new InjectionRegisterScanSpring();
         try {
             clone.container = this.container.clone();
         } catch (CloneNotSupportedException e) {
@@ -33,21 +34,21 @@ public class InjectionRegisterScanEJB extends InjectionRegisterScanBase {
     }
 
     protected boolean isInterfaceAnnotated(Class aClazz) {
-        if(aClazz.isAnnotationPresent(Local.class)){
+        return false;
+    }
+
+    protected boolean isServiceAnnotated(Class aClazz) {
+        if(aClazz.isAnnotationPresent(Component.class)){
             return true;
-        }else if(aClazz.isAnnotationPresent(Remote.class)){
+        }else if(aClazz.isAnnotationPresent(Service.class)){
+            return true;
+        }else if(aClazz.isAnnotationPresent(Controller.class)){
             return true;
         }
         return false;
     }
 
-    @Override
-    protected boolean isServiceAnnotated(Class aClazz) {
-        return false;
-    }
-
     protected Class findServiceImplementation(Class aClazz, List<Class> listOfClasses) {
-
         Class foundServiceImplementation = null;
         for(Class aServiceClass:listOfClasses){
 
@@ -69,13 +70,13 @@ public class InjectionRegisterScanEJB extends InjectionRegisterScanBase {
         }
 
         return foundServiceImplementation;
-    }
+    }  
 
     protected ScopeContainer.Scope getScope(Class serviceClass) {
         // Its a nice thought but for Unit tests we need the container to reform all services at all times
         // TODO: make this work, clear the singletons at "reset"
         if(serviceClass.isAnnotationPresent(Stateless.class)){
-            // return ScopeContainer.Scope.SINGLETON;
+            return ScopeContainer.Scope.SINGLETON;
         }
         return ScopeContainer.Scope.NEW;
     }

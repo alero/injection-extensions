@@ -1,6 +1,7 @@
-package org.hrodberaht.inject.extension.tdd.ejb;
+package org.hrodberaht.inject.extension.tdd;
 
 import org.hrodberaht.inject.InjectContainer;
+import org.hrodberaht.inject.extension.tdd.ejb.EJBResourceHandler;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -18,11 +19,11 @@ import java.lang.annotation.Annotation;
  * @version 1.0
  * @since 1.0
  */
-public class EJBJUnitRunner extends BlockJUnit4ClassRunner {
+public class JUnitRunner extends BlockJUnit4ClassRunner {
 
     private InjectContainer theContainer = null;
 
-    private EJBContainerConfigBase creator = null;
+    private ContainerConfigBase creator = null;
 
     /**
      * Creates a BlockJUnit4ClassRunner to run {@code klass}
@@ -30,7 +31,7 @@ public class EJBJUnitRunner extends BlockJUnit4ClassRunner {
      * @throws org.junit.runners.model.InitializationError
      *          if the test class is malformed.
      */
-    public EJBJUnitRunner(Class<?> klass) throws InitializationError {
+    public JUnitRunner(Class<?> klass) throws InitializationError {
         super(klass);
         createContainerFromRegistration();
     }
@@ -40,9 +41,9 @@ public class EJBJUnitRunner extends BlockJUnit4ClassRunner {
             Class testClass = getTestClass().getJavaClass();
             Annotation[] annotations = testClass.getAnnotations();
             for (Annotation annotation : annotations) {
-                if (annotation.annotationType() == EJBContainerContext.class) {
-                    EJBContainerContext containerContext = (EJBContainerContext) annotation;
-                    Class<? extends EJBContainerConfigBase> transactionClass = containerContext.value();
+                if (annotation.annotationType() == ContainerContext.class) {
+                    ContainerContext containerContext = (ContainerContext) annotation;
+                    Class<? extends ContainerConfigBase> transactionClass = containerContext.value();
                     creator = transactionClass.newInstance();
                     theContainer = creator.createContainer();
                 }
@@ -66,7 +67,7 @@ public class EJBJUnitRunner extends BlockJUnit4ClassRunner {
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
         try {
 
-            EJBResourceHandler.begin(creator); 
+            EJBResourceHandler.begin(creator);
 
             try {
                 super.runChild(frameworkMethod, notifier);

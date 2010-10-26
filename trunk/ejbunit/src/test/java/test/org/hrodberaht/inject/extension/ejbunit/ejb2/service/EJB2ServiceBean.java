@@ -23,7 +23,10 @@ public class EJB2ServiceBean implements SessionBean {
         return "something "+id;
     }
 
-    
+    public SessionContext getSessionContext() {
+        return sessionContext;
+    }
+
     public String getSomethingDeep(Long id) throws CreateException, RemoteException {
 
         EJB2InnerServiceLocalHome localHome = EJBHomeFactory.getInstance().getLocalHome(EJB2InnerServiceLocalHome.class);

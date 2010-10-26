@@ -1,4 +1,4 @@
-package test.org.hrodberaht.inject.extension.ejbunit.ejb3;
+package test.org.hrodberaht.inject.extension.ejbunit.spring;
 
 import org.hrodberaht.inject.extension.tdd.ContainerContext;
 import org.hrodberaht.inject.extension.tdd.JUnitRunner;
@@ -6,34 +6,32 @@ import org.hrodberaht.inject.extension.tdd.ejb.EJBResourceHandler;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import test.org.hrodberaht.inject.extension.ejbunit.ejb3.config.EJBContainerConfigExample;
-import test.org.hrodberaht.inject.extension.ejbunit.ejb3.config.MockedInnerModule;
-import test.org.hrodberaht.inject.extension.ejbunit.ejb3.service.EJB3InnerServiceInterface;
-import test.org.hrodberaht.inject.extension.ejbunit.ejb3.service.EJB3ServiceInterface;
+import org.springframework.beans.factory.annotation.Autowired;
+import test.org.hrodberaht.inject.extension.ejbunit.spring.config.SpringContainerConfigExample;
+import test.org.hrodberaht.inject.extension.ejbunit.spring.service.SpringInnerServiceInterface;
+import test.org.hrodberaht.inject.extension.ejbunit.spring.service.SpringServiceInterface;
 
-import javax.ejb.EJB;
 import javax.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit Test EJB (using @Inject)
+ * ¤Projectname¤
  *
  * @author Robert Alexandersson
- *         2010-okt-11 19:31:30
+ *         2010-okt-26 18:56:45
  * @version 1.0
  * @since 1.0
  */
-@ContainerContext(EJBContainerConfigExample.class)
+@ContainerContext(SpringContainerConfigExample.class)
 @RunWith(JUnitRunner.class)
-public class TestEJB3ServiceContext {
-
+public class TestSpringServiceContext {
 
     @Inject
-    private EJB3ServiceInterface ejb3ServiceInterfaceWithInject;
+    private SpringServiceInterface serviceInterfaceWithInject;
 
-    @EJB
-    private EJB3ServiceInterface anInterface;
+    @Autowired
+    private SpringServiceInterface anInterface;
 
     @Test
     public void testEJBWiring(){
@@ -46,10 +44,10 @@ public class TestEJB3ServiceContext {
 
     @Test
     public void testEJBInjectWiring(){
-        String something = ejb3ServiceInterfaceWithInject.findSomething(12L);
+        String something = serviceInterfaceWithInject.findSomething(12L);
         assertEquals("Something", something);
 
-        String somethingDeep = ejb3ServiceInterfaceWithInject.findSomethingDeep(12L);
+        String somethingDeep = serviceInterfaceWithInject.findSomethingDeep(12L);
         assertEquals("Something Deep", somethingDeep);
     }
 
@@ -64,36 +62,24 @@ public class TestEJB3ServiceContext {
 
     @Test
     public void testEJBResourceInjection(){
-        String something = ejb3ServiceInterfaceWithInject.findSomethingDeepWithDataSource(12L);
+        String something = serviceInterfaceWithInject.findSomethingDeepWithDataSource(12L);
         assertEquals("The Name", something);
-        
     }
-
 
 
     @Test
     public void testEJBWiringWithMockito(){
 
-        EJB3InnerServiceInterface anInterface = Mockito.mock(EJB3InnerServiceInterface.class);
+        SpringInnerServiceInterface anInterface = Mockito.mock(SpringInnerServiceInterface.class);
         Mockito.when(anInterface.findSomething(12L)).thenReturn("Something Deep From Mock");
-        EJBResourceHandler.registerServiceInstance(EJB3InnerServiceInterface.class, anInterface);
+        EJBResourceHandler.registerServiceInstance(SpringInnerServiceInterface.class, anInterface);
 
-        EJB3ServiceInterface serviceInterface = EJBResourceHandler.getService(EJB3ServiceInterface.class); 
+        SpringServiceInterface serviceInterface = EJBResourceHandler.getService(SpringServiceInterface.class);
         String something = serviceInterface.findSomething(12L);
         assertEquals("Something", something);
 
         String somethingDeep = serviceInterface.findSomethingDeep(12L);
         assertEquals("Something Deep From Mock", somethingDeep);
-    }
-
-    @Test
-    public void testModuleRegistration(){
-        EJBResourceHandler.registerModule(new MockedInnerModule());
-
-        EJB3ServiceInterface serviceInterface = EJBResourceHandler.getService(EJB3ServiceInterface.class);
-        String something = serviceInterface.findSomethingDeep(12L);
-        assertEquals("Mocked", something);
-
     }
 
 }

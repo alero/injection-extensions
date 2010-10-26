@@ -1,6 +1,7 @@
-package org.hrodberaht.inject.extension.tdd.ejb.internal;
+package org.hrodberaht.inject.extension.tdd.internal;
 
-import org.hrodberaht.inject.extension.ejbunit.ResourceCreator;
+
+import org.hrodberaht.inject.extension.tdd.ResourceCreator;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
