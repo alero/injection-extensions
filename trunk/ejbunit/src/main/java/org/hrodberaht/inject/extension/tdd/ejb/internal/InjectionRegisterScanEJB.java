@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.ejbunit.internal;
+package org.hrodberaht.inject.extension.tdd.ejb.internal;
 
 import org.hrodberaht.inject.InjectionRegisterModule;
 import org.hrodberaht.inject.ScopeContainer;
