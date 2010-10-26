@@ -1,6 +1,6 @@
 package org.hrodberaht.inject.extension.tdd.ejb;
 
-import org.hrodberaht.inject.extension.ejbunit.internal.DataSourceProxy;
+import org.hrodberaht.inject.extension.tdd.ejb.internal.DataSourceProxy;
 
 import java.util.HashMap;
 import java.util.Map;

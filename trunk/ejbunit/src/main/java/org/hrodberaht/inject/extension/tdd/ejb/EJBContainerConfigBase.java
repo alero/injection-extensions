@@ -1,8 +1,8 @@
 package org.hrodberaht.inject.extension.tdd.ejb;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.ejbunit.internal.DataSourceExecution;
-import org.hrodberaht.inject.extension.ejbunit.internal.InjectionRegisterScanEJB;
+import org.hrodberaht.inject.extension.tdd.ejb.internal.DataSourceExecution;
+import org.hrodberaht.inject.extension.tdd.ejb.internal.InjectionRegisterScanEJB;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
 import org.hrodberaht.inject.spi.InjectionPointFinder;
 
