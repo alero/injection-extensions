@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.ejbunit;
+package org.hrodberaht.inject.extension.tdd.ejb;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

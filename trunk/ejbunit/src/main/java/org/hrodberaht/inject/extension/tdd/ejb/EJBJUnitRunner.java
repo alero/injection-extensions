@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.ejbunit;
+package org.hrodberaht.inject.extension.tdd.ejb;
 
 import org.hrodberaht.inject.InjectContainer;
 import org.junit.runner.Description;
