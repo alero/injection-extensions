@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.tdd.ejb;
+package org.hrodberaht.inject.extension.tdd;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -17,6 +17,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-public @interface EJBContainerContext {
-    Class<? extends EJBContainerConfigBase> value();
+public @interface ContainerContext {
+    Class<? extends ContainerConfigBase> value();
 }

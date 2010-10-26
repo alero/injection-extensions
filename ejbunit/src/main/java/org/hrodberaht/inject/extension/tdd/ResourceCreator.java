@@ -1,6 +1,6 @@
-package org.hrodberaht.inject.extension.tdd.ejb;
+package org.hrodberaht.inject.extension.tdd;
 
-import org.hrodberaht.inject.extension.tdd.ejb.internal.DataSourceProxy;
+import org.hrodberaht.inject.extension.tdd.internal.DataSourceProxy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,5 +38,7 @@ public class ResourceCreator {
     }
 
 
-
+    public static boolean hasDataSource(String dataSourceName) {
+        return DATASOURCES.get(dataSourceName) != null;
+    }
 }

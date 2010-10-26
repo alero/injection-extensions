@@ -18,6 +18,6 @@ public class MockedInnerModule extends RegistrationModuleAnnotation {
         EJB3InnerServiceInterface innerServiceInterface = Mockito.mock(EJB3InnerServiceInterface.class);
         Mockito.when(innerServiceInterface.findSomething(12L)).thenReturn("Mocked");
         register(EJB3InnerServiceInterface.class).withInstance(innerServiceInterface);
-
+        
     }
 }
