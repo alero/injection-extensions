@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.ejbunit.internal;
+package org.hrodberaht.inject.extension.tdd.ejb.internal;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
