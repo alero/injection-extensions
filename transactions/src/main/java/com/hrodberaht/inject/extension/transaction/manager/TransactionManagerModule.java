@@ -1,26 +1,22 @@
 package com.hrodberaht.inject.extension.transaction.manager;
 
+import com.hrodberaht.inject.extension.jdbc.InsertOrUpdater;
+import com.hrodberaht.inject.extension.jdbc.JDBCService;
 import com.hrodberaht.inject.extension.jdbc.internal.InsertOrUpdaterImpl;
 import com.hrodberaht.inject.extension.jdbc.internal.JDBCServiceImpl;
 import com.hrodberaht.inject.extension.transaction.TransactionManager;
-import com.hrodberaht.inject.extension.jdbc.InsertOrUpdater;
-import com.hrodberaht.inject.extension.jdbc.JDBCService;
 import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.TransactionManagerJDBC;
 import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.TransactionManagerJDBCImpl;
 import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPA;
 import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPAImpl;
 import com.hrodberaht.inject.extension.transaction.manager.internal.vendor.ProviderFactory;
 import com.hrodberaht.inject.extension.transaction.manager.internal.vendor.ProviderService;
-import com.hrodberaht.inject.extension.transaction.manager.util.TransactionManagerUtil;
-import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.InjectionRegisterBase;
+import org.hrodberaht.inject.register.ExtendedModule;
 import org.hrodberaht.inject.register.InjectionFactory;
-import org.hrodberaht.inject.register.RegistrationModule;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 
 import javax.persistence.EntityManager;
 import java.sql.Connection;
-import java.util.Collection;
 
 /**
  * Injection Transaction Extension
@@ -30,21 +26,15 @@ import java.util.Collection;
  * @version 1.0
  * @since 1.0
  */
-public class TransactionManagerModule extends RegistrationModuleAnnotation implements RegistrationModule {
+public class TransactionManagerModule extends ExtendedModule {
+    
 
-    RegistrationModuleAnnotation registration = null;
-    InjectContainer theContainer = null;
-
-    public TransactionManagerModule(final TransactionManager transactionManager
-            , InjectionRegisterBase register) {
+    public TransactionManagerModule(final TransactionManager transactionManager) {
         registration = new RegistrationModuleAnnotation() {
             @Override
             public void registrations() {
                 // the withInstance will automatically create a singleton with that instance
                 register(TransactionManager.class).withInstance(transactionManager);
-                // This will make the registration to the correct implementation as well
-                // for usage in the application that needs to know the implementation
-                register(transactionManager.getClass()).withInstance(transactionManager);
 
                 // This will make the registration to the specific implementation interface as well
                 // for usage in an application that needs implementation specific information
@@ -69,18 +59,14 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
                     register(Connection.class).withFactory(injectionFactory);
                 }
 
-                // Connect the the JDBC Services
+                // Configure the JDBC Services
                 register(JDBCService.class).with(JDBCServiceImpl.class);
                 register(InsertOrUpdater.class).with(InsertOrUpdaterImpl.class);
-
-
             }
 
 
         };
-        // Actually performs the registrations to this module
         registration.registrations();
-        theContainer = register.getInjectContainer();
     }
 
     private Connection getConnection(TransactionManagerJPA transactionManagerJPA) {
@@ -99,21 +85,9 @@ public class TransactionManagerModule extends RegistrationModuleAnnotation imple
             return TransactionManagerJDBC.class;
         }
         throw new IllegalArgumentException("transactionManager does not have a specific interface");
-    }
+    }    
 
-    @Override
-    public void postRegistration() {
-        TransactionManagerUtil.registerTransactionManager(theContainer);    
-    }
-
-    public Collection getRegistrations() {
-        return registration.getRegistrations();
-    }
-
-    @Override
-    public void registrations() {
-        // just do nothing
-    }
+    
 
 
 }

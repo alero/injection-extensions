@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.hrodberaht</groupId>
             <artifactId>inject</artifactId>
-            <version>1.1.0</version>
+            <version>1.2-SNAPSHOT</version>
         </dependency>
         <!-- Damn JPA 2.0 does not exist in maven repos -->
         <dependency>

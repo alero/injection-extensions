@@ -1,9 +1,7 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
-import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator;
-import com.hrodberaht.inject.extension.transaction.manager.TransactionManagerModule;
-import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.TransactionManagerJDBCImpl;
+import com.hrodberaht.inject.extension.transaction.manager.JdbcModule;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
 
@@ -34,17 +32,13 @@ public class ModuleContainerForJDBCTests implements InjectionContainerCreator {
     public InjectContainer createContainer() {
         InjectionRegisterModule register = new InjectionRegisterModule();
 
-        // This is just done to simplify the test application
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("example-jpa");
-        DataSource dataSource = getDataSource(entityManagerFactory);
-
         register.register(TransactedApplication.class, JDBCTransactedApplication.class);
-        // Create the JPA transaction manager, different managers will need different objects in their construct.
-        TransactionManager transactionManager = new TransactionManagerJDBCImpl(dataSource);
-        // Use the special RegistrationModule named TransactionManager,
-        // this registers all needed for the container and the service
-        // and does a setup for the AspectJTransactionHandler.
-        register.register(new TransactionManagerModule(transactionManager, register));
+
+        // This pre-creates all the tables and metadata, very useful
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("example-jpa");
+        // Just hook the data-source to the entity-manager, this is ugly but useful in a JUnit
+        DataSource dataSource = getDataSource(entityManagerFactory);
+        register.register(new JdbcModule(dataSource));
         InjectContainer injectContainer = register.getInjectContainer();
         container = injectContainer;
         return injectContainer;

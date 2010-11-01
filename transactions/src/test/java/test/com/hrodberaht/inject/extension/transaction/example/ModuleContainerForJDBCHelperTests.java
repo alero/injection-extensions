@@ -1,9 +1,7 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
-import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator;
-import com.hrodberaht.inject.extension.transaction.manager.TransactionManagerModule;
-import com.hrodberaht.inject.extension.transaction.manager.impl.jdbc.TransactionManagerJDBCImpl;
+import com.hrodberaht.inject.extension.transaction.manager.JdbcModule;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
 
@@ -36,15 +34,13 @@ public class ModuleContainerForJDBCHelperTests implements InjectionContainerCrea
 
         // This is just done to simplify the test application
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("example-jpa");
-        DataSource dataSource = getDataSource(entityManagerFactory);
+
 
         register.register(JDBCHelperApplication.class);
-        // Create the JPA transaction manager, different managers will need different objects in their construct.
-        TransactionManager transactionManager = new TransactionManagerJDBCImpl(dataSource);
-        // Use the special RegistrationModule named TransactionManager,
-        // this registers all needed for the container and the service
-        // and does a setup for the AspectJTransactionHandler.
-        register.register(new TransactionManagerModule(transactionManager, register));
+        // Create the JdbcModule for a data-source
+        DataSource dataSource = getDataSource(entityManagerFactory);
+        register.register(new JdbcModule(dataSource));
+        
         InjectContainer injectContainer = register.getInjectContainer();
         container = injectContainer;
         return injectContainer;
