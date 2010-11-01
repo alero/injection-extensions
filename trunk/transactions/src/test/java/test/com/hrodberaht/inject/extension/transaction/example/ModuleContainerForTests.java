@@ -1,13 +1,9 @@
 package test.com.hrodberaht.inject.extension.transaction.example;
 
-import com.hrodberaht.inject.extension.transaction.TransactionManager;
 import com.hrodberaht.inject.extension.transaction.junit.InjectionContainerCreator;
-import com.hrodberaht.inject.extension.transaction.manager.TransactionManagerModule;
-import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.TransactionManagerJPAImpl;
+import com.hrodberaht.inject.extension.transaction.manager.JpaModule;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
-
-import javax.persistence.Persistence;
 
 /**
  * Injection Transaction Extension
@@ -20,22 +16,16 @@ import javax.persistence.Persistence;
 public class ModuleContainerForTests implements InjectionContainerCreator {
 
     public static InjectContainer container;
+    static {
+        InjectionRegisterModule register = new InjectionRegisterModule();
+        register.register(TransactedApplication.class,  JPATransactedApplication.class);
 
-    public ModuleContainerForTests() {
+        register.register(new JpaModule("example-jpa"));
+        InjectContainer injectContainer = register.getInjectContainer();
+        container = injectContainer;
     }
 
     public InjectContainer createContainer() {
-        InjectionRegisterModule register = new InjectionRegisterModule();        
-        register.register(TransactedApplication.class,  JPATransactedApplication.class);
-        // Create the JPA transaction manager, different managers will need different objects in their construct.
-        final TransactionManager transactionManager =
-                new TransactionManagerJPAImpl(Persistence.createEntityManagerFactory("example-jpa"));
-        // Use the special RegistrationModule named TransactionManager,
-        // this registers all needed for the container and the service
-        // and does a setup for the AspectJTransactionHandler.
-        register.register(new TransactionManagerModule(transactionManager, register));
-        InjectContainer injectContainer = register.getInjectContainer();
-        container = injectContainer;
-        return injectContainer;
+        return container;
     }
 }
