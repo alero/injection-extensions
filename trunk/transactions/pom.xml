@@ -214,6 +214,16 @@
             </build>
         </profile>
         <profile>
+            <id>Hibernate-Provider</id>
+            <build>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>
+        <profile>
             <id>OpenJPA-Provider</id>
             <repositories>
                 <repository>
