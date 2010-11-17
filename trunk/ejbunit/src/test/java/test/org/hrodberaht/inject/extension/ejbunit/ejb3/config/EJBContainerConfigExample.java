@@ -3,8 +3,6 @@ package test.org.hrodberaht.inject.extension.ejbunit.ejb3.config;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.tdd.ResourceCreator;
 import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
-import org.hrodberaht.inject.extension.tdd.ejb.internal.InjectionRegisterScanEJB;
-import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 
 /**
  * Unit Test EJB (using @Inject)
@@ -32,10 +30,7 @@ public class EJBContainerConfigExample extends EJBContainerConfigBase {
 
 
 
-    @Override
-    protected InjectionRegisterScanBase getScanner() {
-        return new InjectionRegisterScanEJB();
-    }
+
 
 
 }

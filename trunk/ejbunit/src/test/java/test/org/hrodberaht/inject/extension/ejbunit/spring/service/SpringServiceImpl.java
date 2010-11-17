@@ -1,6 +1,7 @@
 package test.org.hrodberaht.inject.extension.ejbunit.spring.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,6 +19,11 @@ public class SpringServiceImpl implements SpringServiceInterface {
 
     @Autowired
     private SpringInnerServiceInterface innerService;
+
+    @Autowired
+    @Qualifier(value = "WithAName")
+    private NamedSpringServiceInterface namedService;
+
 
     public void doSomething() {
         System.out.println("Hi");

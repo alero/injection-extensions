@@ -1,11 +1,11 @@
 package org.hrodberaht.inject.extension.tdd.spring;
 
 import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
+import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 import org.hrodberaht.inject.extension.tdd.spring.internal.InjectionRegisterScanSpring;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
 import org.hrodberaht.inject.spi.InjectionPointFinder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
@@ -25,6 +25,8 @@ public abstract class SpringContainerConfigBase extends ContainerConfigBase<Inje
         DefaultInjectionPointFinder finder = new DefaultInjectionPointFinder() {
             @Override
             protected boolean hasInjectAnnotationOnMethod(Method method) {
+                // This is a bit special, named configurations must be configured
+                // and injected by the post processor inject resources
                 return method.isAnnotationPresent(Autowired.class) ||
                         super.hasInjectAnnotationOnMethod(method);
             }
@@ -33,7 +35,7 @@ public abstract class SpringContainerConfigBase extends ContainerConfigBase<Inje
             protected boolean hasInjectAnnotationOnField(Field field) {
                 // This is a bit special, named configurations must be configured
                 // and injected by the post processor inject resources
-                return (field.isAnnotationPresent(Autowired.class) && !field.isAnnotationPresent(Qualifier.class)) ||
+                return field.isAnnotationPresent(Autowired.class) ||
                         super.hasInjectAnnotationOnField(field);
             }
 
@@ -48,7 +50,12 @@ public abstract class SpringContainerConfigBase extends ContainerConfigBase<Inje
     }
 
     @Override
-    protected void injectResources(Object serviceInstance) {
+    protected InjectionRegisterScanBase getScanner() {
+        return new InjectionRegisterScanSpring();
+    }
 
+    @Override
+    protected void injectResources(Object serviceInstance) {
+        
     }
 }

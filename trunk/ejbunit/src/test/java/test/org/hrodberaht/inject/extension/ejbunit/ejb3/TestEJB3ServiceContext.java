@@ -2,7 +2,7 @@ package test.org.hrodberaht.inject.extension.ejbunit.ejb3;
 
 import org.hrodberaht.inject.extension.tdd.ContainerContext;
 import org.hrodberaht.inject.extension.tdd.JUnitRunner;
-import org.hrodberaht.inject.extension.tdd.ejb.EJBResourceHandler;
+import org.hrodberaht.inject.extension.tdd.ResourceHandler;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -76,9 +76,9 @@ public class TestEJB3ServiceContext {
 
         EJB3InnerServiceInterface anInterface = Mockito.mock(EJB3InnerServiceInterface.class);
         Mockito.when(anInterface.findSomething(12L)).thenReturn("Something Deep From Mock");
-        EJBResourceHandler.registerServiceInstance(EJB3InnerServiceInterface.class, anInterface);
+        ResourceHandler.registerServiceInstance(EJB3InnerServiceInterface.class, anInterface);
 
-        EJB3ServiceInterface serviceInterface = EJBResourceHandler.getService(EJB3ServiceInterface.class); 
+        EJB3ServiceInterface serviceInterface = ResourceHandler.getService(EJB3ServiceInterface.class);
         String something = serviceInterface.findSomething(12L);
         assertEquals("Something", something);
 
@@ -88,9 +88,9 @@ public class TestEJB3ServiceContext {
 
     @Test
     public void testModuleRegistration(){
-        EJBResourceHandler.registerModule(new MockedInnerModule());
+        ResourceHandler.registerModule(new MockedInnerModule());
 
-        EJB3ServiceInterface serviceInterface = EJBResourceHandler.getService(EJB3ServiceInterface.class);
+        EJB3ServiceInterface serviceInterface = ResourceHandler.getService(EJB3ServiceInterface.class);
         String something = serviceInterface.findSomethingDeep(12L);
         assertEquals("Mocked", something);
 
