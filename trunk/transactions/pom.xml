@@ -15,6 +15,11 @@
             <name>Jboss</name>
             <url>https://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>EclipseLink Repo</id>
+            <name>EclipseLink Repo</name>
+            <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
+        </repository>
     </repositories>
 
     <distributionManagement>
@@ -56,7 +61,7 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <argLine>
-                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar
+                        -javaagent:'${settings.localRepository}/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar'
                     </argLine>
                     <useSystemClassLoader>true</useSystemClassLoader>
                     <includes>
