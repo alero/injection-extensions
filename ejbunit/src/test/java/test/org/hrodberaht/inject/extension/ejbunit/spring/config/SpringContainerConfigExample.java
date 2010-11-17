@@ -2,9 +2,7 @@ package test.org.hrodberaht.inject.extension.ejbunit.spring.config;
 
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.tdd.ResourceCreator;
-import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 import org.hrodberaht.inject.extension.tdd.spring.SpringContainerConfigBase;
-import org.hrodberaht.inject.extension.tdd.spring.internal.InjectionRegisterScanSpring;
 
 import javax.sql.DataSource;
 
@@ -33,9 +31,6 @@ public class SpringContainerConfigExample extends SpringContainerConfigBase {
         return createAutoScanContainer("test.org.hrodberaht.inject.extension.ejbunit.spring.service");
     }
 
-    @Override
-    protected InjectionRegisterScanBase getScanner() {
-        return new InjectionRegisterScanSpring();
-    }
+
 
 }

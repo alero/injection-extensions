@@ -1,6 +1,5 @@
-package org.hrodberaht.inject.extension.tdd.ejb;
+package org.hrodberaht.inject.extension.tdd;
 
-import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import org.hrodberaht.inject.register.RegistrationModule;
 
 /**
@@ -11,7 +10,7 @@ import org.hrodberaht.inject.register.RegistrationModule;
  * @version 1.0
  * @since 1.0
  */
-public class EJBResourceHandler {
+public class ResourceHandler {
 
     private static ThreadLocal<ContainerConfigBase> threadLocal = new ThreadLocal<ContainerConfigBase>();
 

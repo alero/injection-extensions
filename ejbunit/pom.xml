@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hrodberaht.inject.extension</groupId>
-    <artifactId>ejb-junit</artifactId>
+    <artifactId>tdd</artifactId>
     <packaging>jar</packaging>
     <version>SNAPSHOT</version>
     <name>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</name>
@@ -15,11 +15,17 @@
             <name>Jboss</name>
             <url>http://repository.jboss.org/maven2/</url>
         </repository>
-         <repository>
+        <repository>
             <id>sonatype</id>
             <name>sonatype</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>     
+        </repository>
+        <repository>
+            <id>Java.net</id>
+            <name>For jee</name>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+
     </repositories>
     <build>
         <plugins>
@@ -39,7 +45,6 @@
             <artifactId>inject</artifactId>
             <version>1.2-SNAPSHOT</version>
         </dependency>
-        <!-- Damn JPA 2.0 does not exist in maven repos -->
 
         <dependency>
             <groupId>junit</groupId>
@@ -51,6 +56,7 @@
             <groupId>javax.ejb</groupId>
             <artifactId>ejb-api</artifactId>
             <version>3.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -64,11 +70,37 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.8.5</version>
-            <scope>test</scope>
         </dependency>
 
+        <dependency>
+			<groupId>javaee</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>5</version>
+			<scope>provided</scope>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>3.0.1.RELEASE</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>3.0.1.RELEASE</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>3.0.1.RELEASE</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
-    
+
     <profiles>
         <profile>
             <id>release-sign-artifacts-to-sonatype-nexus</id>

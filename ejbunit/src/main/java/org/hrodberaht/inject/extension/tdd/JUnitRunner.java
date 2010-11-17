@@ -1,7 +1,6 @@
 package org.hrodberaht.inject.extension.tdd;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.tdd.ejb.EJBResourceHandler;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -67,13 +66,13 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
         try {
 
-            EJBResourceHandler.begin(creator);
+            ResourceHandler.begin(creator);
 
             try {
                 super.runChild(frameworkMethod, notifier);
             } finally {
                 ResourceCreator.clearDataSource();
-                EJBResourceHandler.end();
+                ResourceHandler.end();
             }
         } catch (Throwable e) {
             Description description = describeChild(frameworkMethod);

@@ -3,6 +3,7 @@ package org.hrodberaht.inject.extension.tdd.ejb;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.ejb.internal.InjectionRegisterScanEJB;
+import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
 import org.hrodberaht.inject.spi.InjectionPointFinder;
 
@@ -48,6 +49,11 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
 
     public abstract InjectContainer createContainer();
 
+    @Override
+    protected InjectionRegisterScanBase getScanner() {
+        return new InjectionRegisterScanEJB();
+    }
+
     protected void injectResources(Object serviceInstance) {
         if(resources == null){
             return;
@@ -72,7 +78,6 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
                             field.setAccessible(false);
                         }
                     }
-
                 }
             }
             if (field.isAnnotationPresent(EJB.class)
