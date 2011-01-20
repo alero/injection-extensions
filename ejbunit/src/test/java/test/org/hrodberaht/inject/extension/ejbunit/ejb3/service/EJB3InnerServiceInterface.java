@@ -18,5 +18,11 @@ public interface EJB3InnerServiceInterface {
 
     String findSomethingFromDataSource(Long id);
 
+    String findSomethingFromDataSource2(Long id);
+
+    String findSomethingFromEntityManager(Long id);
+
     void updateSomethingInDataSource(Long id, String name);
+
+    SomeData createSomethingForEntityManager(SomeData someData);
 }

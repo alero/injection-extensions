@@ -2,11 +2,14 @@ package test.org.hrodberaht.inject.extension.ejbunit.ejb3.service;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Unit Test EJB (using @Inject)
@@ -17,10 +20,13 @@ import java.sql.SQLException;
  * @since 1.0
  */
 @Stateless
-public class EJB3InnerServiceImpl implements EJB3InnerServiceInterface {
+public class EJB3InnerServiceImpl extends PersistentBase implements EJB3InnerServiceInterface {
 
     @Resource(name = "DataSource")
     private DataSource dataSource;
+
+
+
 
     public void doSomething() {
         System.out.print("Hi there Inner");
@@ -33,21 +39,48 @@ public class EJB3InnerServiceImpl implements EJB3InnerServiceInterface {
     public String findSomethingFromDataSource(Long id) {
         try {
             Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement("select * from the_table where id = ?");
-            preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            String message = null;
-            if(resultSet.next()){
-                message = resultSet.getString("name");
-            }
-            // This is not proper socket close handling and will leak in case of errors, but this is a simple test
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
-            return message;
+            return performFindForConnection(id, connection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }        
+    }
+
+    public String findSomethingFromDataSource2(Long id) {
+        try {
+            Connection connection = typedDataSource.getConnection();
+            return performFindForConnection(id, connection);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String findSomethingFromEntityManager(Long id) {
+        SomeData someData = entityManager.find(SomeData.class, id);
+        return someData.getName();
+    }
+
+    private static AtomicLong id=new AtomicLong(0);
+    public SomeData createSomethingForEntityManager(SomeData someData) {
+        if(someData.getId() == null){
+            someData.setId(id.incrementAndGet());
+        }
+        entityManager.persist(someData);
+        return someData;
+    }
+
+    private String performFindForConnection(Long id, Connection connection) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("select * from the_table where id = ?");
+        preparedStatement.setLong(1, id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        String message = null;
+        if(resultSet.next()){
+            message = resultSet.getString("name");
+        }
+        // This is not proper socket close handling and will leak in case of errors, but this is a simple test
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
+        return message;
     }
 
     public void updateSomethingInDataSource(Long id, String name) {
@@ -65,6 +98,8 @@ public class EJB3InnerServiceImpl implements EJB3InnerServiceInterface {
             throw new RuntimeException(e);
         }
     }
+
+
 
 
 }

@@ -4,6 +4,9 @@ import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.tdd.ResourceCreator;
 import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
 
+import javax.persistence.EntityManager;
+import javax.sql.DataSource;
+
 /**
  * Unit Test EJB (using @Inject)
  *
@@ -15,12 +18,26 @@ import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
 public class EJBContainerConfigExample extends EJBContainerConfigBase {
 
     public EJBContainerConfigExample() {
-        String dataSourceName = "DataSource";
+
+
+
+        String dataSourceName = "MyDataSource";
         if(!ResourceCreator.hasDataSource(dataSourceName)){
-            addResource(dataSourceName, ResourceCreator.createDataSource(dataSourceName));
-            addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/ejbunit");
+            String schemaName = "example-jpa";
+            DataSource dataSource = ResourceCreator.createDataSource(schemaName);
+            // EntityManager resource
+            EntityManager entityManager = ResourceCreator.createEntityManager(schemaName, dataSourceName, dataSource);
+            addPersistenceContext(schemaName, entityManager);
+            // Named resource
+            addResource(dataSourceName, dataSource);
+            addSQLSchemas(schemaName, "test/org/hrodberaht/inject/extension/ejbunit");
+            // Typed resource
+            addResource(DataSource.class, dataSource);
+
         }
     }
+
+
 
     @Override
     public InjectContainer createContainer() {

@@ -66,15 +66,16 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
         try {
 
-            ResourceHandler.begin(creator);
-
+            ContainerLifeCycleHandler.begin(creator);
+            ResourceCreator.begin();
             try {
                 super.runChild(frameworkMethod, notifier);
             } finally {
                 ResourceCreator.clearDataSource();
-                ResourceHandler.end();
+                ContainerLifeCycleHandler.end();
             }
         } catch (Throwable e) {
+            e.printStackTrace();
             Description description = describeChild(frameworkMethod);
             notifier.fireTestFailure(new Failure(description, e));
             notifier.fireTestFinished(description);
