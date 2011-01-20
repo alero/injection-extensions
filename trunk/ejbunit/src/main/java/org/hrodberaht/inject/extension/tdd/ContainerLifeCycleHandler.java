@@ -10,7 +10,7 @@ import org.hrodberaht.inject.register.RegistrationModule;
  * @version 1.0
  * @since 1.0
  */
-public class ResourceHandler {
+public class ContainerLifeCycleHandler {
 
     private static ThreadLocal<ContainerConfigBase> threadLocal = new ThreadLocal<ContainerConfigBase>();
 

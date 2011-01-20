@@ -5,14 +5,21 @@ import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.ejb.internal.InjectionRegisterScanEJB;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
+import org.hrodberaht.inject.internal.annotation.ReflectionUtils;
 import org.hrodberaht.inject.spi.InjectionPointFinder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Unit Test EJB (using @Inject)
@@ -23,6 +30,8 @@ import java.lang.reflect.Method;
  * @since 1.0
  */
 public abstract class EJBContainerConfigBase extends ContainerConfigBase<InjectionRegisterScanEJB> {
+
+    private Map<String, EntityManager> entityManagers = null;
 
     static {
         DefaultInjectionPointFinder finder = new DefaultInjectionPointFinder() {
@@ -54,23 +63,40 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
         return new InjectionRegisterScanEJB();
     }
 
+    protected void addPersistenceContext(String name, EntityManager entityManager) {
+        if(entityManagers == null){
+            entityManagers = new HashMap<String, EntityManager>();
+        }
+        entityManagers.put(name, entityManager);
+
+    }
+
     protected void injectResources(Object serviceInstance) {
-        if(resources == null){
+        if (resources == null && entityManagers == null && typedResources == null) {
             return;
         }
-        
-        Field[] declaredFields = serviceInstance.getClass().getDeclaredFields();
-        for (Field field : declaredFields) {
-            if (field.isAnnotationPresent(Resource.class)) {
-                Resource resource = field.getAnnotation(Resource.class);
-                Object value = resources.get(resource.name());
-                if (value != null) {
+
+        List<Member> members = ReflectionUtils.findMembers(serviceInstance.getClass());
+        for (Member member : members) {
+            if (member instanceof Field) {
+                Field field = (Field) member;
+                if (field.isAnnotationPresent(Resource.class)) {
+                    Resource resource = field.getAnnotation(Resource.class);
+                    injectNamedResource(serviceInstance, field, resource);
+                    injectTypedResource(serviceInstance, field, resource);
+                }
+                if (field.isAnnotationPresent(PersistenceContext.class)) {
+                    PersistenceContext resource = field.getAnnotation(PersistenceContext.class);
+                    injectEntityManager(serviceInstance, field, resource);
+                }
+                if (field.isAnnotationPresent(EJB.class)
+                        || field.isAnnotationPresent(Inject.class)) {
                     boolean accessible = field.isAccessible();
                     try {
                         if (!accessible) {
                             field.setAccessible(true);
                         }
-                        field.set(serviceInstance, value);
+                        injectResources(field.get(serviceInstance));
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     } finally {
@@ -80,24 +106,43 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
                     }
                 }
             }
-            if (field.isAnnotationPresent(EJB.class)
-                    || field.isAnnotationPresent(Inject.class)) {
-                boolean accessible = field.isAccessible();
-                try {
-                    if (!accessible) {
-                        field.setAccessible(true);
-                    }
-                    injectResources(field.get(serviceInstance));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    if (!accessible) {
-                        field.setAccessible(false);
-                    }
+        }
+    }
+
+    private void injectEntityManager(Object serviceInstance, Field field, PersistenceContext resource) {
+        Object value = entityManagers.get(resource.unitName());
+        if(value == null && entityManagers.size() == 1 && "".equals(resource.unitName())){
+            value = entityManagers.values().iterator().next();
+        }
+        injectResourceValue(serviceInstance, field, value);
+    }
+
+    private void injectTypedResource(Object serviceInstance, Field field, Resource resource) {
+        Object value = typedResources.get(field.getType());
+        injectResourceValue(serviceInstance, field, value);
+    }
+
+
+    private void injectNamedResource(Object serviceInstance, Field field, Resource resource) {
+        Object value = resources.get(resource.name());
+        injectResourceValue(serviceInstance, field, value);
+    }
+
+    private void injectResourceValue(Object serviceInstance, Field field, Object value) {
+        if (value != null) {
+            boolean accessible = field.isAccessible();
+            try {
+                if (!accessible) {
+                    field.setAccessible(true);
+                }
+                field.set(serviceInstance, value);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (!accessible) {
+                    field.setAccessible(false);
                 }
             }
         }
-
-
     }
 }

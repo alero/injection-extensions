@@ -6,8 +6,12 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>tdd</artifactId>
     <packaging>jar</packaging>
-    <version>SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <name>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</name>
+
+    <properties>
+        <hibernate-core-version>3.5.3-Final</hibernate-core-version>
+    </properties>
 
     <repositories>
         <repository>
@@ -72,12 +76,7 @@
             <version>1.8.5</version>
         </dependency>
 
-        <dependency>
-			<groupId>javaee</groupId>
-			<artifactId>javaee-api</artifactId>
-			<version>5</version>
-			<scope>provided</scope>
-		</dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -85,6 +84,7 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -92,12 +92,30 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>3.0.1.RELEASE</version>
             <scope>provided</scope>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-annotations</artifactId>
+            <version>${hibernate-core-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate-core-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.11</version>
         </dependency>
     </dependencies>
 
@@ -117,14 +135,14 @@
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
                 </repository>
                 <snapshotRepository>
-                    <id>sonatype-nexus-snapshot</id>
+                    <id>sonatype-nexus-snapshots</id>
                     <name>Nexus Snapshot Repository</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots</url>
                 </snapshotRepository>
             </distributionManagement>
             <build>
                 <plugins>
-                    <plugin>
+                    <!--plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.1</version>
@@ -137,7 +155,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
