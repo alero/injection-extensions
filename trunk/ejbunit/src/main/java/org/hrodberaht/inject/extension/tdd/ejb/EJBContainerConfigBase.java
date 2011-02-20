@@ -14,6 +14,7 @@ import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -63,12 +64,16 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
         return new InjectionRegisterScanEJB();
     }
 
+
     protected void addPersistenceContext(String name, EntityManager entityManager) {
         if(entityManagers == null){
             entityManagers = new HashMap<String, EntityManager>();
         }
         entityManagers.put(name, entityManager);
+    }
 
+    protected EntityManager createEntityManager(String schemaName, String dataSourceName, DataSource dataSource) {
+        return getResourceCreator().createEntityManager(schemaName, dataSourceName, dataSource);
     }
 
     protected void injectResources(Object serviceInstance) {
@@ -82,8 +87,9 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
                 Field field = (Field) member;
                 if (field.isAnnotationPresent(Resource.class)) {
                     Resource resource = field.getAnnotation(Resource.class);
-                    injectNamedResource(serviceInstance, field, resource);
-                    injectTypedResource(serviceInstance, field, resource);
+                    if(!injectNamedResource(serviceInstance, field, resource)){
+                        injectTypedResource(serviceInstance, field, resource);
+                    }
                 }
                 if (field.isAnnotationPresent(PersistenceContext.class)) {
                     PersistenceContext resource = field.getAnnotation(PersistenceContext.class);
@@ -117,15 +123,32 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
         injectResourceValue(serviceInstance, field, value);
     }
 
-    private void injectTypedResource(Object serviceInstance, Field field, Resource resource) {
+    private boolean injectTypedResource(Object serviceInstance, Field field, Resource resource) {
+        if(typedResources == null){
+            return false;
+        }
         Object value = typedResources.get(field.getType());
-        injectResourceValue(serviceInstance, field, value);
+        if(value != null){
+            injectResourceValue(serviceInstance, field, value);
+            return true;
+        }
+        return false;
     }
 
 
-    private void injectNamedResource(Object serviceInstance, Field field, Resource resource) {
+    private boolean injectNamedResource(Object serviceInstance, Field field, Resource resource) {
+        if(resources == null){
+            return false;
+        }
         Object value = resources.get(resource.name());
-        injectResourceValue(serviceInstance, field, value);
+        if(value == null){
+            value = resources.get(resource.mappedName());
+        }
+        if(value != null){
+            injectResourceValue(serviceInstance, field, value);
+            return true;
+        }
+        return false;
     }
 
     private void injectResourceValue(Object serviceInstance, Field field, Object value) {
@@ -145,4 +168,6 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
             }
         }
     }
+
+
 }

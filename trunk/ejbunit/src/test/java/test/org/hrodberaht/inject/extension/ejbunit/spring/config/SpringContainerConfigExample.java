@@ -1,7 +1,6 @@
 package test.org.hrodberaht.inject.extension.ejbunit.spring.config;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.tdd.ResourceCreator;
 import org.hrodberaht.inject.extension.tdd.spring.SpringContainerConfigBase;
 
 import javax.sql.DataSource;
@@ -18,11 +17,11 @@ public class SpringContainerConfigExample extends SpringContainerConfigBase {
 
     public SpringContainerConfigExample() {
         String dataSourceName = "DataSource";
-        if(!ResourceCreator.hasDataSource(dataSourceName)){
-            addResource(DataSource.class, ResourceCreator.createDataSource(dataSourceName));
+        if(!hasDataSource(dataSourceName)){
+            addResource(DataSource.class, createDataSource(dataSourceName));
             addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/ejbunit");
         } else {
-            addResource(DataSource.class, ResourceCreator.createDataSource(dataSourceName));
+            addResource(DataSource.class, createDataSource(dataSourceName));
         }
     }
 

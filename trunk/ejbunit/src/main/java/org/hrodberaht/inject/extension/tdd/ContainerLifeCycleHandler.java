@@ -12,13 +12,14 @@ import org.hrodberaht.inject.register.RegistrationModule;
  */
 public class ContainerLifeCycleHandler {
 
-    private static ThreadLocal<ContainerConfigBase> threadLocal = new ThreadLocal<ContainerConfigBase>();
+    private static final ThreadLocal<ContainerConfigBase> threadLocal = new ThreadLocal<ContainerConfigBase>();
 
     public static void begin(ContainerConfigBase theContainer) {
         threadLocal.set(theContainer);
     }
 
     public static void end() {
+        threadLocal.get().cleanActiveContainer();
         threadLocal.remove();
     }
 
@@ -36,6 +37,9 @@ public class ContainerLifeCycleHandler {
 
 
     public static <T> T getService(Class<T> aClass) {
-        return threadLocal.get().getActiveContainer().get(aClass);
+        ContainerConfigBase containerConfigBase = threadLocal.get();
+        T t = containerConfigBase.getActiveContainer().get(aClass);
+        containerConfigBase.injectResources(t);
+        return t;
     }
 }
