@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  */
 @ContainerContext(EJBContainerConfigExample.class)
 @RunWith(JUnitRunner.class)
-public class TestEJB3ServiceContext {
+public class TestEJB3ServiceContext2 {
 
 
     @Inject
@@ -126,17 +126,6 @@ public class TestEJB3ServiceContext {
         String somethingDeep = serviceInterface.findSomethingDeep(12L);
         assertEquals("Something Deep From Mock", somethingDeep);
     }
-
-
-    @Test
-    public void testEJBWiringWithContainerLifeCycleHandler(){
-
-        EJB3InnerServiceInterface serviceInterface =
-                ContainerLifeCycleHandler.getService(EJB3InnerServiceInterface.class);
-        String something = serviceInterface.findSomethingFromEntityManager(12L);
-        assertEquals("The Name", something);
-    }
-
 
     @Test
     public void testModuleRegistration(){

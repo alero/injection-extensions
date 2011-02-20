@@ -2,8 +2,6 @@ package test.org.hrodberaht.inject.extension.ejbunit.ejb3.service;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -65,6 +63,7 @@ public class EJB3InnerServiceImpl extends PersistentBase implements EJB3InnerSer
             someData.setId(id.incrementAndGet());
         }
         entityManager.persist(someData);
+        entityManager.flush();
         return someData;
     }
 

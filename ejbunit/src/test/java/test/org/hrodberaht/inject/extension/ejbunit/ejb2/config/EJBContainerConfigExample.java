@@ -1,13 +1,12 @@
 package test.org.hrodberaht.inject.extension.ejbunit.ejb2.config;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.tdd.ResourceCreator;
 import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.ejb.internal.InjectionRegisterScanEJB;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 
 /**
- * ¤Projectname¤
+ * ï¿½Projectnameï¿½
  *
  * @author Robert Alexandersson
  *         2010-okt-26 20:49:29
@@ -18,11 +17,14 @@ public class EJBContainerConfigExample extends EJBContainerConfigBase {
 
     public EJBContainerConfigExample() {
         String dataSourceName = "DataSource";
-        if(!ResourceCreator.hasDataSource(dataSourceName)){
-            addResource(dataSourceName, ResourceCreator.createDataSource(dataSourceName));
+        if(!hasDataSource(dataSourceName)){
+            addResource(dataSourceName, createDataSource(dataSourceName));
             addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/ejbunit");
         }
     }
+
+
+
 
     @Override
     public InjectContainer createContainer() {

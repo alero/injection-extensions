@@ -1,15 +1,7 @@
 package org.hrodberaht.inject.extension.tdd.internal;
 
 
-import org.hrodberaht.inject.extension.tdd.ResourceCreator;
-
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,7 +20,15 @@ public class DataSourceExecution {
     public static String SCHEMA_PREFIX = "create_schema";
     public static String INSERT_SCRIPT_PREFIX = "insert_script";
 
+    private ResourceCreator resourceCreator;
+
+
+    public DataSourceExecution(ResourceCreator resourceCreator) {
+        this.resourceCreator = resourceCreator;
+    }
+
     public void addSQLSchemas(String schemaName, String packageBase) {
+
         URL url = Thread.currentThread().getContextClassLoader().getResource(packageBase);
         String directoryString = url.getFile().replaceAll("%20", " ");
         File directory = new File(directoryString);
@@ -59,7 +59,7 @@ public class DataSourceExecution {
                 stringBuffer.append(strLine);
             }
 
-            DataSourceProxy dataSourceProxy = ResourceCreator.getDataSource(schemaName);
+            DataSourceProxy dataSourceProxy = resourceCreator.getDataSource(schemaName);
             PreparedStatement pstmt = null;
             try {
                 Connection connection = dataSourceProxy.getConnection();
@@ -82,6 +82,29 @@ public class DataSourceExecution {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+
+    public boolean isInited(String schemaName) {
+        DataSourceProxy dataSourceProxy = resourceCreator.getDataSource(schemaName);
+        PreparedStatement pstmt = null;
+        try {
+            Connection connection = dataSourceProxy.getConnection();
+            pstmt = connection.prepareStatement("create table init_control (  control_it integer)");
+            pstmt.execute();
+            return false;
+        } catch (SQLException e) {
+            return true;
+        } finally {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+            } catch (SQLException e) {
+
+            }
+            dataSourceProxy.commitDataSource();
         }
     }
 }

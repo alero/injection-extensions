@@ -1,6 +1,7 @@
 package org.hrodberaht.inject.extension.tdd;
 
 import org.hrodberaht.inject.InjectContainer;
+import org.hrodberaht.inject.extension.tdd.internal.TransactionManager;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -66,12 +67,13 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
         try {
 
+            TransactionManager.beginTransaction(creator);
             ContainerLifeCycleHandler.begin(creator);
-            ResourceCreator.begin();
+
             try {
                 super.runChild(frameworkMethod, notifier);
             } finally {
-                ResourceCreator.clearDataSource();
+                TransactionManager.endTransaction();
                 ContainerLifeCycleHandler.end();
             }
         } catch (Throwable e) {

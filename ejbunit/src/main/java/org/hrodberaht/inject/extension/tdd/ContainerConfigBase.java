@@ -3,8 +3,10 @@ package org.hrodberaht.inject.extension.tdd;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.tdd.internal.DataSourceExecution;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
+import org.hrodberaht.inject.extension.tdd.internal.ResourceCreator;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,13 +20,14 @@ import java.util.Map;
  */
 public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
 
-    private static ThreadLocal<InjectionRegisterScanBase> threadLocal = new ThreadLocal<InjectionRegisterScanBase>();
-
     protected InjectionRegisterScanBase originalRegister = null;
     protected InjectionRegisterScanBase activeRegister = null;
 
     protected Map<String, Object> resources = null;
     protected Map<Class, Object> typedResources = null;
+
+
+    private ResourceCreator resourceCreator = new ResourceCreator();
 
     public abstract InjectContainer createContainer();
 
@@ -57,25 +60,15 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
     }
 
     public T getActiveRegister() {
-        InjectionRegisterScanBase registerModule = threadLocal.get();
-        if (registerModule == null) {
-            threadLocal.set(activeRegister);
-            registerModule = activeRegister;
-        }
-        return (T) registerModule;
+        return (T) activeRegister;
     }
 
     public InjectContainer getActiveContainer() {
-        InjectionRegisterScanBase registerModule = threadLocal.get();
-        if (registerModule == null) {
-            threadLocal.set(activeRegister);
-            registerModule = activeRegister;
-        }
-        return registerModule.getInjectContainer();
+
+        return activeRegister.getInjectContainer();
     }
 
     public void cleanActiveContainer() {
-        threadLocal.remove();
         activeRegister = originalRegister;
     }
 
@@ -93,11 +86,24 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
         typedResources.put(typedName, value);
     }
 
+    protected DataSource createDataSource(String dataSourceName) {
+        return resourceCreator.createDataSource(dataSourceName);
+    }
 
-    public void addSQLSchemas(String schemaName, String packageBase) {
-        DataSourceExecution sourceExecution = new DataSourceExecution();
-        sourceExecution.addSQLSchemas(schemaName, packageBase);
+    protected boolean hasDataSource(String dataSourceName) {
+        return resourceCreator.hasDataSource(dataSourceName);
     }
 
 
+    public void addSQLSchemas(String schemaName, String packageBase) {
+        DataSourceExecution sourceExecution = new DataSourceExecution(resourceCreator);
+        if(!sourceExecution.isInited(schemaName)){
+            sourceExecution.addSQLSchemas(schemaName, packageBase);
+        }
+    }
+
+
+    public ResourceCreator getResourceCreator() {
+        return resourceCreator;
+    }
 }

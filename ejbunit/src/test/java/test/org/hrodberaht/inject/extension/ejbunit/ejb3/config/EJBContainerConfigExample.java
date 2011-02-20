@@ -1,7 +1,6 @@
 package test.org.hrodberaht.inject.extension.ejbunit.ejb3.config;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.tdd.ResourceCreator;
 import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
 
 import javax.persistence.EntityManager;
@@ -22,20 +21,19 @@ public class EJBContainerConfigExample extends EJBContainerConfigBase {
 
 
         String dataSourceName = "MyDataSource";
-        if(!ResourceCreator.hasDataSource(dataSourceName)){
-            String schemaName = "example-jpa";
-            DataSource dataSource = ResourceCreator.createDataSource(schemaName);
-            // EntityManager resource
-            EntityManager entityManager = ResourceCreator.createEntityManager(schemaName, dataSourceName, dataSource);
-            addPersistenceContext(schemaName, entityManager);
-            // Named resource
-            addResource(dataSourceName, dataSource);
-            addSQLSchemas(schemaName, "test/org/hrodberaht/inject/extension/ejbunit");
-            // Typed resource
-            addResource(DataSource.class, dataSource);
+        String schemaName = "example-jpa";
+        DataSource dataSource = createDataSource(schemaName);
+        // EntityManager resource
+        EntityManager entityManager = createEntityManager(schemaName, dataSourceName, dataSource);
+        addPersistenceContext(schemaName, entityManager);
+        // Named resource
+        addResource(dataSourceName, dataSource);
+        addSQLSchemas(schemaName, "test/org/hrodberaht/inject/extension/ejbunit");
+        // Typed resource
+        addResource(DataSource.class, dataSource);
 
-        }
     }
+
 
 
 
