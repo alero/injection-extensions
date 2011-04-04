@@ -35,7 +35,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
 
     protected abstract InjectionRegisterScanBase getScanner();
 
-    protected InjectContainer createAutoScanContainer(String packageName) {
+    protected InjectContainer createAutoScanContainer(String... packageName) {
 
         InjectionRegisterScanBase registerScan = getScanner();
         registerScan.scanPackage(packageName);
@@ -69,7 +69,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
     }
 
     public void cleanActiveContainer() {
-        activeRegister = originalRegister;
+        activeRegister = originalRegister.clone();
     }
 
     protected void addResource(String name, Object value) {

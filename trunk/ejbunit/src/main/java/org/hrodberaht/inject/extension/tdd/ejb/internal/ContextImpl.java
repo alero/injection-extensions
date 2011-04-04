@@ -15,11 +15,11 @@ import java.util.Map;
  */
 public class ContextImpl implements Context {
 
-    Map<Name, Object> typedContextItems = new HashMap<Name, Object>();
+    // Map<Name, Object> typedContextItems = new HashMap<Name, Object>();
     Map<String, Object> namedContextItems = new HashMap<String, Object>();
 
     public Object lookup(Name name) throws NamingException {
-        return typedContextItems.get(name);
+        return namedContextItems.get(name.get(0));
     }
 
     public Object lookup(String name) throws NamingException {
@@ -27,7 +27,7 @@ public class ContextImpl implements Context {
     }
 
     public void bind(Name name, Object obj) throws NamingException {
-        typedContextItems.put(name, obj);
+        namedContextItems.put(name.get(0), obj);
     }
 
     public void bind(String name, Object obj) throws NamingException {
