@@ -13,7 +13,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * ¤Projectname¤
+ * ï¿½Projectnameï¿½
  *
  * @author Robert Alexandersson
  *         2010-okt-26 19:09:57
@@ -30,14 +30,16 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
     public abstract InjectionRegisterScanBase clone();
 
 
-    public InjectionRegisterScanBase scanPackage(String packagename) {
-        Class[] clazzs = getClasses(packagename);
-        List<Class> listOfClasses = new ArrayList<Class>(clazzs.length);
-        for (Class aClazz : clazzs) {
-            listOfClasses.add(aClazz);
-        }
-        for (Class aClazz : clazzs) {
-            createRegistration(aClazz, listOfClasses);
+    public InjectionRegisterScanBase scanPackage(String... packagenames) {
+        for(String packagename:packagenames){
+            Class[] clazzs = getClasses(packagename);
+            List<Class> listOfClasses = new ArrayList<Class>(clazzs.length);
+            for (Class aClazz : clazzs) {
+                listOfClasses.add(aClazz);
+            }
+            for (Class aClazz : clazzs) {
+                createRegistration(aClazz, listOfClasses);
+            }
         }
         return this;
     }

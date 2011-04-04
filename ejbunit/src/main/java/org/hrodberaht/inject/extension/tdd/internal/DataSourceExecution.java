@@ -6,6 +6,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Unit Test EJB (using @Inject)
@@ -60,17 +61,17 @@ public class DataSourceExecution {
             }
 
             DataSourceProxy dataSourceProxy = resourceCreator.getDataSource(schemaName);
-            PreparedStatement pstmt = null;
+            Statement stmt = null;
             try {
                 Connection connection = dataSourceProxy.getConnection();
-                pstmt = connection.prepareStatement(stringBuffer.toString());
-                pstmt.execute();
+                stmt = connection.createStatement();
+                stmt.execute(stringBuffer.toString());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } finally {
                 try {
-                    if (pstmt != null) {
-                        pstmt.close();
+                    if (stmt != null) {
+                        stmt.close();
                     }
                 } catch (SQLException e) {
 
