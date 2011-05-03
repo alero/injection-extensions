@@ -28,4 +28,9 @@ public class CustomerAccountServiceBean implements CustomerAccountService{
     public CustomerAccount find(Long id) {
         return entityManager.find(CustomerAccount.class, id);
     }
+
+    public CustomerAccount update(CustomerAccount customerAccount) {
+        entityManager.persist(customerAccount);
+        return customerAccount;
+    }
 }

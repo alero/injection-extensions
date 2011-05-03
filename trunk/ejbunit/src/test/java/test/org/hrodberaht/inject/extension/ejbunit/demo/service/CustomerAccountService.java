@@ -17,4 +17,6 @@ public interface CustomerAccountService {
 
     CustomerAccount create(CustomerAccount customer);
     CustomerAccount find(Long id);
+
+    CustomerAccount update(CustomerAccount customerAccount);
 }

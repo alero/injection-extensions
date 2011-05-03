@@ -1,5 +1,8 @@
 package test.org.hrodberaht.inject.extension.ejbunit.demo.service;
 
+import test.org.hrodberaht.inject.extension.ejbunit.demo.model.CustomerAccount;
+
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,4 +22,17 @@ public class AccountingServiceBean implements AccountingService{
     @PersistenceContext(unitName="example-jpa")
     protected EntityManager entityManager;
 
+    @EJB
+    private CustomerAccountService customerAccountService;
+
+    public void addMoney(double money, long customerAccountId) {
+        CustomerAccount customerAccount = customerAccountService.find(customerAccountId);
+        if(customerAccount.getMoney() != null){
+            customerAccount.setMoney( customerAccount.getMoney() + money );
+        } else {
+            customerAccount.setMoney(money);
+        }
+
+        customerAccountService.update(customerAccount);
+    }
 }
