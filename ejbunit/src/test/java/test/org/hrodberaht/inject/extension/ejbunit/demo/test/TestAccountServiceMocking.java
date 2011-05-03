@@ -35,7 +35,6 @@ public class TestAccountServiceMocking {
     @EJB
     private CustomerService customerService;
 
-
     @Test
     public void testAccountAddMoneyMockedUpdate() throws Exception {
 
