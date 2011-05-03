@@ -25,7 +25,7 @@ public class CourseDataModelStub {
         return customer;
     }
 
-    public static CustomerAccount createCustomerAccount(Customer customer){
+    public static CustomerAccount createCustomerAccountEmpty(Customer customer){
         CustomerAccount customerAccount = new CustomerAccount();
         customerAccount.setId(aLong.incrementAndGet());
         customerAccount.setAccountNumber("JD1000123123");

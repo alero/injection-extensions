@@ -13,4 +13,6 @@ import javax.ejb.Local;
 @Local
 public interface AccountingService {
 
+    void addMoney(double money, long customerAccountId);
+
 }

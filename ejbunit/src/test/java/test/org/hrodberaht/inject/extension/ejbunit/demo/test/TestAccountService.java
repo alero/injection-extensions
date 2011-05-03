@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import test.org.hrodberaht.inject.extension.ejbunit.demo.model.Customer;
 import test.org.hrodberaht.inject.extension.ejbunit.demo.model.CustomerAccount;
+import test.org.hrodberaht.inject.extension.ejbunit.demo.service.AccountingService;
 import test.org.hrodberaht.inject.extension.ejbunit.demo.service.CustomerAccountService;
 import test.org.hrodberaht.inject.extension.ejbunit.demo.service.CustomerService;
 import test.org.hrodberaht.inject.extension.ejbunit.demo.test.config.CourseContainerConfigExample;
@@ -24,8 +25,10 @@ import static org.junit.Assert.assertEquals;
  */
 @ContainerContext(CourseContainerConfigExample.class)
 @RunWith(JUnitRunner.class)
-public class TestCustomerAccountServicePersistence {
+public class TestAccountService {
 
+    @EJB
+    private AccountingService accountingService;
 
     @EJB
     private CustomerAccountService customerAccountService;
@@ -33,20 +36,19 @@ public class TestCustomerAccountServicePersistence {
     @EJB
     private CustomerService customerService;
 
-    /**
-     * Test Persistence create/read
-     */
+
     @Test
-    public void testCustomerCreateRead(){
+    public void testAccountAddMoney() throws Exception {
         Customer customer = customerService.find(-1L);
         CustomerAccount customerAccount = CourseDataModelStub.createCustomerAccountEmpty(customer);
 
         customerAccountService.create(customerAccount);
 
+        accountingService.addMoney(500D, customerAccount.getId());
+
         CustomerAccount foundCustomerAccount = customerAccountService.find(customerAccount.getId());
 
-        assertEquals(customerAccount.getId(), foundCustomerAccount.getId());
-        assertEquals(customerAccount.getAccountNumber(), foundCustomerAccount.getAccountNumber());
+        assertEquals(new Double(500D), foundCustomerAccount.getMoney());
 
     }
 
