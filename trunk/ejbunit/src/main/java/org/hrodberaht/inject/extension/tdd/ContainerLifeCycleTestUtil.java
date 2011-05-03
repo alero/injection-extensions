@@ -10,15 +10,15 @@ import org.hrodberaht.inject.register.RegistrationModule;
  * @version 1.0
  * @since 1.0
  */
-public class ContainerLifeCycleHandler {
+public class ContainerLifeCycleTestUtil {
 
     private static final ThreadLocal<ContainerConfigBase> threadLocal = new ThreadLocal<ContainerConfigBase>();
 
-    public static void begin(ContainerConfigBase theContainer) {
+    protected static void begin(ContainerConfigBase theContainer) {
         threadLocal.set(theContainer);
     }
 
-    public static void end() {
+    protected static void end() {
         threadLocal.get().cleanActiveContainer();
         threadLocal.remove();
     }

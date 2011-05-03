@@ -5,39 +5,19 @@
 
     <persistence-unit name="example-jpa" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-
+        <non-jta-data-source>MyDataSource</non-jta-data-source>
         <properties>
-            <property name="hibernate.connection.datasource" value="MyDataSource"/>
+
             <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
             <property name="hibernate.show_sql" value="true"/>
-
+            <property name="hibernate.cache.use_second_level_cache" value="false"/>
         </properties>
     </persistence-unit>
 
 
     <!--
+
     <persistence-unit name="example-jpa" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
-
-        <properties>
-            <property name="hibernate.connection.datasource" value="MyDataSource"/>
-
-            <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
-            <property name="current_session_context_class" value="thread"/>
-            <property name="hibernate.transaction.factory_class"
-                      value="org.hibernate.transaction.JDBCTransactionFactory"/>
-            <property name="hibernate.cache.use_second_level_cache" value="false"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.dbcp.maxActive" value="20"/>
-            <property name="hibernate.dbcp.maxIdle" value="20"/>
-            <property name="hibernate.dbcp.whenExhaustedAction" value="1"/>
-
-
-        </properties>
-    </persistence-unit>
-
-<persistence-unit name="example-jpa" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <non-jta-data-source>MyDataSource</non-jta-data-source>
 

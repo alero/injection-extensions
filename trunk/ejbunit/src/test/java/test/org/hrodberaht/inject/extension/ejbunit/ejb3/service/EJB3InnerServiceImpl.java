@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Stateless
 public class EJB3InnerServiceImpl extends PersistentBase implements EJB3InnerServiceInterface {
 
-    @Resource(name = "DataSource")
+    @Resource(name = "MyDataSource")
     private DataSource dataSource;
 
 

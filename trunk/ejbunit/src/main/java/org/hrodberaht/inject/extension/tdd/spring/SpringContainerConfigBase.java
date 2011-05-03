@@ -12,16 +12,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * ¤Projectname¤
+ * ï¿½Projectnameï¿½
  *
  * @author Robert Alexandersson
  *         2010-okt-26 18:59:45
  * @version 1.0
  * @since 1.0
  */
-public abstract class SpringContainerConfigBase extends ContainerConfigBase<InjectionRegisterScanSpring> {   
+public abstract class SpringContainerConfigBase extends ContainerConfigBase<InjectionRegisterScanSpring> {
 
-    static {
+    protected SpringContainerConfigBase() {
+        final SpringContainerConfigBase thisReference = this;
         DefaultInjectionPointFinder finder = new DefaultInjectionPointFinder() {
             @Override
             protected boolean hasInjectAnnotationOnMethod(Method method) {
@@ -45,6 +46,11 @@ public abstract class SpringContainerConfigBase extends ContainerConfigBase<Inje
                 return method.isAnnotationPresent(PostConstruct.class) ||
                         super.hasPostConstructAnnotation(method);
             }
+
+            @Override
+            public void extendedInjection(Object service) {
+                thisReference.injectResources(service);
+            }
         };
         InjectionPointFinder.setInjectionFinder(finder);
     }
@@ -55,7 +61,28 @@ public abstract class SpringContainerConfigBase extends ContainerConfigBase<Inje
     }
 
     @Override
+    protected void addResource(final Class typedName, final Object value) {
+        super.addResource(typedName, value);
+
+    }
+
+    @Override
     protected void injectResources(Object serviceInstance) {
-        
+        if (resources == null && typedResources == null) {
+            return;
+        }
+        /*
+        List<Member> members = ReflectionUtils.findMembers(serviceInstance.getClass());
+        for (Member member : members) {
+            if (member instanceof Field) {
+                Field field = (Field) member;
+                if (field.isAnnotationPresent(Autowired.class)) {
+                    Qualifier resource = field.getAnnotation(Qualifier.class);
+                    if(!injectNamedResource(serviceInstance, field, resource.value())){
+                        injectTypedResource(serviceInstance, field);
+                    }
+                }
+            }
+        }*/
     }
 }

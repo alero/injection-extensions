@@ -87,12 +87,12 @@ public class DataSourceExecution {
     }
 
 
-    public boolean isInited(String schemaName) {
+    public boolean isInitiated(String schemaName) {
         DataSourceProxy dataSourceProxy = resourceCreator.getDataSource(schemaName);
         PreparedStatement pstmt = null;
         try {
             Connection connection = dataSourceProxy.getConnection();
-            pstmt = connection.prepareStatement("create table init_control (  control_it integer)");
+            pstmt = connection.prepareStatement("create table init_control_table (  control_it integer)");
             pstmt.execute();
             return false;
         } catch (SQLException e) {

@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
- * Qmatic Booking Module
+ * Inject extension TDD
  *
  * @author Robert Alexandersson
  *         2011-01-20 13:26

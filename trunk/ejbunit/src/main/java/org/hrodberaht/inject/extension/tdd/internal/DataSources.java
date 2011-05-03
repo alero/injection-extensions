@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Qmatic Booking Module
+ * Inject extension TDD
  *
  * @author Robert Alexandersson
  *         2011-02-05 19:32

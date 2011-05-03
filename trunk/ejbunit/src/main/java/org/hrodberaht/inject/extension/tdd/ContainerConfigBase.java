@@ -6,7 +6,9 @@ import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 import org.hrodberaht.inject.extension.tdd.internal.ResourceCreator;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,7 +99,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
 
     public void addSQLSchemas(String schemaName, String packageBase) {
         DataSourceExecution sourceExecution = new DataSourceExecution(resourceCreator);
-        if(!sourceExecution.isInited(schemaName)){
+        if(!sourceExecution.isInitiated(schemaName)){
             sourceExecution.addSQLSchemas(schemaName, packageBase);
         }
     }
@@ -105,5 +107,62 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
 
     public ResourceCreator getResourceCreator() {
         return resourceCreator;
+    }
+
+    protected boolean injectTypedResource(Object serviceInstance, Field field) {
+        if(typedResources == null){
+            return false;
+        }
+        Object value = typedResources.get(field.getType());
+        if(value != null){
+            injectResourceValue(serviceInstance, field, value);
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean injectNamedResource(Object serviceInstance, Field field, String name) {
+        if(resources == null){
+            return false;
+        }
+        Object value = resources.get(name);
+        if(value != null){
+            injectResourceValue(serviceInstance, field, value);
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean injectNamedResource(Object serviceInstance, Field field, Resource resource) {
+        if(resources == null){
+            return false;
+        }
+        Object value = resources.get(resource.name());
+        if(value == null){
+            value = resources.get(resource.mappedName());
+        }
+        if(value != null){
+            injectResourceValue(serviceInstance, field, value);
+            return true;
+        }
+        return false;
+    }
+
+    protected void injectResourceValue(Object serviceInstance, Field field, Object value) {
+        if (value != null) {
+            boolean accessible = field.isAccessible();
+            try {
+                if (!accessible) {
+                    field.setAccessible(true);
+                }
+                field.set(serviceInstance, value);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (!accessible) {
+                    field.setAccessible(false);
+                }
+            }
+        }
     }
 }
