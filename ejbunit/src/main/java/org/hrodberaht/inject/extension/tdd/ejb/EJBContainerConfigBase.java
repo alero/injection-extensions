@@ -3,6 +3,7 @@ package org.hrodberaht.inject.extension.tdd.ejb;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.ejb.internal.InjectionRegisterScanEJB;
+import org.hrodberaht.inject.extension.tdd.ejb.internal.SessionContextCreator;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
 import org.hrodberaht.inject.internal.annotation.ReflectionUtils;
@@ -11,13 +12,14 @@ import org.hrodberaht.inject.spi.InjectionPointFinder;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
-import javax.inject.Inject;
+import javax.ejb.SessionBean;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +36,8 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
 
     private Map<String, EntityManager> entityManagers = null;
 
-    static {
+    protected EJBContainerConfigBase() {
+        final EJBContainerConfigBase thisReference = this;
         DefaultInjectionPointFinder finder = new DefaultInjectionPointFinder() {
             @Override
             protected boolean hasInjectAnnotationOnMethod(Method method) {
@@ -52,6 +55,11 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
             protected boolean hasPostConstructAnnotation(Method method) {
                 return method.isAnnotationPresent(PostConstruct.class) ||
                         super.hasPostConstructAnnotation(method);
+            }
+
+            @Override
+            public void extendedInjection(Object service) {
+                thisReference.injectResources(service);
             }
         };
         InjectionPointFinder.setInjectionFinder(finder);
@@ -77,6 +85,17 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
     }
 
     protected void injectResources(Object serviceInstance) {
+
+        if(serviceInstance instanceof SessionBean){
+            SessionBean sessionBean = (SessionBean)serviceInstance;
+            try {
+                sessionBean.setSessionContext(SessionContextCreator.create());
+            } catch (RemoteException e) {
+                // Nope
+            }
+        }
+
+
         if (resources == null && entityManagers == null && typedResources == null) {
             return;
         }
@@ -88,28 +107,12 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
                 if (field.isAnnotationPresent(Resource.class)) {
                     Resource resource = field.getAnnotation(Resource.class);
                     if(!injectNamedResource(serviceInstance, field, resource)){
-                        injectTypedResource(serviceInstance, field, resource);
+                        injectTypedResource(serviceInstance, field);
                     }
                 }
                 if (field.isAnnotationPresent(PersistenceContext.class)) {
                     PersistenceContext resource = field.getAnnotation(PersistenceContext.class);
                     injectEntityManager(serviceInstance, field, resource);
-                }
-                if (field.isAnnotationPresent(EJB.class)
-                        || field.isAnnotationPresent(Inject.class)) {
-                    boolean accessible = field.isAccessible();
-                    try {
-                        if (!accessible) {
-                            field.setAccessible(true);
-                        }
-                        injectResources(field.get(serviceInstance));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    } finally {
-                        if (!accessible) {
-                            field.setAccessible(false);
-                        }
-                    }
                 }
             }
         }
@@ -123,51 +126,7 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
         injectResourceValue(serviceInstance, field, value);
     }
 
-    private boolean injectTypedResource(Object serviceInstance, Field field, Resource resource) {
-        if(typedResources == null){
-            return false;
-        }
-        Object value = typedResources.get(field.getType());
-        if(value != null){
-            injectResourceValue(serviceInstance, field, value);
-            return true;
-        }
-        return false;
-    }
 
-
-    private boolean injectNamedResource(Object serviceInstance, Field field, Resource resource) {
-        if(resources == null){
-            return false;
-        }
-        Object value = resources.get(resource.name());
-        if(value == null){
-            value = resources.get(resource.mappedName());
-        }
-        if(value != null){
-            injectResourceValue(serviceInstance, field, value);
-            return true;
-        }
-        return false;
-    }
-
-    private void injectResourceValue(Object serviceInstance, Field field, Object value) {
-        if (value != null) {
-            boolean accessible = field.isAccessible();
-            try {
-                if (!accessible) {
-                    field.setAccessible(true);
-                }
-                field.set(serviceInstance, value);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } finally {
-                if (!accessible) {
-                    field.setAccessible(false);
-                }
-            }
-        }
-    }
 
 
 }

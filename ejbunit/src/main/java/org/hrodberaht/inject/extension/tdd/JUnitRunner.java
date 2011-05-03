@@ -68,13 +68,13 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
         try {
 
             TransactionManager.beginTransaction(creator);
-            ContainerLifeCycleHandler.begin(creator);
+            ContainerLifeCycleTestUtil.begin(creator);
 
             try {
                 super.runChild(frameworkMethod, notifier);
             } finally {
                 TransactionManager.endTransaction();
-                ContainerLifeCycleHandler.end();
+                ContainerLifeCycleTestUtil.end();
             }
         } catch (Throwable e) {
             e.printStackTrace();

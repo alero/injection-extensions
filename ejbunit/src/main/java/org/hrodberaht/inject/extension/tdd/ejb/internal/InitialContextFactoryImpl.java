@@ -6,7 +6,7 @@ import javax.naming.spi.InitialContextFactory;
 import java.util.Hashtable;
 
 /**
- * Qmatic Booking Module
+ * Inject extension TDD
  *
  * @author Robert Alexandersson
  *         2011-01-20 13:25

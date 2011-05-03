@@ -72,10 +72,8 @@ public class InjectionRegisterScanEJB extends InjectionRegisterScanBase {
     }
 
     protected ScopeContainer.Scope getScope(Class serviceClass) {
-        // Its a nice thought but for Unit tests we need the container to reform all services at all times
-        // TODO: make this work, clear the singletons at "reset"
         if(serviceClass.isAnnotationPresent(Stateless.class)){
-            // return ScopeContainer.Scope.SINGLETON;
+            return ScopeContainer.Scope.SINGLETON;
         }
         return ScopeContainer.Scope.NEW;
     }

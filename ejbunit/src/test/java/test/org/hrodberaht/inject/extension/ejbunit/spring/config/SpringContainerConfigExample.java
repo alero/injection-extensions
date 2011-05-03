@@ -19,9 +19,7 @@ public class SpringContainerConfigExample extends SpringContainerConfigBase {
         String dataSourceName = "DataSource";
         if(!hasDataSource(dataSourceName)){
             addResource(DataSource.class, createDataSource(dataSourceName));
-            addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/ejbunit");
-        } else {
-            addResource(DataSource.class, createDataSource(dataSourceName));
+            addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/ejb2unit");
         }
     }
 

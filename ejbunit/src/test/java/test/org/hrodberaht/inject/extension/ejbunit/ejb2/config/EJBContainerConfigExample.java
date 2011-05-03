@@ -19,7 +19,7 @@ public class EJBContainerConfigExample extends EJBContainerConfigBase {
         String dataSourceName = "DataSource";
         if(!hasDataSource(dataSourceName)){
             addResource(dataSourceName, createDataSource(dataSourceName));
-            addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/ejbunit");
+            addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/ejb2unit");
         }
     }
 

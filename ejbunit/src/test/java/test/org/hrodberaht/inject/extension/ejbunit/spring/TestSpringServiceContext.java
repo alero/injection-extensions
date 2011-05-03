@@ -1,7 +1,7 @@
 package test.org.hrodberaht.inject.extension.ejbunit.spring;
 
 import org.hrodberaht.inject.extension.tdd.ContainerContext;
-import org.hrodberaht.inject.extension.tdd.ContainerLifeCycleHandler;
+import org.hrodberaht.inject.extension.tdd.ContainerLifeCycleTestUtil;
 import org.hrodberaht.inject.extension.tdd.JUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,9 +81,9 @@ public class TestSpringServiceContext {
 
         SpringInnerServiceInterface anInterface = Mockito.mock(SpringInnerServiceInterface.class);
         Mockito.when(anInterface.findSomething(12L)).thenReturn("Something Deep From Mock");
-        ContainerLifeCycleHandler.registerServiceInstance(SpringInnerServiceInterface.class, anInterface);
+        ContainerLifeCycleTestUtil.registerServiceInstance(SpringInnerServiceInterface.class, anInterface);
 
-        SpringServiceInterface serviceInterface = ContainerLifeCycleHandler.getService(SpringServiceInterface.class);
+        SpringServiceInterface serviceInterface = ContainerLifeCycleTestUtil.getService(SpringServiceInterface.class);
         String something = serviceInterface.findSomething(12L);
         assertEquals("Something", something);
 

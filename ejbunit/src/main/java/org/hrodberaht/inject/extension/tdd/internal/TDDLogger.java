@@ -1,7 +1,7 @@
 package org.hrodberaht.inject.extension.tdd.internal;
 
 /**
- * Qmatic Booking Module
+ * Inject extension TDD
  *
  * @author Robert Alexandersson
  *         2011-02-05 20:11

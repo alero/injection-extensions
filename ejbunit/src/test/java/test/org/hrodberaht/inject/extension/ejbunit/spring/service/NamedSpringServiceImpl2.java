@@ -18,7 +18,8 @@ import java.sql.SQLException;
  * @since 1.0
  */
 @Component(value = "WithAName2")
-public class NamedSpringServiceImpl2 implements NamedSpringServiceInterface {
+public class NamedSpringServiceImpl2 // implements NamedSpringServiceInterface
+{
 
     @Autowired
     private DataSource dataSource;

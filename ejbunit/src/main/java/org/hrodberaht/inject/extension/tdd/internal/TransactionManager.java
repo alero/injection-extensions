@@ -5,7 +5,7 @@ import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import javax.persistence.EntityManager;
 
 /**
- * Qmatic Booking Module
+ * Inject extension TDD
  *
  * @author Robert Alexandersson
  *         2011-02-05 19:26
@@ -55,13 +55,4 @@ public class TransactionManager {
         }
     }
 
-
-    public static void registerAll() {
-
-
-
-
-
-
-    }
 }
