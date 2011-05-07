@@ -3,6 +3,7 @@ package test.org.hrodberaht.inject.extension.ejbunit.demo.test;
 import org.hrodberaht.inject.extension.tdd.ContainerContext;
 import org.hrodberaht.inject.extension.tdd.ContainerLifeCycleTestUtil;
 import org.hrodberaht.inject.extension.tdd.JUnitRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -36,6 +37,7 @@ public class TestAccountServiceMocking {
     private CustomerService customerService;
 
     @Test
+    @Ignore
     public void testAccountAddMoneyMockedUpdate() throws Exception {
 
         // Prepare data (no mocking active)
@@ -53,6 +55,7 @@ public class TestAccountServiceMocking {
         AccountingService accountingService = ContainerLifeCycleTestUtil.getService(AccountingService.class);
         accountingService.addMoney(500D, customerAccount.getId());
 
+        // Asserting the functionality
         Mockito.verify(customerAccountMock).find(customerAccount.getId());
         Mockito.verify(customerAccountMock).update(Mockito.<CustomerAccount>any());
 
@@ -64,8 +67,8 @@ public class TestAccountServiceMocking {
         // Prepare data (no mocking active)
         Customer customer = customerService.find(-1L);
         final CustomerAccount customerAccount = CourseDataModelStub.createCustomerAccountEmpty(customer);
+        customerAccount.setMoney(5D);
         customerAccountService.create(customerAccount);
-
         // Register mocking
         final CustomerAccount[] customerAccountReturn = new CustomerAccount[1];
         CustomerAccountService customerAccountMock = new CustomerAccountService(){
@@ -73,7 +76,7 @@ public class TestAccountServiceMocking {
                 return customer;
             }
             public CustomerAccount find(Long id) {
-                return customerAccount;
+                return customerAccountService.find(id);
             }
             public CustomerAccount update(CustomerAccount customerAccount) {
                 customerAccountReturn[0] = customerAccount;
@@ -87,7 +90,8 @@ public class TestAccountServiceMocking {
         AccountingService accountingService = ContainerLifeCycleTestUtil.getService(AccountingService.class);
         accountingService.addMoney(500D, customerAccount.getId());
 
-        assertEquals(new Double(500D), customerAccountReturn[0].getMoney());
+        // Asserting the functionality
+        assertEquals(new Double(505D), customerAccountReturn[0].getMoney());
 
     }
 }

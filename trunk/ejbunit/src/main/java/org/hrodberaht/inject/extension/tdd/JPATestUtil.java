@@ -1,5 +1,10 @@
 package org.hrodberaht.inject.extension.tdd;
 
+import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
+
+import javax.persistence.EntityManager;
+import java.util.Collection;
+
 /**
  * Inject extension TDD
  *
@@ -11,4 +16,12 @@ package org.hrodberaht.inject.extension.tdd;
 public class JPATestUtil {
 
 
+    public static void flushAndClear() {
+        Collection<EntityManager> entityManagers =
+                ((EJBContainerConfigBase)ContainerLifeCycleTestUtil.getThreadConfigBase()).getEntityManagers();
+        for(EntityManager entityManager:entityManagers){
+            entityManager.flush();
+            entityManager.clear();
+        }
+    }
 }

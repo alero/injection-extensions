@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,10 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
             }
         };
         InjectionPointFinder.setInjectionFinder(finder);
+    }
+
+    public Collection<EntityManager> getEntityManagers() {
+        return entityManagers.values();
     }
 
     public abstract InjectContainer createContainer();
