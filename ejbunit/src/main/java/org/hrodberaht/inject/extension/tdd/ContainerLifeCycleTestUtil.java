@@ -23,6 +23,11 @@ public class ContainerLifeCycleTestUtil {
         threadLocal.remove();
     }
 
+    protected static ContainerConfigBase getThreadConfigBase(){
+        return threadLocal.get();
+    }
+
+
     public static void registerService(Class serviceDefinition, Class service){
         threadLocal.get().getActiveRegister().overrideRegister(serviceDefinition, service);
     }

@@ -19,16 +19,13 @@ public class CourseContainerConfigExample extends EJBContainerConfigBase {
     public CourseContainerConfigExample() {
 
         String dataSourceName = "MyDataSource";
-        String schemaName = "example-jpa";
-        DataSource dataSource = createDataSource(schemaName);
+        String jpaName  = "example-jpa";
+        DataSource dataSource = createDataSource(dataSourceName);
         // EntityManager resource
-        EntityManager entityManager = createEntityManager(schemaName, dataSourceName, dataSource);
-        addPersistenceContext(schemaName, entityManager);
-        // Named resource
-        // addResource(dataSourceName, dataSource);
-        addSQLSchemas(schemaName, "test/org/hrodberaht/inject/extension/course");
-        // Typed resource
-        // addResource(DataSource.class, dataSource);
+        EntityManager entityManager = createEntityManager(jpaName , dataSourceName, dataSource);
+        addPersistenceContext(jpaName, entityManager);
+
+        addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/course");
     }
 
     @Override

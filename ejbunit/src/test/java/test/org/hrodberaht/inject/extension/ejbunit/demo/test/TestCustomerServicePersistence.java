@@ -1,6 +1,7 @@
 package test.org.hrodberaht.inject.extension.ejbunit.demo.test;
 
 import org.hrodberaht.inject.extension.tdd.ContainerContext;
+import org.hrodberaht.inject.extension.tdd.JPATestUtil;
 import org.hrodberaht.inject.extension.tdd.JUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,8 +11,7 @@ import test.org.hrodberaht.inject.extension.ejbunit.demo.test.config.CourseConta
 
 import javax.ejb.EJB;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Inject extension TDD
@@ -34,12 +34,16 @@ public class TestCustomerServicePersistence {
      */
     @Test
     public void testCustomerCreateRead(){
+        // Create the customer and save in DB
         Customer customer = CourseDataModelStub.createCustomer();
-
         customerService.create(customer);
-
+        // Flush the JPA session to force insert and clear first lvl cache for reselect
+        JPATestUtil.flushAndClear();
+        // Find the customer from DB, new instance means recreated from db
         Customer foundCustomer = customerService.find(customer.getId());
 
+        // Assert functionality
+        assertNotSame(customer, foundCustomer);
         assertEquals(customer.getId(), foundCustomer.getId());
         assertEquals(customer.getName(), foundCustomer.getName());
 
