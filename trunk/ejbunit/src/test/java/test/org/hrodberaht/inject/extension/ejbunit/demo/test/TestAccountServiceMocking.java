@@ -3,7 +3,6 @@ package test.org.hrodberaht.inject.extension.ejbunit.demo.test;
 import org.hrodberaht.inject.extension.tdd.ContainerContext;
 import org.hrodberaht.inject.extension.tdd.ContainerLifeCycleTestUtil;
 import org.hrodberaht.inject.extension.tdd.JUnitRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -37,7 +36,6 @@ public class TestAccountServiceMocking {
     private CustomerService customerService;
 
     @Test
-    @Ignore
     public void testAccountAddMoneyMockedUpdate() throws Exception {
 
         // Prepare data (no mocking active)
@@ -67,7 +65,7 @@ public class TestAccountServiceMocking {
         // Prepare data (no mocking active)
         Customer customer = customerService.find(-1L);
         final CustomerAccount customerAccount = CourseDataModelStub.createCustomerAccountEmpty(customer);
-        customerAccount.setMoney(5D);
+        // customerAccount.setMoney(5D);
         customerAccountService.create(customerAccount);
         // Register mocking
         final CustomerAccount[] customerAccountReturn = new CustomerAccount[1];
@@ -91,7 +89,7 @@ public class TestAccountServiceMocking {
         accountingService.addMoney(500D, customerAccount.getId());
 
         // Asserting the functionality
-        assertEquals(new Double(505D), customerAccountReturn[0].getMoney());
+        assertEquals(new Double(500D), customerAccountReturn[0].getMoney());
 
     }
 }
