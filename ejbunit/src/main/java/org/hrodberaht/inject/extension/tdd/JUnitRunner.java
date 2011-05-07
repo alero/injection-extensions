@@ -21,12 +21,12 @@ import java.lang.annotation.Annotation;
  */
 public class JUnitRunner extends BlockJUnit4ClassRunner {
 
-    private InjectContainer theContainer = null;
+    private InjectContainer activeContainer = null;
 
     private ContainerConfigBase creator = null;
 
     /**
-     * Creates a BlockJUnit4ClassRunner to run {@code klass}
+     * Creates a BlockJUnit4ClassRunner to run
      *
      * @throws org.junit.runners.model.InitializationError
      *          if the test class is malformed.
@@ -45,7 +45,7 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
                     ContainerContext containerContext = (ContainerContext) annotation;
                     Class<? extends ContainerConfigBase> transactionClass = containerContext.value();
                     creator = transactionClass.newInstance();
-                    theContainer = creator.createContainer();
+                    creator.createContainer();
                 }
             }
         } catch (InstantiationException e) {
@@ -56,9 +56,6 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * Each test is verified for transaction support.
-     * To enable a single methods for transaction use the @TransactionAttribute
-     * Disabled TransactionDisabled comes first and will always disable (even if a TransactionAttribute exists)
      *
      * @param frameworkMethod
      * @param notifier
@@ -69,6 +66,7 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
 
             TransactionManager.beginTransaction(creator);
             ContainerLifeCycleTestUtil.begin(creator);
+            activeContainer = creator.activeRegister.getInjectContainer();
 
             try {
                 super.runChild(frameworkMethod, notifier);
@@ -85,14 +83,14 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
     }
 
     /**
-     * Runs the injection of dependencies on the test case before returned
+     * Runs the injection of dependencies and resources on the test case before returned
      * @return the testcase
      * @throws Exception
      */
     @Override
     protected Object createTest() throws Exception {
         Object testInstance = super.createTest();
-        theContainer.injectDependencies(testInstance);
+        activeContainer.injectDependencies(testInstance);
         creator.injectResources(testInstance);
         return testInstance;
     }
