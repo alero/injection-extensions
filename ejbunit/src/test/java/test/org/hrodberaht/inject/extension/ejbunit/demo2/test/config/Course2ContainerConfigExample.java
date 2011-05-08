@@ -3,7 +3,6 @@ package test.org.hrodberaht.inject.extension.ejbunit.demo2.test.config;
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
 
-import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 /**
@@ -19,12 +18,8 @@ public class Course2ContainerConfigExample extends EJBContainerConfigBase {
     public Course2ContainerConfigExample() {
 
         String dataSourceName = "MyDataSource";
-        String jpaName  = "example-jpa";
         DataSource dataSource = super.createDataSource(dataSourceName);
         super.addResource(dataSourceName, dataSource);
-        // EntityManager resource
-        EntityManager entityManager = createEntityManager(jpaName , dataSourceName, dataSource);
-        super.addPersistenceContext(jpaName, entityManager);
 
         super.addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/course2");
     }
