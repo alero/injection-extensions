@@ -3,6 +3,8 @@ package test.org.hrodberaht.inject.extension.ejbunit.demo.service;
 import test.org.hrodberaht.inject.extension.ejbunit.demo.model.Customer;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -20,6 +22,7 @@ public class CustomerServiceBean implements CustomerService{
     @PersistenceContext(unitName="example-jpa")
     protected EntityManager entityManager;
 
+    @TransactionAttribute(value = TransactionAttributeType.REQUIRED)
     public Customer create(Customer customer) {
         entityManager.persist(customer);
         return customer;

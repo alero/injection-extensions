@@ -4,6 +4,8 @@ import test.org.hrodberaht.inject.extension.ejbunit.demo.model.CustomerAccount;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -25,6 +27,7 @@ public class AccountingServiceBean implements AccountingService{
     @EJB
     private CustomerAccountService customerAccountService;
 
+    @TransactionAttribute(value = TransactionAttributeType.REQUIRED)
     public void addMoney(double money, long customerAccountId) {
         CustomerAccount customerAccount = customerAccountService.find(customerAccountId);
         if(customerAccount.getMoney() != null){
