@@ -20,10 +20,6 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class AccountingServiceBean implements AccountingService{
 
-
-    @PersistenceContext(unitName="example-jpa")
-    protected EntityManager entityManager;
-
     @EJB
     private CustomerAccountService customerAccountService;
 

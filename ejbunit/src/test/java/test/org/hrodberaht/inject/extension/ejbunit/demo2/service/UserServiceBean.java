@@ -7,6 +7,7 @@ import test.org.hrodberaht.inject.extension.ejbunit.demo2.model.User;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.Stateless;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
  * @created 1.0
  * @since 1.0
  */
+@Stateless
 public class UserServiceBean implements UserService{
 
     @Resource(mappedName = "MyDataSource")
