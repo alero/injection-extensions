@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>tdd</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0_RC1</version>
     <name>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</name>
 
     <properties>
@@ -14,9 +13,9 @@
     </properties>
 
      <scm>
-        <url>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/</url>
-        <connection>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/</connection>
-        <developerConnection>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/
+        <url>scm:svn:https://injection-extensions.googlecode.com/svn/tags/1.0_RC1</url>
+        <connection>scm:svn:https://injection-extensions.googlecode.com/svn/tags/1.0_RC1</connection>
+        <developerConnection>scm:svn:https://injection-extensions.googlecode.com/svn/tags/1.0_RC1
         </developerConnection>
     </scm>
 
