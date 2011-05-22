@@ -5,6 +5,7 @@ import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.ejb.internal.InjectionRegisterScanEJB;
 import org.hrodberaht.inject.extension.tdd.ejb.internal.SessionContextCreator;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
+import org.hrodberaht.inject.extension.tdd.internal.ThreadConfigHolder;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
 import org.hrodberaht.inject.internal.annotation.ReflectionUtils;
 import org.hrodberaht.inject.spi.InjectionPointFinder;
@@ -38,8 +39,14 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
     private Map<String, EntityManager> entityManagers = null;
 
     protected EJBContainerConfigBase() {
-        final EJBContainerConfigBase thisReference = this;
+
+
+
+
         DefaultInjectionPointFinder finder = new DefaultInjectionPointFinder() {
+
+
+
             @Override
             protected boolean hasInjectAnnotationOnMethod(Method method) {
                 return method.isAnnotationPresent(EJB.class) ||
@@ -60,7 +67,8 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
 
             @Override
             public void extendedInjection(Object service) {
-                thisReference.injectResources(service);
+                EJBContainerConfigBase config = (EJBContainerConfigBase) ThreadConfigHolder.get();
+                config.injectResources(service);
             }
         };
         InjectionPointFinder.setInjectionFinder(finder);
@@ -90,7 +98,6 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
     }
 
     protected void injectResources(Object serviceInstance) {
-
         if(serviceInstance instanceof SessionBean){
             SessionBean sessionBean = (SessionBean)serviceInstance;
             try {
@@ -99,7 +106,6 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
                 // Nope
             }
         }
-
 
         if (resources == null && entityManagers == null && typedResources == null) {
             return;

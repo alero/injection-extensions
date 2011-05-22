@@ -72,7 +72,7 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
                 ) {
             try{
                 Class serviceClass = findServiceImplementation(aClazz, listOfClasses);
-                register(aClazz, serviceClass, getScope(serviceClass));
+                overrideRegister(aClazz, serviceClass, getScope(serviceClass));
             }catch(InjectRuntimeException e){
                 System.out.println("Hrodberaht Injection: Silently failed to register class = "+aClazz);
                 if(detailedScanLogging){
@@ -85,8 +85,12 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
                 && !aClazz.isAnnotation()
                 && isServiceAnnotated(aClazz)
                 ) {
-            try{                
-                register(aClazz, aClazz, getScope(aClazz));
+            try{
+                Class[] interfaces = aClazz.getInterfaces();
+                ScopeContainer.Scope scope = getScope(aClazz);
+                for(Class _interface:interfaces){
+                    overrideRegister(_interface, aClazz, scope);
+                }
             }catch(InjectRuntimeException e){
                 System.out.println("Hrodberaht Injection: Silently failed to register class = "+aClazz);
                 if(detailedScanLogging){

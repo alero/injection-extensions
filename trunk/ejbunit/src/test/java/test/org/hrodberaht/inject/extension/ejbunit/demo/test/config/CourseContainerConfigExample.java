@@ -25,7 +25,8 @@ public class CourseContainerConfigExample extends EJBContainerConfigBase {
         EntityManager entityManager = createEntityManager(jpaName , dataSourceName, dataSource);
         addPersistenceContext(jpaName, entityManager);
 
-        addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/course");
+        addSQLSchemas(
+                "CourseContainerConfigExample","MyDataSource",  "test/org/hrodberaht/inject/extension/course");
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
+import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -43,6 +44,11 @@ public class InjectionRegisterScanEJB extends InjectionRegisterScanBase {
 
     @Override
     protected boolean isServiceAnnotated(Class aClazz) {
+        if(aClazz.isAnnotationPresent(Stateless.class)){
+            return true;
+        }else if(aClazz.isAnnotationPresent(Stateful.class)){
+            return true;
+        }
         return false;
     }
 

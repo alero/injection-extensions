@@ -44,6 +44,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
         originalRegister = registerScan;
         appendTypedResources();
         activeRegister = originalRegister.clone();
+        System.out.println("originalRegister - "+originalRegister);
         return activeRegister.getInjectContainer();
     }
 
@@ -99,7 +100,14 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
 
     public void addSQLSchemas(String schemaName, String packageBase) {
         DataSourceExecution sourceExecution = new DataSourceExecution(resourceCreator);
-        if(!sourceExecution.isInitiated(schemaName)){
+        if(!sourceExecution.isInitiated(schemaName, schemaName)){
+            sourceExecution.addSQLSchemas(schemaName, packageBase);
+        }
+    }
+
+    public void addSQLSchemas(String testPackageName, String schemaName, String packageBase) {
+        DataSourceExecution sourceExecution = new DataSourceExecution(resourceCreator);
+        if(!sourceExecution.isInitiated(testPackageName, schemaName)){
             sourceExecution.addSQLSchemas(schemaName, packageBase);
         }
     }
@@ -114,18 +122,6 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
             return false;
         }
         Object value = typedResources.get(field.getType());
-        if(value != null){
-            injectResourceValue(serviceInstance, field, value);
-            return true;
-        }
-        return false;
-    }
-
-    protected boolean injectNamedResource(Object serviceInstance, Field field, String name) {
-        if(resources == null){
-            return false;
-        }
-        Object value = resources.get(name);
         if(value != null){
             injectResourceValue(serviceInstance, field, value);
             return true;

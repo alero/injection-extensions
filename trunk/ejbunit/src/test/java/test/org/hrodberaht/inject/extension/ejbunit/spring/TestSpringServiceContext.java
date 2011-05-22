@@ -1,13 +1,10 @@
 package test.org.hrodberaht.inject.extension.ejbunit.spring;
 
-import org.hrodberaht.inject.extension.tdd.ContainerContext;
 import org.hrodberaht.inject.extension.tdd.ContainerLifeCycleTestUtil;
-import org.hrodberaht.inject.extension.tdd.JUnitRunner;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import test.org.hrodberaht.inject.extension.ejbunit.spring.config.SpringContainerConfigExample;
 import test.org.hrodberaht.inject.extension.ejbunit.spring.service.SpringInnerServiceInterface;
 import test.org.hrodberaht.inject.extension.ejbunit.spring.service.SpringServiceInterface;
 
@@ -23,8 +20,9 @@ import static org.junit.Assert.assertEquals;
  * @version 1.0
  * @since 1.0
  */
-@ContainerContext(SpringContainerConfigExample.class)
-@RunWith(JUnitRunner.class)
+// @ContainerContext(SpringContainerConfigExample.class)
+// @RunWith(JUnitRunner.class)
+@Ignore
 public class TestSpringServiceContext {
 
     @Inject

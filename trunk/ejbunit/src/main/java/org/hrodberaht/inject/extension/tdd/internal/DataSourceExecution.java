@@ -87,13 +87,17 @@ public class DataSourceExecution {
     }
 
 
-    public boolean isInitiated(String schemaName) {
+    public boolean isInitiated(String testPackageName, String schemaName) {
         DataSourceProxy dataSourceProxy = resourceCreator.getDataSource(schemaName);
         PreparedStatement pstmt = null;
         try {
+            if(dataSourceProxy == null){
+                throw new IllegalAccessError("schemaName:"+schemaName +" does not exist ");
+            }
             Connection connection = dataSourceProxy.getConnection();
-            pstmt = connection.prepareStatement("create table init_control_table (  control_it integer)");
+            pstmt = connection.prepareStatement("create table "+testPackageName+" (  control_it integer)");
             pstmt.execute();
+            dataSourceProxy.commitDataSource();
             return false;
         } catch (SQLException e) {
             return true;
@@ -105,7 +109,9 @@ public class DataSourceExecution {
             } catch (SQLException e) {
 
             }
-            dataSourceProxy.commitDataSource();
+
         }
     }
+
+
 }

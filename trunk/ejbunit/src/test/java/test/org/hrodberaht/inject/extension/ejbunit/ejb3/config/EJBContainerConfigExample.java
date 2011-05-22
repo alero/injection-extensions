@@ -18,17 +18,16 @@ public class EJBContainerConfigExample extends EJBContainerConfigBase {
 
     public EJBContainerConfigExample() {
 
-
-
         String dataSourceName = "MyDataSource";
         String schemaName = "example-jpa";
-        DataSource dataSource = createDataSource(schemaName);
+        DataSource dataSource = createDataSource(dataSourceName);
         // EntityManager resource
         EntityManager entityManager = createEntityManager(schemaName, dataSourceName, dataSource);
         addPersistenceContext(schemaName, entityManager);
         // Named resource
         addResource(dataSourceName, dataSource);
-        addSQLSchemas(schemaName, "test/org/hrodberaht/inject/extension/ejbunit");
+        addSQLSchemas(
+                "EJBContainerConfigExample","MyDataSource", "test/org/hrodberaht/inject/extension/ejbunit");
         // Typed resource
         addResource(DataSource.class, dataSource);
 
