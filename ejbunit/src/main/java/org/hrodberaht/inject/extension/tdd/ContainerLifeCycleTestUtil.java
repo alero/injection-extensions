@@ -1,5 +1,6 @@
 package org.hrodberaht.inject.extension.tdd;
 
+import org.hrodberaht.inject.extension.tdd.internal.ThreadConfigHolder;
 import org.hrodberaht.inject.register.RegistrationModule;
 
 /**
@@ -12,37 +13,37 @@ import org.hrodberaht.inject.register.RegistrationModule;
  */
 public class ContainerLifeCycleTestUtil {
 
-    private static final ThreadLocal<ContainerConfigBase> threadLocal = new ThreadLocal<ContainerConfigBase>();
+
 
     protected static void begin(ContainerConfigBase theContainer) {
-        threadLocal.set(theContainer);
+        ThreadConfigHolder.set(theContainer);
     }
 
     protected static void end() {
-        threadLocal.get().cleanActiveContainer();
-        threadLocal.remove();
+        ThreadConfigHolder.get().cleanActiveContainer();
+        ThreadConfigHolder.remove();
     }
 
     protected static ContainerConfigBase getThreadConfigBase(){
-        return threadLocal.get();
+        return ThreadConfigHolder.get();
     }
 
 
     public static void registerService(Class serviceDefinition, Class service){
-        threadLocal.get().getActiveRegister().overrideRegister(serviceDefinition, service);
+        ThreadConfigHolder.get().getActiveRegister().overrideRegister(serviceDefinition, service);
     }
 
     public static void registerServiceInstance(Class serviceDefinition, Object service){
-        threadLocal.get().getActiveRegister().overrideRegister(serviceDefinition, service);
+        ThreadConfigHolder.get().getActiveRegister().overrideRegister(serviceDefinition, service);
     }
 
     public static void registerModule(RegistrationModule module){
-        threadLocal.get().getActiveRegister().register(module);
+        ThreadConfigHolder.get().getActiveRegister().register(module);
     }
 
 
     public static <T> T getService(Class<T> aClass) {
-        ContainerConfigBase containerConfigBase = threadLocal.get();
+        ContainerConfigBase containerConfigBase = ThreadConfigHolder.get();
         T t = containerConfigBase.getActiveContainer().get(aClass);
         containerConfigBase.injectResources(t);
         return t;

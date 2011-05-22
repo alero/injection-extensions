@@ -2,9 +2,9 @@ package org.hrodberaht.inject.extension.tdd.spring;
 
 import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
+import org.hrodberaht.inject.extension.tdd.internal.ThreadConfigHolder;
 import org.hrodberaht.inject.extension.tdd.spring.internal.InjectionRegisterScanSpring;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
-import org.hrodberaht.inject.spi.InjectionPointFinder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -22,37 +22,32 @@ import java.lang.reflect.Method;
 public abstract class SpringContainerConfigBase extends ContainerConfigBase<InjectionRegisterScanSpring> {
 
     protected SpringContainerConfigBase() {
-        final SpringContainerConfigBase thisReference = this;
         DefaultInjectionPointFinder finder = new DefaultInjectionPointFinder() {
             @Override
             protected boolean hasInjectAnnotationOnMethod(Method method) {
-                // This is a bit special, named configurations must be configured
-                // and injected by the post processor inject resources
                 return method.isAnnotationPresent(Autowired.class) ||
                         super.hasInjectAnnotationOnMethod(method);
             }
 
             @Override
             protected boolean hasInjectAnnotationOnField(Field field) {
-                // This is a bit special, named configurations must be configured
-                // and injected by the post processor inject resources
                 return field.isAnnotationPresent(Autowired.class) ||
                         super.hasInjectAnnotationOnField(field);
             }
 
             @Override
             protected boolean hasPostConstructAnnotation(Method method) {
-                // TODO: perhaps not? ...
                 return method.isAnnotationPresent(PostConstruct.class) ||
                         super.hasPostConstructAnnotation(method);
             }
 
             @Override
             public void extendedInjection(Object service) {
-                thisReference.injectResources(service);
+                SpringContainerConfigBase config = (SpringContainerConfigBase) ThreadConfigHolder.get();
+                config.injectResources(service);
             }
         };
-        InjectionPointFinder.setInjectionFinder(finder);
+        // InjectionPointFinder.setInjectionFinder(finder);
     }
 
     @Override

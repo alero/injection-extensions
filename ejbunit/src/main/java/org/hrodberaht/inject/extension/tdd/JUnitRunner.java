@@ -67,8 +67,8 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
             TransactionManager.beginTransaction(creator);
             ContainerLifeCycleTestUtil.begin(creator);
             activeContainer = creator.activeRegister.getInjectContainer();
-
             try {
+                // This will execute the createTest method below, the activeContainer handling relies on this.
                 super.runChild(frameworkMethod, notifier);
             } finally {
                 TransactionManager.endTransaction();
@@ -90,8 +90,8 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
     @Override
     protected Object createTest() throws Exception {
         Object testInstance = super.createTest();
+        // The active container will automatically inject all normal dependencies and resources
         activeContainer.injectDependencies(testInstance);
-        creator.injectResources(testInstance);
         return testInstance;
     }
 

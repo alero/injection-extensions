@@ -21,7 +21,9 @@ public class Course2ContainerConfigExample extends EJBContainerConfigBase {
         DataSource dataSource = super.createDataSource(dataSourceName);
         super.addResource(dataSourceName, dataSource);
 
-        super.addSQLSchemas(dataSourceName, "test/org/hrodberaht/inject/extension/course2");
+        super.addSQLSchemas(
+                "Course2ContainerConfigExample","MyDataSource","test/org/hrodberaht/inject/extension/course2"
+        );
     }
 
     @Override
