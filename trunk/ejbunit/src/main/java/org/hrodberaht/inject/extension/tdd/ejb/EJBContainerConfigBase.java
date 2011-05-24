@@ -39,14 +39,7 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
     private Map<String, EntityManager> entityManagers = null;
 
     protected EJBContainerConfigBase() {
-
-
-
-
         DefaultInjectionPointFinder finder = new DefaultInjectionPointFinder() {
-
-
-
             @Override
             protected boolean hasInjectAnnotationOnMethod(Method method) {
                 return method.isAnnotationPresent(EJB.class) ||
@@ -84,7 +77,6 @@ public abstract class EJBContainerConfigBase extends ContainerConfigBase<Injecti
     protected InjectionRegisterScanBase getScanner() {
         return new InjectionRegisterScanEJB();
     }
-
 
     protected void addPersistenceContext(String name, EntityManager entityManager) {
         if(entityManagers == null){
