@@ -24,15 +24,6 @@ public class ContainerLifeCycleTestUtil {
         ThreadConfigHolder.remove();
     }
 
-    protected static ContainerConfigBase getThreadConfigBase(){
-        return ThreadConfigHolder.get();
-    }
-
-
-    public static void registerService(Class serviceDefinition, Class service){
-        ThreadConfigHolder.get().getActiveRegister().overrideRegister(serviceDefinition, service);
-    }
-
     public static void registerServiceInstance(Class serviceDefinition, Object service){
         ThreadConfigHolder.get().getActiveRegister().overrideRegister(serviceDefinition, service);
     }
@@ -44,8 +35,6 @@ public class ContainerLifeCycleTestUtil {
 
     public static <T> T getService(Class<T> aClass) {
         ContainerConfigBase containerConfigBase = ThreadConfigHolder.get();
-        T t = containerConfigBase.getActiveContainer().get(aClass);
-        containerConfigBase.injectResources(t);
-        return t;
+        return containerConfigBase.getActiveContainer().get(aClass);
     }
 }
