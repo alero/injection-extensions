@@ -5,7 +5,7 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>tdd</artifactId>
     <packaging>jar</packaging>
-    <version>1.0_RC2-SNAPSHOT</version>
+    <version>1.0_RC2</version>
     <name>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</name>
 
     <properties>
@@ -13,9 +13,9 @@
     </properties>
 
     <scm>
-        <url>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/</url>
-        <connection>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/</connection>
-        <developerConnection>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/
+        <url>scm:svn:https://injection-extensions.googlecode.com/svn/tags/1.0_RC2</url>
+        <connection>scm:svn:https://injection-extensions.googlecode.com/svn/tags/1.0_RC2</connection>
+        <developerConnection>scm:svn:https://injection-extensions.googlecode.com/svn/tags/1.0_RC2
         </developerConnection>
     </scm>
 
