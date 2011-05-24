@@ -12,13 +12,12 @@
         <hibernate-core-version>3.5.3-Final</hibernate-core-version>
     </properties>
 
-     <scm>
+    <scm>
         <url>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/</url>
         <connection>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/</connection>
         <developerConnection>scm:svn:https://injection-extensions.googlecode.com/svn/trunk/ejbunit/
         </developerConnection>
     </scm>
-
 
     <developers>
         <developer>
@@ -72,6 +71,8 @@
         </plugins>
     </build>
     <dependencies>
+
+        <!-- The follow dependencies are needed and these versions are recommended //-->
         <dependency>
             <groupId>org.hrodberaht</groupId>
             <artifactId>inject</artifactId>
@@ -85,25 +86,36 @@
         </dependency>
 
         <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>1.8.0.7</version>
+        </dependency>
+
+        <dependency>
             <groupId>javax.ejb</groupId>
             <artifactId>ejb-api</artifactId>
             <version>3.0</version>
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.8.0.7</version>
-            <scope>test</scope>
-        </dependency>
-
+        <!-- The follow dependencies are recommended and the user needs to define them in their POM //-->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.8.5</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.11</version>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- The follow dependencies are not needed outside this POM //-->
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -112,6 +124,7 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -142,7 +155,9 @@
             <artifactId>hibernate-annotations</artifactId>
             <version>${hibernate-core-version}</version>
             <scope>test</scope>
+            <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
@@ -155,12 +170,9 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate-core-version}</version>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.11</version>
-        </dependency>
+
     </dependencies>
 
     <profiles>
