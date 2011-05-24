@@ -19,6 +19,14 @@
         </developerConnection>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>Local release</id>
+            <name>Local release</name>
+            <url>file://${user.home}/.m2/repository</url>
+        </repository>
+    </distributionManagement>
+
     <developers>
         <developer>
             <id>robert.alexandersson</id>
