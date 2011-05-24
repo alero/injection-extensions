@@ -6,7 +6,16 @@
     <artifactId>tdd</artifactId>
     <packaging>jar</packaging>
     <version>1.0_RC3-SNAPSHOT</version>
-    <name>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</name>
+    <name>TDD for EJB</name>
+	<description>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</description>
+    <url>http://code.google.com/p/injection-extensions/</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
 
     <properties>
         <hibernate-core-version>3.5.3-Final</hibernate-core-version>
