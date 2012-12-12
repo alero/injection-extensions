@@ -1,12 +1,8 @@
 package test.org.hrodberaht.inject.extension.cdi.config;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.CDIContainerConfigBase;
-import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
-import org.hrodberaht.inject.spi.ResourceCreator;
 
 import javax.sql.DataSource;
-import java.util.Collection;
 
 /**
  * Unit Test EJB (using @Inject)

@@ -1,7 +1,9 @@
-package org.hrodberaht.inject.extension.inner;
+package org.hrodberaht.inject.extension.cdi.inner;
 
+import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
 import org.hrodberaht.inject.ScopeContainer;
+import org.hrodberaht.inject.SimpleInjection;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
@@ -14,7 +16,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * �Projectname�
+ * Projectname
  *
  * @author Robert Alexandersson
  *         2010-okt-26 19:09:57
@@ -30,6 +32,9 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
     protected abstract ScopeContainer.Scope getScope(Class serviceClass);
     public abstract InjectionRegisterScanBase clone();
 
+    public void setInjectContainer(InjectContainer injectContainer) {
+        super.container = (SimpleInjection) injectContainer;
+    }
 
     public InjectionRegisterScanBase scanPackage(String... packagenames) {
         for(String packagename:packagenames){

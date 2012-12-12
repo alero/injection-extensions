@@ -1,6 +1,6 @@
 package test.org.hrodberaht.inject.extension.cdi.config;
 
-import org.hrodberaht.inject.extension.CDIContainerConfigBase;
+import org.hrodberaht.inject.extension.cdi.CDIContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.internal.DataSourceExecution;
 import org.hrodberaht.inject.extension.tdd.internal.DataSourceProxy;
 import org.hrodberaht.inject.extension.tdd.internal.ProxyResourceCreator;

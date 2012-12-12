@@ -1,7 +1,6 @@
-package org.hrodberaht.inject.extension;
+package org.hrodberaht.inject.extension.cdi;
 
-import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.inner.JSEResourceCreator;
+import org.hrodberaht.inject.extension.cdi.inner.JSEResourceCreator;
 import org.hrodberaht.inject.spi.ResourceCreator;
 
 /**

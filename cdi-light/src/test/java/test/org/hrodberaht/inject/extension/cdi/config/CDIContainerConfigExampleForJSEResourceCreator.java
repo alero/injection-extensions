@@ -1,8 +1,7 @@
 package test.org.hrodberaht.inject.extension.cdi.config;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.CDIContainerConfig;
-import org.hrodberaht.inject.extension.tdd.internal.DataSourceProxy;
+import org.hrodberaht.inject.extension.cdi.CDIContainerConfig;
 import org.hrodberaht.inject.spi.ResourceCreator;
 
 import javax.sql.DataSource;
@@ -25,11 +24,15 @@ public class CDIContainerConfigExampleForJSEResourceCreator extends CDIContainer
 
     public CDIContainerConfigExampleForJSEResourceCreator() {
 
+        System.setProperty("MyDataSource.driver", "org.hsqldb.jdbcDriver");
+        System.setProperty("MyDataSource.url", "jdbc:hsqldb:mem:MyDataSource");
+        System.setProperty("MyDataSource.username", "sa");
+        System.setProperty("MyDataSource.password", "");
+
         String dataSourceName = "MyDataSource";
         DataSource dataSource = createDataSource(dataSourceName);
         // Named resource
         addResource(dataSourceName, dataSource);
-
         addSQLSchemas(dataSourceName, "test");
 
     }

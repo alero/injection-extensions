@@ -1,14 +1,9 @@
-package org.hrodberaht.inject.extension.inner;
+package org.hrodberaht.inject.extension.cdi.inner;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,11 +13,6 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class JSEDataSourceHandler implements DataSource {
-
-
-
-
-
     private String dataSourceName;
 
     public JSEDataSourceHandler(String dataSourceName) {

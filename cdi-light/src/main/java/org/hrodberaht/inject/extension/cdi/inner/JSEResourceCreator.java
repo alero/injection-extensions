@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.inner;
+package org.hrodberaht.inject.extension.cdi.inner;
 
 import org.hrodberaht.inject.spi.ResourceCreator;
 

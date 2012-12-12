@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.cdiext;
+package org.hrodberaht.inject.extension.cdi.cdiext;
 
 import java.lang.reflect.Method;
 

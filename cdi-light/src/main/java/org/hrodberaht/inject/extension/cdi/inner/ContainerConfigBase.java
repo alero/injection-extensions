@@ -1,7 +1,7 @@
-package org.hrodberaht.inject.extension.inner;
+package org.hrodberaht.inject.extension.cdi.inner;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.cdiext.CDIExtensions;
+import org.hrodberaht.inject.extension.cdi.cdiext.CDIExtensions;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 import org.hrodberaht.inject.spi.ContainerConfig;
 import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
@@ -35,6 +35,26 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
 
     protected abstract InjectionRegisterScanInterface getScanner();
 
+    protected InjectContainer createAutoScanContainerManuallyRunAfterBeanDiscovery(String... packageName) {
+        cdiExtensions.runBeforeBeanDiscovery(originalRegister, this);
+        InjectionRegisterScanInterface registerScan = getScanner();
+        registerScan.scanPackage(packageName);
+        originalRegister = registerScan;
+        appendTypedResources();
+        activeRegister = originalRegister.clone();
+        System.out.println("createAutoScanContainerManuallyRunAfterBeanDiscovery - "+originalRegister);
+        return activeRegister.getInjectContainer();
+    }
+
+    protected void registerInjectionContainer(InjectContainer injectContainer) {
+        originalRegister.setInjectContainer(injectContainer);
+        activeRegister = originalRegister;
+    }
+
+    protected void runAfterBeanDiscovery() {
+        cdiExtensions.runAfterBeanDiscovery(activeRegister, this);
+    }
+
     protected InjectContainer createAutoScanContainer(String... packageName) {
         cdiExtensions.runBeforeBeanDiscovery(originalRegister, this);
         InjectionRegisterScanInterface registerScan = getScanner();
@@ -43,7 +63,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
         appendTypedResources();
         activeRegister = originalRegister.clone();
         cdiExtensions.runAfterBeanDiscovery(activeRegister, this);
-        System.out.println("originalRegister - "+originalRegister);
+        System.out.println("createAutoScanContainer - "+originalRegister);
         return activeRegister.getInjectContainer();
     }
 
@@ -66,7 +86,6 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
     }
 
     public InjectContainer getActiveContainer() {
-
         return activeRegister.getInjectContainer();
     }
 
