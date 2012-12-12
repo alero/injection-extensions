@@ -1,8 +1,5 @@
-package org.hrodberaht.inject.extension.cdiext;
+package org.hrodberaht.inject.extension.cdi.cdiext;
 
-import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
-
-import javax.enterprise.context.spi.Context;
 import javax.enterprise.inject.spi.*;
 import java.lang.annotation.Annotation;
 

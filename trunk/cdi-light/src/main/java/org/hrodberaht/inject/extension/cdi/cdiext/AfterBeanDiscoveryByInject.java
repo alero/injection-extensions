@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.cdiext;
+package org.hrodberaht.inject.extension.cdi.cdiext;
 
 import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
 

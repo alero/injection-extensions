@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.inner;
+package org.hrodberaht.inject.extension.cdi.inner;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -18,21 +18,34 @@ import java.util.LinkedList;
 public class DBPool {
 
     protected static final LinkedList<Connection> AVAILABLE_CONNECTIONS = new LinkedList<Connection>();
-    // protected static final LinkedList<Connection> USED_CONNECTIONS = new LinkedList<Connection>();
-
-    public static final String JDBC_DRIVER = "org.hsqldb.jdbcDriver";
-    public static final String JDBC_URL = "jdbc:hsqldb:mem:";
-    public static final String JDBC_USERNAME = "sa";
-    public static final String JDBC_PASSWORD = "";
 
     public static Connection getConnection(String dataSourceName) throws SQLException {
-        return getConnection(JDBC_USERNAME,JDBC_PASSWORD,  dataSourceName);
+        DataSourceDriver dataSourceDriver = initiateDriver(dataSourceName, null, null);
+        return getConnection(dataSourceName, dataSourceDriver);
     }
 
     public static synchronized Connection  getConnection(
             String username, String password, String dataSourceName) throws SQLException {
+        DataSourceDriver dataSourceDriver = initiateDriver(dataSourceName, username, password);
+        return getConnection(dataSourceName, dataSourceDriver);
+    }
+
+    private static DataSourceDriver initiateDriver(String dataSourceName, String username, String password) {
+        String driver = System.getProperty(dataSourceName+".driver");
+        if(driver == null || "".equals(driver)){
+            throw new IllegalStateException("JSEResourceCreator can not find a driver for "+dataSourceName);
+        }
+        String url = System.getProperty(dataSourceName+".url");
+        username = username != null ? username : System.getProperty(dataSourceName+".username");
+        password = password != null ? password : System.getProperty(dataSourceName+".password");
+        return new DataSourceDriver(driver, url, username, password);
+    }
+
+
+    private static synchronized Connection  getConnection(
+            String dataSourceName, DataSourceDriver dataSourceDriver) throws SQLException {
         if(AVAILABLE_CONNECTIONS.isEmpty()){
-            Connection connection = createConnectionProxy(username, password, dataSourceName);
+            Connection connection = createConnectionProxy(dataSourceDriver);
             System.out.println("Create Connection "+connection.toString());
             // USED_CONNECTIONS.push(connection);
             return connection;
@@ -43,11 +56,12 @@ public class DBPool {
     }
 
     private static Connection createConnectionProxy(
-            String username, String password, String dataSourceName)
+            DataSourceDriver dataSourceDriver)
             throws SQLException {
         try {
-            Class.forName(JDBC_DRIVER);
-            final Connection conn = DriverManager.getConnection(JDBC_URL + dataSourceName, username, password);
+            Class.forName(dataSourceDriver.driver);
+            final Connection conn = DriverManager.getConnection(
+                    dataSourceDriver.url, dataSourceDriver.username, dataSourceDriver.password);
             conn.setAutoCommit(false);
             InvocationHandler invocationHandler = new InvocationHandler() {
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -72,5 +86,18 @@ public class DBPool {
         }
     }
 
+    private static class DataSourceDriver{
+        private String driver;
+        private String url;
+        private String username;
+        private String password;
+
+        private DataSourceDriver(String driver, String url, String username, String password) {
+            this.driver = driver;
+            this.url = url;
+            this.username = username;
+            this.password = password;
+        }
+    }
 
 }

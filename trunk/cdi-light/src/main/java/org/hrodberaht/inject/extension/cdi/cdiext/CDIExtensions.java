@@ -1,4 +1,4 @@
-package org.hrodberaht.inject.extension.cdiext;
+package org.hrodberaht.inject.extension.cdi.cdiext;
 
 import org.hrodberaht.inject.internal.annotation.ReflectionUtils;
 import org.hrodberaht.inject.spi.ContainerConfig;
@@ -26,9 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class CDIExtensions {
-
-
-
 
     private enum Phase {AfterBeanDiscovery, BeforeBeanDiscovery}
 
