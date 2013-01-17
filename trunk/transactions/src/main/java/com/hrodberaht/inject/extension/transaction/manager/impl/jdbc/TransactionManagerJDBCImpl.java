@@ -6,6 +6,7 @@ import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionManag
 import com.hrodberaht.inject.extension.transaction.manager.impl.TransactionScopeHandler;
 import com.hrodberaht.inject.extension.transaction.manager.impl.jpa.StatisticsJPA;
 import com.hrodberaht.inject.extension.transaction.manager.internal.TransactionLogging;
+import org.hrodberaht.inject.extension.tdd.internal.DataSourceProxy;
 import org.hrodberaht.inject.register.InjectionFactory;
 
 import javax.sql.DataSource;
@@ -28,10 +29,18 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
     protected static final TransactionScopeHandler entityManagerScope = new TransactionScopeHandler();
     protected static final ThreadLocal<Boolean> requiresNewDisabled = new ThreadLocal<Boolean>();
 
-    DataSource connectionFactory = null;
+    private DataSource connectionFactory = null;
+    private boolean isDataSourceProxy = false;
 
     public TransactionManagerJDBCImpl(DataSource connectionFactory) {
         this.connectionFactory = connectionFactory;
+        try{
+            if(connectionFactory instanceof DataSourceProxy){
+                isDataSourceProxy = true;
+            }
+        }catch (Throwable e){
+            TransactionLogging.log(e);
+        }
     }
 
     public Connection getInstance() {
@@ -45,6 +54,9 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
     @Override
     protected void closeNative(Connection nativeTransaction) {
         try {
+            if(isDataSourceProxy){
+                ((DataSourceProxy)connectionFactory).finalizeConnection(nativeTransaction);
+            }
             nativeTransaction.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -54,6 +66,9 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
     @Override
     protected Connection createNativeManager() {
         try {
+            if(isDataSourceProxy){
+                ((DataSourceProxy)connectionFactory).forceCreateNewConnection();
+            }
             return connectionFactory.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -115,11 +130,7 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
 
     public void newClose() {
         TransactionHolder<Connection> holder = findDeepestHolder();
-        try {
-            holder.getNativeManager().close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        closeNative(holder.getNativeManager());
         TransactionLogging.log("TransactionManagerJDBCImpl: NewTx Close for Connection {0}", holder.getNativeManager());
         cleanupTransactionHolder(holder);
         StatisticsJPA.addCloseCount();
@@ -174,11 +185,7 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
 
         ConnectionHolder holder = getConnectionHolder();
         if (isActive()) {
-            try {
-                holder.getNativeManager().close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            closeNative(holder.getNativeManager());
             TransactionLogging.log("TransactionManagerJDBCImpl: Tx Close for Connection {0}", holder.getNativeManager());
             StatisticsJDBC.addCloseCount();
         }

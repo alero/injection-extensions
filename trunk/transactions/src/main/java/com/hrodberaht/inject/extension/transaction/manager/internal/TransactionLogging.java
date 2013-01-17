@@ -16,4 +16,10 @@ public class TransactionLogging {
             System.out.println(java.text.MessageFormat.format(message, args));
         }
     }
+
+    public static void log(Throwable e) {
+        if(enableLogging){
+            e.printStackTrace(System.out);
+        }
+    }
 }
