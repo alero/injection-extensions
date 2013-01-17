@@ -87,9 +87,29 @@
 				//-->	
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
+
+        <dependency>
+            <groupId>org.hrodberaht.inject.extension</groupId>
+            <artifactId>cdi-test</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <optional>true</optional>
+        </dependency>
 
         <!-- The follow dependencies are needed and these versions are recommended //-->
         <dependency>
@@ -244,31 +264,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>ext_serverbuild</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <configuration>
-                            <skip>false</skip>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            <distributionManagement>
-                <repository>
-                    <id>ext-server-release</id>
-                    <name>CM server releases</name>
-                    <url>http://192.176.148.85/m2repo/ext-release-local</url>
-                </repository>
-                <snapshotRepository>
-                    <id>ext-server-snapshots</id>
-                    <name>CM server snapshots</name>
-                    <url>http://192.176.148.85/m2repo/ext-snapshot-local</url>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
+
     </profiles>
 </project>
