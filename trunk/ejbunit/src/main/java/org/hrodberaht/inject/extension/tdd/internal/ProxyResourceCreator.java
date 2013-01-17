@@ -1,5 +1,8 @@
 package org.hrodberaht.inject.extension.tdd.internal;
 
+import org.hrodberaht.inject.spi.DataSourceProxyInterface;
+import org.hrodberaht.inject.spi.ResourceCreator;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -18,7 +21,7 @@ import java.util.Map;
  * @version 1.0
  * @since 1.0
  */
-public class ResourceCreator {
+public class ProxyResourceCreator implements ResourceCreator<EntityManager, DataSourceProxy> {
 
     private static LocalResources LOCAL = new LocalResources();
     
@@ -26,7 +29,7 @@ public class ResourceCreator {
     private Map<String, EntityManager> ENTITYMANAGERS = new HashMap<String, EntityManager>();
 
 
-    public ResourceCreator() {
+    public ProxyResourceCreator() {
     }
 
     public DataSourceProxy createDataSource(String dbName) {
@@ -82,7 +85,7 @@ public class ResourceCreator {
         return DATASOURCES.values();
     }
 
-    public Collection<EntityManager> getEntityManager() {
+    public Collection<EntityManager> getEntityManagers() {
         return ENTITYMANAGERS.values();
     }
 }

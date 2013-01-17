@@ -2,9 +2,9 @@ package org.hrodberaht.inject.extension.tdd.spring;
 
 import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
-import org.hrodberaht.inject.extension.tdd.internal.ThreadConfigHolder;
 import org.hrodberaht.inject.extension.tdd.spring.internal.InjectionRegisterScanSpring;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
+import org.hrodberaht.inject.spi.ThreadConfigHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;

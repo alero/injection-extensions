@@ -1,7 +1,8 @@
 package org.hrodberaht.inject.extension.tdd;
 
-import org.hrodberaht.inject.extension.tdd.internal.ThreadConfigHolder;
 import org.hrodberaht.inject.register.RegistrationModule;
+import org.hrodberaht.inject.spi.ContainerConfig;
+import org.hrodberaht.inject.spi.ThreadConfigHolder;
 
 /**
  * Unit Test EJB (using @Inject)
@@ -15,7 +16,7 @@ public class ContainerLifeCycleTestUtil {
 
 
 
-    protected static void begin(ContainerConfigBase theContainer) {
+    protected static void begin(ContainerConfig theContainer) {
         ThreadConfigHolder.set(theContainer);
     }
 
@@ -34,7 +35,7 @@ public class ContainerLifeCycleTestUtil {
 
 
     public static <T> T getService(Class<T> aClass) {
-        ContainerConfigBase containerConfigBase = ThreadConfigHolder.get();
+        ContainerConfig containerConfigBase = ThreadConfigHolder.get();
         return containerConfigBase.getActiveContainer().get(aClass);
     }
 }

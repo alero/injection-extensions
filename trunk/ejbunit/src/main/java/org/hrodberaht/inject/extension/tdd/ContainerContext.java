@@ -1,5 +1,7 @@
 package org.hrodberaht.inject.extension.tdd;
 
+import org.hrodberaht.inject.spi.ContainerConfig;
+
 import java.lang.annotation.*;
 
 /**
@@ -14,5 +16,5 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Inherited
 public @interface ContainerContext {
-    Class<? extends ContainerConfigBase> value();
+    Class<? extends ContainerConfig> value();
 }

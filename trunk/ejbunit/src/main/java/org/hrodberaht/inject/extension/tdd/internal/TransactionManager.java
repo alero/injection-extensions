@@ -1,6 +1,6 @@
 package org.hrodberaht.inject.extension.tdd.internal;
 
-import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
+import org.hrodberaht.inject.spi.ContainerConfig;
 
 import javax.persistence.EntityManager;
 
@@ -39,9 +39,9 @@ public class TransactionManager {
         }
     }
 
-    public static void beginTransaction(ContainerConfigBase creator){
+    public static void beginTransaction(ContainerConfig creator){
 
-        MANAGERS.set(new EntityManagers(creator.getResourceCreator().getEntityManager()));
+        MANAGERS.set(new EntityManagers(creator.getResourceCreator().getEntityManagers()));
         DATA_SOURCES.set(new DataSources(creator.getResourceCreator().getDataSources()));
 
         EntityManagers entityManagers = MANAGERS.get();
