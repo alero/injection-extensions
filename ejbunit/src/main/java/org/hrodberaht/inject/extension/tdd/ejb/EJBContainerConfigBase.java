@@ -5,10 +5,10 @@ import org.hrodberaht.inject.extension.tdd.ContainerConfigBase;
 import org.hrodberaht.inject.extension.tdd.ejb.internal.InjectionRegisterScanEJB;
 import org.hrodberaht.inject.extension.tdd.ejb.internal.SessionContextCreator;
 import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
-import org.hrodberaht.inject.extension.tdd.internal.ThreadConfigHolder;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
 import org.hrodberaht.inject.internal.annotation.ReflectionUtils;
 import org.hrodberaht.inject.spi.InjectionPointFinder;
+import org.hrodberaht.inject.spi.ThreadConfigHolder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;

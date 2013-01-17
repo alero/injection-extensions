@@ -1,9 +1,12 @@
 package org.hrodberaht.inject.extension.tdd.internal;
 
+import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
 import org.hrodberaht.inject.ScopeContainer;
+import org.hrodberaht.inject.SimpleInjection;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
+import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +23,7 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public abstract class InjectionRegisterScanBase extends InjectionRegisterModule {
+public abstract class InjectionRegisterScanBase extends InjectionRegisterModule implements InjectionRegisterScanInterface {
     private boolean detailedScanLogging = false;
 
     protected abstract boolean isInterfaceAnnotated(Class aClazz);
@@ -29,8 +32,11 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
     protected abstract ScopeContainer.Scope getScope(Class serviceClass);
     public abstract InjectionRegisterScanBase clone();
 
+    public void setInjectContainer(InjectContainer injectContainer) {
+        super.container = (SimpleInjection) injectContainer;
+    }
 
-    public InjectionRegisterScanBase scanPackage(String... packagenames) {
+    public InjectionRegisterScanInterface scanPackage(String... packagenames) {
         for(String packagename:packagenames){
             Class[] clazzs = getClasses(packagename);
             List<Class> listOfClasses = new ArrayList<Class>(clazzs.length);
@@ -44,7 +50,7 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         return this;
     }
 
-    public InjectionRegisterScanBase scanPackage(String packagename, Class... manuallyexcluded) {
+    public InjectionRegisterScanInterface scanPackage(String packagename, Class... manuallyexcluded) {
         Class[] clazzs = getClasses(packagename);
         List<Class> listOfClasses = new ArrayList<Class>(clazzs.length);
 

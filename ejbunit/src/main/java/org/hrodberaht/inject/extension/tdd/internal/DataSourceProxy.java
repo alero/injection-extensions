@@ -1,5 +1,7 @@
 package org.hrodberaht.inject.extension.tdd.internal;
 
+import org.hrodberaht.inject.spi.DataSourceProxyInterface;
+
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
@@ -8,6 +10,10 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Unit Test EJB (using @Inject)
@@ -17,7 +23,7 @@ import java.sql.SQLException;
  * @version 1.0
  * @since 1.0
  */
-public class DataSourceProxy implements DataSource {
+public class DataSourceProxy implements DataSourceProxyInterface {
     private final ThreadLocal<ConnectionHandler> threadLocal = new ThreadLocal<ConnectionHandler>();
 
     public String JDBC_DRIVER = "org.hsqldb.jdbcDriver";
@@ -37,10 +43,23 @@ public class DataSourceProxy implements DataSource {
             try {
                 connection.conn.rollback();
                 connection.conn.close();
+                closeRecursively(connection);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
             threadLocal.remove();
+        }
+    }
+
+    private void closeRecursively(ConnectionHandler connection) {
+        for(ConnectionHandler children:connection.children){
+            try {
+                children.conn.rollback();
+                children.conn.close();
+                closeRecursively(children);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -57,15 +76,27 @@ public class DataSourceProxy implements DataSource {
         }
     }
 
+    public void finalizeConnection(Connection connection){
+        ConnectionHandler localConnection = threadLocal.get();
+        if(localConnection != null && localConnection.parent != null){
+            threadLocal.set(localConnection.parent);
+        }
+    }
 
-
+    public void forceCreateNewConnection(){
+        ConnectionHandler connection = threadLocal.get();
+        if(connection != null){
+            threadLocal.set(new ConnectionHandler(connection));
+        }
+    }
 
     public Connection getConnection() throws SQLException {
         ConnectionHandler connection = threadLocal.get();
-        if (connection != null) {
+        if (connection != null && connection.hasConnection()) {
             return connection.proxy;
         }
         try {
+            ConnectionHandler connectionHandler = new ConnectionHandler();
             Class.forName(JDBC_DRIVER);
             final Connection conn = DriverManager.getConnection(JDBC_URL + dbName, JDBC_USERNAME, JDBC_PASSWORD);
             conn.setAutoCommit(false);
@@ -85,7 +116,14 @@ public class DataSourceProxy implements DataSource {
             Connection proxy = (Connection) Proxy.newProxyInstance(
                     Thread.currentThread().getContextClassLoader(), new Class[]{Connection.class}, invocationHandler
             );
-            threadLocal.set(new ConnectionHandler(conn, proxy));
+            if(connection != null && !connection.hasConnection()){
+                connection.conn = conn;
+                connection.proxy = proxy;
+            }else{
+                connectionHandler.conn = conn;
+                connectionHandler.proxy = proxy;
+                threadLocal.set(connectionHandler);
+            }
             return proxy;
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -125,9 +163,20 @@ public class DataSourceProxy implements DataSource {
         private Connection conn;
         private Connection proxy;
 
-        private ConnectionHandler(Connection conn, Connection proxy) {
-            this.conn = conn;
-            this.proxy = proxy;
+        private ConnectionHandler parent;
+        private Collection<ConnectionHandler> children = new ArrayList<ConnectionHandler>();
+
+
+        private ConnectionHandler() {
+        }
+
+        private ConnectionHandler(ConnectionHandler parent) {
+            this.parent = parent;
+            parent.children.add(this);
+        }
+
+        private boolean hasConnection(){
+            return conn != null;
         }
     }
 }

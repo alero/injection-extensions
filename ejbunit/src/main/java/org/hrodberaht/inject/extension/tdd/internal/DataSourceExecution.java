@@ -1,6 +1,8 @@
 package org.hrodberaht.inject.extension.tdd.internal;
 
 
+import org.hrodberaht.inject.spi.ResourceCreator;
+
 import java.io.*;
 import java.net.URL;
 import java.sql.Connection;
@@ -60,7 +62,7 @@ public class DataSourceExecution {
                 stringBuffer.append(strLine);
             }
 
-            DataSourceProxy dataSourceProxy = resourceCreator.getDataSource(schemaName);
+            DataSourceProxy dataSourceProxy = (DataSourceProxy) resourceCreator.getDataSource(schemaName);
             Statement stmt = null;
             try {
                 Connection connection = dataSourceProxy.getConnection();
@@ -88,7 +90,7 @@ public class DataSourceExecution {
 
 
     public boolean isInitiated(String testPackageName, String schemaName) {
-        DataSourceProxy dataSourceProxy = resourceCreator.getDataSource(schemaName);
+        DataSourceProxy dataSourceProxy = (DataSourceProxy) resourceCreator.getDataSource(schemaName);
         PreparedStatement pstmt = null;
         try {
             if(dataSourceProxy == null){

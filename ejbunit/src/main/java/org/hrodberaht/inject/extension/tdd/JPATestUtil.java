@@ -1,7 +1,7 @@
 package org.hrodberaht.inject.extension.tdd;
 
 import org.hrodberaht.inject.extension.tdd.ejb.EJBContainerConfigBase;
-import org.hrodberaht.inject.extension.tdd.internal.ThreadConfigHolder;
+import org.hrodberaht.inject.spi.ThreadConfigHolder;
 
 import javax.persistence.EntityManager;
 import java.util.Collection;

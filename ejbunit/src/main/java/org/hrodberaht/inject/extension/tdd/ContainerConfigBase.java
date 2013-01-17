@@ -1,12 +1,14 @@
 package org.hrodberaht.inject.extension.tdd;
 
 import org.hrodberaht.inject.InjectContainer;
-import org.hrodberaht.inject.extension.tdd.internal.DataSourceExecution;
-import org.hrodberaht.inject.extension.tdd.internal.InjectionRegisterScanBase;
-import org.hrodberaht.inject.extension.tdd.internal.ResourceCreator;
+import org.hrodberaht.inject.extension.tdd.internal.*;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
+import org.hrodberaht.inject.spi.ContainerConfig;
+import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
+import org.hrodberaht.inject.spi.ResourceCreator;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -20,26 +22,26 @@ import java.util.Map;
  * @version 1.0
  * @since 1.0
  */
-public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
+public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> implements ContainerConfig {
 
-    protected InjectionRegisterScanBase originalRegister = null;
-    protected InjectionRegisterScanBase activeRegister = null;
+    protected InjectionRegisterScanInterface originalRegister = null;
+    protected InjectionRegisterScanInterface activeRegister = null;
 
     protected Map<String, Object> resources = null;
     protected Map<Class, Object> typedResources = null;
 
 
-    private ResourceCreator resourceCreator = new ResourceCreator();
+    private ResourceCreator resourceCreator = new ProxyResourceCreator();
 
     public abstract InjectContainer createContainer();
 
     protected abstract void injectResources(Object serviceInstance);
 
-    protected abstract InjectionRegisterScanBase getScanner();
+    protected abstract InjectionRegisterScanInterface getScanner();
 
     protected InjectContainer createAutoScanContainer(String... packageName) {
 
-        InjectionRegisterScanBase registerScan = getScanner();
+        InjectionRegisterScanInterface registerScan = getScanner();
         registerScan.scanPackage(packageName);
         originalRegister = registerScan;
         appendTypedResources();
@@ -113,7 +115,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> {
     }
 
 
-    public ResourceCreator getResourceCreator() {
+    public ResourceCreator<EntityManager, DataSourceProxy> getResourceCreator() {
         return resourceCreator;
     }
 

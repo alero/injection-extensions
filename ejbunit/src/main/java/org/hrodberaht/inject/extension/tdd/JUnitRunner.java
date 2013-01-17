@@ -2,6 +2,7 @@ package org.hrodberaht.inject.extension.tdd;
 
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.tdd.internal.TransactionManager;
+import org.hrodberaht.inject.spi.ContainerConfig;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -23,7 +24,7 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
 
     private InjectContainer activeContainer = null;
 
-    private ContainerConfigBase creator = null;
+    private ContainerConfig creator = null;
 
     /**
      * Creates a BlockJUnit4ClassRunner to run
@@ -43,7 +44,7 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
             for (Annotation annotation : annotations) {
                 if (annotation.annotationType() == ContainerContext.class) {
                     ContainerContext containerContext = (ContainerContext) annotation;
-                    Class<? extends ContainerConfigBase> transactionClass = containerContext.value();
+                    Class<? extends ContainerConfig> transactionClass = containerContext.value();
                     creator = transactionClass.newInstance();
                     creator.createContainer();
                 }
@@ -66,7 +67,7 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
 
             TransactionManager.beginTransaction(creator);
             ContainerLifeCycleTestUtil.begin(creator);
-            activeContainer = creator.activeRegister.getInjectContainer();
+            activeContainer = creator.getActiveRegister().getInjectContainer();
             try {
                 // This will execute the createTest method below, the activeContainer handling relies on this.
                 super.runChild(frameworkMethod, notifier);
