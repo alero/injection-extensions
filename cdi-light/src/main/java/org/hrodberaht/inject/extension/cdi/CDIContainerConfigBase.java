@@ -58,7 +58,12 @@ public abstract class CDIContainerConfigBase extends ContainerConfigBase<Injecti
             @Override
             public void extendedInjection(Object service) {
                 CDIContainerConfigBase config = (CDIContainerConfigBase) ThreadConfigHolder.get();
-                config.injectResources(service);
+                if(config != null){
+                    // System.out.println("DefaultInjectionPointFinder injecting resources");
+                    config.injectResources(service);
+                }else{
+                    System.out.println("DefaultInjectionPointFinder NOT injecting resources due to null thread");
+                }
             }
         };
         InjectionPointFinder.setInjectionFinder(finder);

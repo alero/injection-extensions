@@ -41,7 +41,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
         registerScan.scanPackage(packageName);
         originalRegister = registerScan;
         appendTypedResources();
-        activeRegister = originalRegister.clone();
+        activeRegister = originalRegister;
         System.out.println("createAutoScanContainerManuallyRunAfterBeanDiscovery - "+originalRegister);
         return activeRegister.getInjectContainer();
     }
@@ -52,7 +52,8 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
     }
 
     protected void runAfterBeanDiscovery() {
-        cdiExtensions.runAfterBeanDiscovery(activeRegister, this);
+        cdiExtensions.runAfterBeanDiscovery(originalRegister, this);
+        activeRegister = originalRegister;
     }
 
     protected InjectContainer createAutoScanContainer(String... packageName) {
@@ -61,7 +62,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
         registerScan.scanPackage(packageName);
         originalRegister = registerScan;
         appendTypedResources();
-        activeRegister = originalRegister.clone();
+        activeRegister = originalRegister;
         cdiExtensions.runAfterBeanDiscovery(activeRegister, this);
         System.out.println("createAutoScanContainer - "+originalRegister);
         return activeRegister.getInjectContainer();
@@ -82,15 +83,18 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
     }
 
     public InjectionRegisterScanInterface getActiveRegister() {
+        // System.out.println("getActiveRegister "+activeRegister);
         return activeRegister;
     }
 
     public InjectContainer getActiveContainer() {
+        // System.out.println("getActiveContainer "+activeRegister);
         return activeRegister.getInjectContainer();
     }
 
     public void cleanActiveContainer() {
-        activeRegister = originalRegister.clone();
+        // System.out.println("cleanActiveContainer "+activeRegister);
+        activeRegister = originalRegister;
         cdiExtensions.runAfterBeanDiscovery(activeRegister, this);
     }
 

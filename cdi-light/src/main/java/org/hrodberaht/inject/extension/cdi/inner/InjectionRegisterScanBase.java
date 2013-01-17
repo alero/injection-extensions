@@ -11,9 +11,12 @@ import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Projectname
@@ -108,12 +111,6 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         }
     }
 
-
-
-
-
-
-
     private boolean manuallyExcluded(Class aClazz, Class[] manuallyexluded) {
         for (Class excluded : manuallyexluded) {
             if (excluded == aClazz) {
@@ -130,11 +127,6 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
      * @param packageName The base package
      * @return The classes
      */
-    private Class[] getClasses(String packageName) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        ArrayList<Class> classes = findFiles(packageName, classLoader);
-        return classes.toArray(new Class[classes.size()]);
-    }
 
     private ArrayList<Class> findFiles(String packageName, ClassLoader classLoader) {
         ArrayList<Class> classes = new ArrayList<Class>();
@@ -189,6 +181,59 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
 
 
 
+    private Class[] getClasses(String packageName) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ArrayList<Class> classes = findClassesToLoad(
+                packageName, classLoader, CustomClassLoader.ClassLoaderType.THREAD
+        );
+        classes.addAll(findClassesToLoad(packageName, classLoader, CustomClassLoader.ClassLoaderType.JAR));
+
+        return classes.toArray(new Class[classes.size()]);
+    }
+
+    private ArrayList<Class> findClassesToLoad(
+            String packageName, ClassLoader classLoader, CustomClassLoader.ClassLoaderType loaderType) {
+        if (loaderType == CustomClassLoader.ClassLoaderType.THREAD) {
+            return findFiles(packageName, classLoader);
+        } else if (loaderType == CustomClassLoader.ClassLoaderType.JAR) {
+            return findJarFiles(packageName, classLoader);
+        }
+        return null;
+    }
+
+    private ArrayList<Class> findJarFiles(String packageName, ClassLoader classLoader) {
+
+        try {
+            File fileToLoad = findAJarFile(packageName, classLoader);
+            if(fileToLoad == null){
+                return new ArrayList<Class>();
+            }
+            JarFile jarFile = new JarFile(fileToLoad);
+            Enumeration<JarEntry> enumeration = jarFile.entries();
+            ArrayList<Class> classes = new ArrayList<Class>(100);
+            while(enumeration.hasMoreElements()){
+                JarEntry jarEntry = enumeration.nextElement();
+                String classPath = jarEntry.getName().replaceAll("/",".");
+                if(!jarEntry.isDirectory() && classPath.startsWith(packageName) && classPath.endsWith(".class")){
+                    String classPathName = classPath.substring(0, classPath.length()-6);
+                    try {
+                        Class aClass = Class.forName(classPathName);
+                        System.out.println("jar aClass: "+aClass);
+                        classes.add(aClass);
+                    } catch (ClassNotFoundException e) {
+                        System.out.println("jar error: "+classPath);
+                        throw e;
+                    }
+                }
+            }
+            return classes;  //To change body of created methods use File | Settings | File Templates.
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void overrideRegister(final Class serviceDefinition, final Object service) {
         RegistrationModuleAnnotation registrationModule = new RegistrationModuleAnnotation(){
             @Override
@@ -199,4 +244,46 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         container.register(registrationModule);
     }
 
+    private static class CustomClassLoader {
+
+        private enum ClassLoaderType {
+            JAR, THREAD
+        };
+
+        public CustomClassLoader(URLClassLoader classLoader, ClassLoaderType loaderType) {
+            this.classLoader = classLoader;
+            this.loaderType = loaderType;
+        }
+
+        private ClassLoader classLoader;
+        private ClassLoaderType loaderType;
+    }
+
+    private File findAJarFile(String packageName, ClassLoader classLoader) throws IOException {
+        Enumeration<URL> resources = classLoader.getResources(packageName.replace('.', '/'));
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            String path = resource.getFile();
+            if(isJarFile(resource)){
+                return new File(findJarFile(path));
+            }
+        }
+        return null;
+    }
+
+    private boolean isJarFile(URL resource) {
+        String path = resource.getFile();
+        return path.indexOf("file:") != -1 && path.indexOf(".jar!")!= -1;
+    }
+
+    private String findJarFile(String file) {
+        file = file.replaceAll("%20"," ");
+        if (file.indexOf("//") > -1)
+        {
+            return file.substring(6, file.indexOf("!"));
+        } else
+        {	// for unix
+            return file.substring(5, file.indexOf("!"));
+        }
+    }
 }

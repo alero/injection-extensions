@@ -80,13 +80,12 @@ public class CDIExtensions {
 
 
     private void findExtensions() {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("META-INF/services/javax.enterprise.inject.spi.Extension");
+
         try {
-            File file = new File(url.toURI());
-            FileInputStream in = new FileInputStream(file);
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream("META-INF/services/javax.enterprise.inject.spi.Extension");
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String strLine;
-            StringBuffer stringBuffer = new StringBuffer();
+
             while ((strLine = br.readLine()) != null) {
                 try{
                     evaluateMethodAndPutToCache(strLine);
@@ -98,6 +97,25 @@ public class CDIExtensions {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private File findFile() {
+        URL url = this.getClass().getClassLoader().getResource("META-INF/services/javax.enterprise.inject.spi.Extension");
+        if(url == null){
+            return null;
+        }
+        File file = new File(url.getFile());
+        if(!file.exists()){
+            url = this.getClass().getClassLoader().getResource("META-INF/services/javax.enterprise.inject.spi.Extension");
+            if(url == null){
+                return null;
+            }
+            file = new File(url.getFile());
+            if(!file.exists()){
+                throw new RuntimeException("file not found "+file);
+            }
+        }
+        return file;
     }
 
     private void evaluateMethodAndPutToCache(String strLine) throws ClassNotFoundException {

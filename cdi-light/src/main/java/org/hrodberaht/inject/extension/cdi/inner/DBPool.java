@@ -62,7 +62,8 @@ public class DBPool {
             Class.forName(dataSourceDriver.driver);
             final Connection conn = DriverManager.getConnection(
                     dataSourceDriver.url, dataSourceDriver.username, dataSourceDriver.password);
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(true);
+            /*
             InvocationHandler invocationHandler = new InvocationHandler() {
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                     if (method.getName().equals("close")) {
@@ -81,6 +82,8 @@ public class DBPool {
                     Thread.currentThread().getContextClassLoader(), new Class[]{Connection.class}, invocationHandler
             );
             return proxy;
+            */
+            return conn;
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
