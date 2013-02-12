@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -43,9 +44,7 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         for(String packagename:packagenames){
             Class[] clazzs = getClasses(packagename);
             List<Class> listOfClasses = new ArrayList<Class>(clazzs.length);
-            for (Class aClazz : clazzs) {
-                listOfClasses.add(aClazz);
-            }
+            Collections.addAll(listOfClasses, clazzs);
             for (Class aClazz : clazzs) {
                 createRegistration(aClazz, listOfClasses);
             }
@@ -166,6 +165,9 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
             return classes;
         }
         File[] files = directory.listFiles();
+        if(files == null){
+            return null;
+        }
         for (File file : files) {
             if (file.isDirectory()) {
                 assert !file.getName().contains(".");
@@ -205,6 +207,7 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
 
         try {
             File fileToLoad = findAJarFile(packageName, classLoader);
+            SimpleLogger.log("findJarFiles fileToLoad = " + fileToLoad);
             if(fileToLoad == null){
                 return new ArrayList<Class>();
             }
@@ -218,10 +221,10 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
                     String classPathName = classPath.substring(0, classPath.length()-6);
                     try {
                         Class aClass = Class.forName(classPathName);
-                        System.out.println("jar aClass: "+aClass);
+                        SimpleLogger.log("jar aClass: " + aClass + " for " + fileToLoad.getName());
                         classes.add(aClass);
                     } catch (ClassNotFoundException e) {
-                        System.out.println("jar error: "+classPath);
+                        SimpleLogger.log("jar error: " + classPath);
                         throw e;
                     }
                 }
@@ -264,26 +267,38 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         while (resources.hasMoreElements()) {
             URL resource = resources.nextElement();
             String path = resource.getFile();
+            SimpleLogger.log("evaluating jar-file = "+path);
             if(isJarFile(resource)){
+                SimpleLogger.log("found valid jar-file = "+path);
                 return new File(findJarFile(path));
             }
         }
+        SimpleLogger.log("found no valid jar-file");
         return null;
     }
 
     private boolean isJarFile(URL resource) {
         String path = resource.getFile();
-        return path.indexOf("file:") != -1 && path.indexOf(".jar!")!= -1;
+        return path.contains(".jar!");
     }
 
     private String findJarFile(String file) {
         file = file.replaceAll("%20"," ");
-        if (file.indexOf("//") > -1)
+        int sizeOfPrefix[] = null;
+        if(file.contains("file:")){
+            sizeOfPrefix = new int[]{6,5};
+        }
+        else if(file.startsWith("/")){
+            sizeOfPrefix = new int[]{1,1};
+        }else{
+            throw new IllegalAccessError("no valid evaluation of jar path available");
+        }
+        if (file.contains("//"))
         {
-            return file.substring(6, file.indexOf("!"));
+            return file.substring(sizeOfPrefix[0], file.indexOf("!"));
         } else
         {	// for unix
-            return file.substring(5, file.indexOf("!"));
+            return file.substring(sizeOfPrefix[1], file.indexOf("!"));
         }
     }
 }
