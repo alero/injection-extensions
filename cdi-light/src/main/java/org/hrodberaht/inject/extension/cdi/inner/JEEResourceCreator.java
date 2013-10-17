@@ -38,7 +38,10 @@ public class JEEResourceCreator implements ResourceCreator<EntityManager, DataSo
                 String appServer = System.getProperty("app.server");
                 if (appServer != null && appServer.equals("jboss")) {
                     dataSource = (DataSource) ctx.lookup("java:/" + dataSourceName);
-                }else{
+                } else if (appServer != null && appServer.equals("dynamic")) {
+                    String dataSourceBase = System.getProperty("app.server.jndi.datasourcebase");
+                    dataSource = (DataSource) ctx.lookup(dataSourceBase + dataSourceName);
+                } else {
                     dataSource = (DataSource) ctx.lookup(dataSourceName);
                 }
             } catch (NamingException e) {
