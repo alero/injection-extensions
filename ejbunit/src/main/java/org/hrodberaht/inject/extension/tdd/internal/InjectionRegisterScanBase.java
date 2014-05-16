@@ -4,6 +4,8 @@ import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.InjectionRegisterModule;
 import org.hrodberaht.inject.ScopeContainer;
 import org.hrodberaht.inject.SimpleInjection;
+import org.hrodberaht.inject.extension.tdd.util.JarUtil;
+import org.hrodberaht.inject.extension.tdd.util.SimpleLogger;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
@@ -11,9 +13,13 @@ import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * �Projectname�
@@ -36,13 +42,11 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         super.container = (SimpleInjection) injectContainer;
     }
 
-    public InjectionRegisterScanInterface scanPackage(String... packagenames) {
+    public InjectionRegisterScanBase scanPackage(String... packagenames) {
         for(String packagename:packagenames){
             Class[] clazzs = getClasses(packagename);
             List<Class> listOfClasses = new ArrayList<Class>(clazzs.length);
-            for (Class aClazz : clazzs) {
-                listOfClasses.add(aClazz);
-            }
+            Collections.addAll(listOfClasses, clazzs);
             for (Class aClazz : clazzs) {
                 createRegistration(aClazz, listOfClasses);
             }
@@ -50,7 +54,7 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         return this;
     }
 
-    public InjectionRegisterScanInterface scanPackage(String packagename, Class... manuallyexcluded) {
+    public InjectionRegisterScanBase scanPackage(String packagename, Class... manuallyexcluded) {
         Class[] clazzs = getClasses(packagename);
         List<Class> listOfClasses = new ArrayList<Class>(clazzs.length);
 
@@ -73,12 +77,14 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
     private void createRegistration(Class aClazz, List<Class> listOfClasses) {
         if (
                 aClazz.isInterface()
-                && !aClazz.isAnnotation()
-                && isInterfaceAnnotated(aClazz)
+                        && !aClazz.isAnnotation()
+                        && isInterfaceAnnotated(aClazz)
                 ) {
             try{
                 Class serviceClass = findServiceImplementation(aClazz, listOfClasses);
-                overrideRegister(aClazz, serviceClass, getScope(serviceClass));
+                if(serviceClass != null){
+                    overrideRegister(aClazz, serviceClass, getScope(serviceClass));
+                }
             }catch(InjectRuntimeException e){
                 System.out.println("Hrodberaht Injection: Silently failed to register class = "+aClazz);
                 if(detailedScanLogging){
@@ -88,8 +94,8 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         }
         else if (
                 !aClazz.isInterface()
-                && !aClazz.isAnnotation()
-                && isServiceAnnotated(aClazz)
+                        && !aClazz.isAnnotation()
+                        && isServiceAnnotated(aClazz)
                 ) {
             try{
                 Class[] interfaces = aClazz.getInterfaces();
@@ -105,12 +111,6 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
             }
         }
     }
-
-
-
-
-
-
 
     private boolean manuallyExcluded(Class aClazz, Class[] manuallyexluded) {
         for (Class excluded : manuallyexluded) {
@@ -128,11 +128,6 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
      * @param packageName The base package
      * @return The classes
      */
-    private Class[] getClasses(String packageName) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        ArrayList<Class> classes = findFiles(packageName, classLoader);
-        return classes.toArray(new Class[classes.size()]);
-    }
 
     private ArrayList<Class> findFiles(String packageName, ClassLoader classLoader) {
         ArrayList<Class> classes = new ArrayList<Class>();
@@ -172,6 +167,9 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
             return classes;
         }
         File[] files = directory.listFiles();
+        if(files == null){
+            return null;
+        }
         for (File file : files) {
             if (file.isDirectory()) {
                 assert !file.getName().contains(".");
@@ -187,6 +185,63 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
 
 
 
+    private Class[] getClasses(String packageName) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ArrayList<Class> classes = findClassesToLoad(
+                packageName, classLoader, CustomClassLoader.ClassLoaderType.THREAD
+        );
+        classes.addAll(findClassesToLoad(packageName, classLoader, CustomClassLoader.ClassLoaderType.JAR));
+
+        return classes.toArray(new Class[classes.size()]);
+    }
+
+    private ArrayList<Class> findClassesToLoad(
+            String packageName, ClassLoader classLoader, CustomClassLoader.ClassLoaderType loaderType) {
+        if (loaderType == CustomClassLoader.ClassLoaderType.THREAD) {
+            return findFiles(packageName, classLoader);
+        } else if (loaderType == CustomClassLoader.ClassLoaderType.JAR) {
+            return findJarFiles(packageName, classLoader);
+        }
+        return null;
+    }
+
+    private ArrayList<Class> findJarFiles(String packageName, ClassLoader classLoader) {
+
+        try {
+            List<File> filesToLoad = JarUtil.findTheJarFiles(packageName, classLoader);
+
+            if(filesToLoad == null){
+                return new ArrayList<Class>();
+            }
+            ArrayList<Class> classes = new ArrayList<Class>(200);
+            for(File fileToLoad:filesToLoad){
+                SimpleLogger.log("findJarFiles fileToLoad = " + fileToLoad);
+                JarFile jarFile = new JarFile(fileToLoad);
+                Enumeration<JarEntry> enumeration = jarFile.entries();
+                while(enumeration.hasMoreElements()){
+                    JarEntry jarEntry = enumeration.nextElement();
+                    String classPath = jarEntry.getName().replaceAll("/",".");
+                    if(!jarEntry.isDirectory() && classPath.startsWith(packageName) && classPath.endsWith(".class")){
+                        String classPathName = classPath.substring(0, classPath.length()-6);
+                        try {
+                            Class aClass = Class.forName(classPathName);
+                            SimpleLogger.log("jar aClass: " + aClass + " for " + fileToLoad.getName());
+                            classes.add(aClass);
+                        } catch (ClassNotFoundException e) {
+                            SimpleLogger.log("jar error: " + classPath);
+                            throw e;
+                        }
+                    }
+                }
+            }
+            return classes;  //To change body of created methods use File | Settings | File Templates.
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void overrideRegister(final Class serviceDefinition, final Object service) {
         RegistrationModuleAnnotation registrationModule = new RegistrationModuleAnnotation(){
             @Override
@@ -196,5 +251,24 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         };
         container.register(registrationModule);
     }
+
+    private static class CustomClassLoader {
+
+        private enum ClassLoaderType {
+            JAR, THREAD
+        };
+
+        public CustomClassLoader(URLClassLoader classLoader, ClassLoaderType loaderType) {
+            this.classLoader = classLoader;
+            this.loaderType = loaderType;
+        }
+
+        private ClassLoader classLoader;
+        private ClassLoaderType loaderType;
+    }
+
+
+
+
 
 }

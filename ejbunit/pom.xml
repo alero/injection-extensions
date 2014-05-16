@@ -5,7 +5,7 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>tdd</artifactId>
     <packaging>jar</packaging>
-    <version>1.0_RC3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
     <name>TDD for EJB</name>
 	<description>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</description>
     <url>http://code.google.com/p/injection-extensions/</url>
@@ -110,7 +110,7 @@
         <dependency>
             <groupId>org.hrodberaht</groupId>
             <artifactId>inject</artifactId>
-            <version>1.3-SNAPSHOT</version>
+            <version>1.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>

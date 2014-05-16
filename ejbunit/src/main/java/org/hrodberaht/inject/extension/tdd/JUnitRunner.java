@@ -26,6 +26,8 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
 
     private ContainerConfig creator = null;
 
+    private InjectContainer injectContainer = null;
+
     /**
      * Creates a BlockJUnit4ClassRunner to run
      *
@@ -46,7 +48,7 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
                     ContainerContext containerContext = (ContainerContext) annotation;
                     Class<? extends ContainerConfig> transactionClass = containerContext.value();
                     creator = transactionClass.newInstance();
-                    creator.createContainer();
+                    System.out.println("Creating creator for thread "+Thread.currentThread().toString());
                 }
             }
         } catch (InstantiationException e) {
@@ -64,13 +66,20 @@ public class JUnitRunner extends BlockJUnit4ClassRunner {
     @Override
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
         try {
-
+            if(injectContainer == null){
+                injectContainer = creator.createContainer();
+                System.out.println("Creating injectContainer for thread "+Thread.currentThread().toString());
+            }
             TransactionManager.beginTransaction(creator);
             ContainerLifeCycleTestUtil.begin(creator);
             activeContainer = creator.getActiveRegister().getInjectContainer();
             try {
                 // This will execute the createTest method below, the activeContainer handling relies on this.
+                System.out.println("START running test "+
+                        frameworkMethod.getName() +" for thread "+Thread.currentThread().toString());
                 super.runChild(frameworkMethod, notifier);
+                System.out.println("END running test "+
+                        frameworkMethod.getName() +" for thread "+Thread.currentThread().toString());
             } finally {
                 TransactionManager.endTransaction();
                 ContainerLifeCycleTestUtil.end();

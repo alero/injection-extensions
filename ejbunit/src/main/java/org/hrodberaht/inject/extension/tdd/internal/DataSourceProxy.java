@@ -24,17 +24,29 @@ import java.util.Map;
  * @since 1.0
  */
 public class DataSourceProxy implements DataSourceProxyInterface {
+
+    private static Map<String, String> DB_NAME_MAPPING = new HashMap<String, String>();
+
     private final ThreadLocal<ConnectionHandler> threadLocal = new ThreadLocal<ConnectionHandler>();
 
     public String JDBC_DRIVER = "org.hsqldb.jdbcDriver";
-    public String JDBC_URL = "jdbc:hsqldb:mem:";
+    public String JDBC_URL = "jdbc:hsqldb:mem:test";
     public String JDBC_USERNAME = "sa";
     public String JDBC_PASSWORD = "";
 
     private String dbName = null;
 
     public DataSourceProxy(String dbName) {
-        this.dbName = dbName;
+        if(DB_NAME_MAPPING.containsKey(dbName)){
+            this.dbName = DB_NAME_MAPPING.get(dbName);
+        }else{
+            this.dbName = dbName;
+        }
+    }
+
+
+    public static void addDataSourceNameMapping(String dataSourceName, String databaseName){
+        DB_NAME_MAPPING.put(dataSourceName, databaseName);
     }
 
     public void clearDataSource() {
