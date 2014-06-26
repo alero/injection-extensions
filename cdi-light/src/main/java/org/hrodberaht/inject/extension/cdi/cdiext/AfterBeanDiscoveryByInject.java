@@ -23,18 +23,18 @@ public class AfterBeanDiscoveryByInject implements AfterBeanDiscovery {
     }
 
     public void addDefinitionError(Throwable throwable) {
-        throw new IllegalAccessError("not supported");
+
     }
 
     public void addBean(Bean<?> bean) {
-        throw new IllegalAccessError("not supported");
+
     }
 
     public void addObserverMethod(ObserverMethod<?> observerMethod) {
-        throw new IllegalAccessError("not supported");
+
     }
 
     public void addContext(Context context) {
-        throw new IllegalAccessError("not supported");
+
     }
 }

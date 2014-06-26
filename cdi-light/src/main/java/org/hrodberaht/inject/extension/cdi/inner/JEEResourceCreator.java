@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class JEEResourceCreator implements ResourceCreator<EntityManager, DataSource> {
 
-    private Map<String, DataSource> dataSources = new ConcurrentHashMap<String, DataSource>();
-    private InitialContext ctx;
+    protected Map<String, DataSource> dataSources = new ConcurrentHashMap<String, DataSource>();
+    protected InitialContext ctx;
 
     public JEEResourceCreator() {
         try {

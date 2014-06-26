@@ -21,7 +21,7 @@ import javax.inject.Inject;
 public class CDIExtension implements Extension {
 
     @Inject
-    ConstantClassLoadedPostContainer constantClassLoadedPostContainer;
+    public ConstantClassLoadedPostContainer constantClassLoadedPostContainer;
 
     void beforeBeanDiscovery(@Observes BeforeBeanDiscovery bbd) {
 

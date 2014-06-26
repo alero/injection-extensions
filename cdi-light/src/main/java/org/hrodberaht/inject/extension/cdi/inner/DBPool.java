@@ -17,7 +17,11 @@ import java.util.LinkedList;
  */
 public class DBPool {
 
-    protected static final LinkedList<Connection> AVAILABLE_CONNECTIONS = new LinkedList<Connection>();
+    // protected static final LinkedList<Connection> AVAILABLE_CONNECTIONS = new LinkedList<Connection>();
+
+    private static InheritableThreadLocal<Connection> threadLocal = new InheritableThreadLocal<Connection>();
+
+    private static boolean useThreadReusableConnection = true;
 
     public static Connection getConnection(String dataSourceName) throws SQLException {
         DataSourceDriver dataSourceDriver = initiateDriver(dataSourceName, null, null);
@@ -44,15 +48,23 @@ public class DBPool {
 
     private static synchronized Connection  getConnection(
             String dataSourceName, DataSourceDriver dataSourceDriver) throws SQLException {
-        if(AVAILABLE_CONNECTIONS.isEmpty()){
-            Connection connection = createConnectionProxy(dataSourceDriver);
-            System.out.println("Create Connection "+connection.toString());
-            // USED_CONNECTIONS.push(connection);
+        if(useThreadReusableConnection && threadLocal.get() != null){
+            Connection connection = threadLocal.get();
+            System.out.println("Reused Connection "+connection.toString());
             return connection;
         }
-        Connection connection = AVAILABLE_CONNECTIONS.pop();
-        System.out.println("Reuse Connection "+connection.toString());
+
+        Connection connection = createConnectionProxy(dataSourceDriver);
+
+        if(useThreadReusableConnection){
+            System.out.println("Create Reusable Connection "+connection.toString());
+            threadLocal.set(connection);
+        }else{
+            System.out.println("Create Connection "+connection.toString());
+        }
         return connection;
+
+
     }
 
     private static Connection createConnectionProxy(
@@ -63,17 +75,18 @@ public class DBPool {
             final Connection conn = DriverManager.getConnection(
                     dataSourceDriver.url, dataSourceDriver.username, dataSourceDriver.password);
             conn.setAutoCommit(true);
-            /*
+            if(!useThreadReusableConnection){
+                return conn;
+            }
+
             InvocationHandler invocationHandler = new InvocationHandler() {
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                     if (method.getName().equals("close")) {
-                        // do nothing
-                        // USED_CONNECTIONS.remove(proxy);
-                        AVAILABLE_CONNECTIONS.push((Connection)proxy);
+                        // conn.close();
+                        // threadLocal.remove();
                         System.out.println("Release Connection "+proxy.toString());
                         return null;
                     }
-
                     return method.invoke(conn, args);
                 }
             };
@@ -82,8 +95,8 @@ public class DBPool {
                     Thread.currentThread().getContextClassLoader(), new Class[]{Connection.class}, invocationHandler
             );
             return proxy;
-            */
-            return conn;
+
+            // return conn;
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

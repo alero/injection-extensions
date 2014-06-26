@@ -173,9 +173,14 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
                 assert !file.getName().contains(".");
                 classes.addAll(findClasses(file, packageName + "." + file.getName()));
             } else if (file.getName().endsWith(".class")) {
-                classes.add(
-                        Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6))
-                );
+                String classPath = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
+                try{
+                    classes.add(Class.forName(classPath));
+                } catch (ClassNotFoundException e) {
+                    SimpleLogger.log("jar aClass error: " + classPath);
+                } catch (ClassFormatError e) {
+                    SimpleLogger.log("jar aClass error: " + classPath);
+                }
             }
         }
         return classes;
@@ -206,33 +211,38 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
     private ArrayList<Class> findJarFiles(String packageName, ClassLoader classLoader) {
 
         try {
-            File fileToLoad = findAJarFile(packageName, classLoader);
-            SimpleLogger.log("findJarFiles fileToLoad = " + fileToLoad);
-            if(fileToLoad == null){
+            List<File> filesToLoad = findTheJarFiles(packageName, classLoader);
+
+            if(filesToLoad == null){
                 return new ArrayList<Class>();
             }
-            JarFile jarFile = new JarFile(fileToLoad);
-            Enumeration<JarEntry> enumeration = jarFile.entries();
-            ArrayList<Class> classes = new ArrayList<Class>(100);
-            while(enumeration.hasMoreElements()){
-                JarEntry jarEntry = enumeration.nextElement();
-                String classPath = jarEntry.getName().replaceAll("/",".");
-                if(!jarEntry.isDirectory() && classPath.startsWith(packageName) && classPath.endsWith(".class")){
-                    String classPathName = classPath.substring(0, classPath.length()-6);
-                    try {
-                        Class aClass = Class.forName(classPathName);
-                        SimpleLogger.log("jar aClass: " + aClass + " for " + fileToLoad.getName());
-                        classes.add(aClass);
-                    } catch (ClassNotFoundException e) {
-                        SimpleLogger.log("jar error: " + classPath);
-                        throw e;
+            ArrayList<Class> classes = new ArrayList<Class>(200);
+            for(File fileToLoad:filesToLoad){
+                SimpleLogger.log("findJarFiles fileToLoad = " + fileToLoad);
+                JarFile jarFile = new JarFile(fileToLoad);
+                Enumeration<JarEntry> enumeration = jarFile.entries();
+                while(enumeration.hasMoreElements()){
+                    JarEntry jarEntry = enumeration.nextElement();
+                    String classPath = jarEntry.getName().replaceAll("/",".");
+                    if(!jarEntry.isDirectory() && classPath.startsWith(packageName) && classPath.endsWith(".class")){
+                        String classPathName = classPath.substring(0, classPath.length()-6);
+                        try {
+                            Class aClass = Class.forName(classPathName);
+                            SimpleLogger.log("jar aClass: " + aClass + " for " + fileToLoad.getName());
+                            classes.add(aClass);
+                        } catch (ClassNotFoundException e) {
+                            SimpleLogger.log("jar aClass error: " + classPath);
+                        } catch (ClassFormatError e) {
+                            SimpleLogger.log("jar aClass error: " + classPath);
+                        } catch (NoClassDefFoundError e) {
+                            SimpleLogger.log("jar aClass error: " + classPath);
+                            throw new RuntimeException("jar aClass error: " + classPath, e);
+                        }
                     }
                 }
             }
             return classes;  //To change body of created methods use File | Settings | File Templates.
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -241,7 +251,7 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         RegistrationModuleAnnotation registrationModule = new RegistrationModuleAnnotation(){
             @Override
             public void registrations() {
-                register(serviceDefinition).withInstance(service);
+            register(serviceDefinition).withInstance(service);
             }
         };
         container.register(registrationModule);
@@ -262,43 +272,24 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
         private ClassLoaderType loaderType;
     }
 
-    private File findAJarFile(String packageName, ClassLoader classLoader) throws IOException {
+    private List<File> findTheJarFiles(String packageName, ClassLoader classLoader) throws IOException {
         Enumeration<URL> resources = classLoader.getResources(packageName.replace('.', '/'));
+        List<File> jarFiles = new ArrayList<File>();
         while (resources.hasMoreElements()) {
             URL resource = resources.nextElement();
             String path = resource.getFile();
             SimpleLogger.log("evaluating jar-file = "+path);
-            if(isJarFile(resource)){
+            if(FileScanningUtil.isJarFile(resource)){
                 SimpleLogger.log("found valid jar-file = "+path);
-                return new File(findJarFile(path));
+                jarFiles.add(new File(FileScanningUtil.findJarFile(path)));
             }
         }
         SimpleLogger.log("found no valid jar-file");
-        return null;
+        return jarFiles;
     }
 
-    private boolean isJarFile(URL resource) {
-        String path = resource.getFile();
-        return path.contains(".jar!");
-    }
 
-    private String findJarFile(String file) {
-        file = file.replaceAll("%20"," ");
-        int sizeOfPrefix[] = null;
-        if(file.contains("file:")){
-            sizeOfPrefix = new int[]{6,5};
-        }
-        else if(file.startsWith("/")){
-            sizeOfPrefix = new int[]{1,1};
-        }else{
-            throw new IllegalAccessError("no valid evaluation of jar path available");
-        }
-        if (file.contains("//"))
-        {
-            return file.substring(sizeOfPrefix[0], file.indexOf("!"));
-        } else
-        {	// for unix
-            return file.substring(sizeOfPrefix[1], file.indexOf("!"));
-        }
-    }
+
+
+
 }

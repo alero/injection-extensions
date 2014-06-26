@@ -2,6 +2,7 @@ package org.hrodberaht.inject.extension.cdi.inner;
 
 import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.cdi.cdiext.CDIExtensions;
+import org.hrodberaht.inject.internal.annotation.InjectionFinder;
 import org.hrodberaht.inject.register.RegistrationModuleAnnotation;
 import org.hrodberaht.inject.spi.ContainerConfig;
 import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
@@ -26,14 +27,19 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
 
     protected Map<String, Object> resources = null;
     protected Map<Class, Object> typedResources = null;
+    protected InjectionFinder injectionFinder;
 
-    private CDIExtensions cdiExtensions = new CDIExtensions();
+    private CDIExtensions cdiExtensions = createExtensionScanner();
 
     public abstract InjectContainer createContainer();
 
     protected abstract void injectResources(Object serviceInstance);
 
     protected abstract InjectionRegisterScanInterface getScanner();
+
+    protected CDIExtensions createExtensionScanner(){
+        return new CDIExtensions();
+    }
 
     protected InjectContainer createAutoScanContainerManuallyRunAfterBeanDiscovery(String... packageName) {
         cdiExtensions.runBeforeBeanDiscovery(originalRegister, this);
@@ -68,7 +74,14 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
         return activeRegister.getInjectContainer();
     }
 
-    private void appendTypedResources() {
+    protected void appendTypedResources() {
+        originalRegister.register(new RegistrationModuleAnnotation() {
+            @Override
+            public void registrations() {
+                registerInjectionFinder(injectionFinder);
+            }
+        });
+
         if (typedResources != null) {
             for (final Class typedResource : typedResources.keySet()) {
                 final Object value = typedResources.get(typedResource);
@@ -130,7 +143,7 @@ public abstract class ContainerConfigBase<T extends InjectionRegisterScanBase> i
             return false;
         }
         Object value = resources.get(resource.name());
-        if(value == null){
+        if(value == null) {
             value = resources.get(resource.mappedName());
         }
         if(value != null){
