@@ -4,6 +4,8 @@ import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,6 +43,10 @@ public class JSEDataSourceHandler implements DataSource {
 
     public int getLoginTimeout() throws SQLException {
         return 0;
+    }
+
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {

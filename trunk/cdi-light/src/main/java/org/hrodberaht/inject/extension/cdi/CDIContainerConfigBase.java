@@ -4,7 +4,9 @@ import org.hrodberaht.inject.InjectContainer;
 import org.hrodberaht.inject.extension.cdi.inner.ContainerConfigBase;
 import org.hrodberaht.inject.extension.cdi.inner.InjectionRegisterScanBase;
 import org.hrodberaht.inject.extension.cdi.inner.InjectionRegisterScanCDI;
+import org.hrodberaht.inject.internal.annotation.AnnotationInjectionContainer;
 import org.hrodberaht.inject.internal.annotation.DefaultInjectionPointFinder;
+import org.hrodberaht.inject.internal.annotation.InjectionFinder;
 import org.hrodberaht.inject.internal.annotation.ReflectionUtils;
 import org.hrodberaht.inject.spi.InjectionPointFinder;
 import org.hrodberaht.inject.spi.ResourceCreator;
@@ -36,6 +38,7 @@ public abstract class CDIContainerConfigBase extends ContainerConfigBase<Injecti
 
     protected ResourceCreator resourceCreator = null;
     private Map<String, EntityManager> entityManagers = null;
+    private boolean hasPersistenceContextInClassPath = true;
 
     protected CDIContainerConfigBase(ResourceCreator resourceCreator) {
         this.resourceCreator = resourceCreator;
@@ -47,8 +50,7 @@ public abstract class CDIContainerConfigBase extends ContainerConfigBase<Injecti
     }
 
     private void initInjectionPoint() {
-        DefaultInjectionPointFinder finder = new DefaultInjectionPointFinder() {
-
+        super.injectionFinder = new DefaultInjectionPointFinder(this) {
             @Override
             protected boolean hasPostConstructAnnotation(Method method) {
                 return method.isAnnotationPresent(PostConstruct.class) ||
@@ -57,16 +59,16 @@ public abstract class CDIContainerConfigBase extends ContainerConfigBase<Injecti
 
             @Override
             public void extendedInjection(Object service) {
-                CDIContainerConfigBase config = (CDIContainerConfigBase) ThreadConfigHolder.get();
+                CDIContainerConfigBase config = (CDIContainerConfigBase) getContainerConfig();
                 if(config != null){
                     // System.out.println("DefaultInjectionPointFinder injecting resources");
                     config.injectResources(service);
                 }else{
-                    System.out.println("DefaultInjectionPointFinder NOT injecting resources due to null thread");
+                    System.out.println("DefaultInjectionPointFinder NOT injecting resources due to config value null");
                 }
             }
         };
-        InjectionPointFinder.setInjectionFinder(finder);
+        // InjectionPointFinder.setInjectionFinder(finder);
     }
 
     protected DataSource createDataSource(String dataSourceName) {
@@ -107,9 +109,15 @@ public abstract class CDIContainerConfigBase extends ContainerConfigBase<Injecti
                         injectTypedResource(serviceInstance, field);
                     }
                 }
-                if (field.isAnnotationPresent(PersistenceContext.class)) {
-                    PersistenceContext resource = field.getAnnotation(PersistenceContext.class);
-                    injectEntityManager(serviceInstance, field, resource);
+                if(hasPersistenceContextInClassPath){
+                    try{
+                        if (field.isAnnotationPresent(PersistenceContext.class)) {
+                            PersistenceContext resource = field.getAnnotation(PersistenceContext.class);
+                            injectEntityManager(serviceInstance, field, resource);
+                        }
+                    } catch (NoClassDefFoundError e) {
+                        hasPersistenceContextInClassPath = false;
+                    }
                 }
             }
         }

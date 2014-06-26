@@ -3,8 +3,7 @@ package org.hrodberaht.inject.extension.cdi.inner;
 import org.hrodberaht.inject.ScopeContainer;
 import org.hrodberaht.inject.internal.exception.InjectRuntimeException;
 
-import javax.ejb.Stateless;
-import javax.inject.Singleton;
+
 import java.lang.reflect.Modifier;
 import java.util.List;
 
@@ -17,6 +16,9 @@ import java.util.List;
  * @since 1.0
  */
 public class InjectionRegisterScanCDI extends InjectionRegisterScanBase {
+
+    private boolean hasStatelessAnnotationInClassPath = true;
+    private boolean hasSingletonAnnotationInClassPath = true;
 
     @Override
     public InjectionRegisterScanCDI clone() {
@@ -64,11 +66,24 @@ public class InjectionRegisterScanCDI extends InjectionRegisterScanBase {
     }
 
     protected ScopeContainer.Scope getScope(Class serviceClass) {
-        if(serviceClass.isAnnotationPresent(Stateless.class)){
-            return ScopeContainer.Scope.SINGLETON;
+
+        if(hasStatelessAnnotationInClassPath){
+            try {
+                if(serviceClass.isAnnotationPresent(javax.ejb.Stateless.class)){
+                    return ScopeContainer.Scope.SINGLETON;
+                }
+            } catch (NoClassDefFoundError e) {
+                hasStatelessAnnotationInClassPath = false;
+            }
         }
-        if(serviceClass.isAnnotationPresent(Singleton.class)){
-            return ScopeContainer.Scope.SINGLETON;
+        if(hasSingletonAnnotationInClassPath){
+            try{
+                if(serviceClass.isAnnotationPresent(javax.inject.Singleton.class)){
+                    return ScopeContainer.Scope.SINGLETON;
+                }
+            } catch (NoClassDefFoundError e) {
+                hasSingletonAnnotationInClassPath = false;
+            }
         }
         return ScopeContainer.Scope.NEW;
     }

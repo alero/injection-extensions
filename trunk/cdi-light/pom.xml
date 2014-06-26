@@ -5,7 +5,7 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>cdi-light</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.4.1</version>
     <name>Partial CDI implementation for supporting useful Container with applications</name>
 	<description>A Container extension with CDI annotation support</description>
     <url>http://code.google.com/p/injection-extensions/</url>
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>org.hrodberaht.inject.extension</groupId>
             <artifactId>cdi-test</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -115,7 +115,7 @@
         <dependency>
             <groupId>org.hrodberaht</groupId>
             <artifactId>inject</artifactId>
-            <version>1.3-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -139,6 +139,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>el-impl</artifactId>
+            <version>2.2</version>
+            <scope>provided</scope>
+        </dependency>
+
 
 
         <!-- The follow dependencies are recommended and the user needs to define them in their POM //-->
@@ -153,7 +160,7 @@
         <dependency>
             <groupId>org.hrodberaht.inject.extension</groupId>
             <artifactId>tdd</artifactId>
-            <version>1.0_RC3-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>

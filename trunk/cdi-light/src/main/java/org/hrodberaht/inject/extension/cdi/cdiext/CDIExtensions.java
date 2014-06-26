@@ -1,5 +1,8 @@
 package org.hrodberaht.inject.extension.cdi.cdiext;
 
+import org.hrodberaht.inject.extension.cdi.inner.FileScanningUtil;
+import org.hrodberaht.inject.extension.cdi.inner.InjectionRegisterScanBase;
+import org.hrodberaht.inject.extension.cdi.inner.SimpleLogger;
 import org.hrodberaht.inject.internal.annotation.ReflectionUtils;
 import org.hrodberaht.inject.spi.ContainerConfig;
 import org.hrodberaht.inject.spi.InjectionRegisterScanInterface;
@@ -14,9 +17,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,9 +33,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CDIExtensions {
 
-    private enum Phase {AfterBeanDiscovery, BeforeBeanDiscovery}
+    protected enum Phase {AfterBeanDiscovery, BeforeBeanDiscovery}
 
-    private Map<Phase, List<MethodClassHolder>> phaseMethods = new ConcurrentHashMap<Phase, List<MethodClassHolder>>();
+    protected Map<Phase, List<MethodClassHolder>> phaseMethods = new ConcurrentHashMap<Phase, List<MethodClassHolder>>();
 
     public CDIExtensions() {
         phaseMethods.put(Phase.BeforeBeanDiscovery, new ArrayList<MethodClassHolder>());
@@ -46,7 +52,11 @@ public class CDIExtensions {
                 methodClassHolder.getMethod().setAccessible(true);
                 Object instance = methodClassHolder.getaClass().newInstance();
                 register.getInjectContainer().injectDependencies(instance);
-                methodClassHolder.getMethod().invoke(instance, inject);
+                if(methodClassHolder.getMethod().getParameterTypes().length == 1){
+                    methodClassHolder.getMethod().invoke(instance, inject);
+                }else {
+                    // TODO: figure out what to do some day
+                }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {
@@ -67,7 +77,11 @@ public class CDIExtensions {
                 Object instance = methodClassHolder.getaClass().newInstance();
                 // Not possible to inject dependencies before the container is built
                 // register.getInjectContainer().injectDependencies(instance);
-                methodClassHolder.getMethod().invoke(instance, inject);
+                if(methodClassHolder.getMethod().getParameterTypes().length == 1){
+                    methodClassHolder.getMethod().invoke(instance, inject);
+                }else {
+                   // TODO: figure out what to do some day
+                }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {
@@ -78,57 +92,69 @@ public class CDIExtensions {
         }
     }
 
-
-    private void findExtensions() {
-
+    protected void findExtensions() {
         try {
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream("META-INF/services/javax.enterprise.inject.spi.Extension");
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String strLine;
-
-            while ((strLine = br.readLine()) != null) {
-                try{
-                    evaluateMethodAndPutToCache(strLine);
-                }catch (Exception e){
-
+            String extensionFileName = "javax.enterprise.inject.spi.Extension";
+            Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources("META-INF/services/"+extensionFileName);
+            for(URL resource;resources.hasMoreElements();){
+                resource = resources.nextElement();
+                String path = resource.getFile();
+                SimpleLogger.log("evaluating jar-file = " + path);
+                if(FileScanningUtil.isJarFile(resource)){
+                    SimpleLogger.log("findJarFiles fileToLoad = " + path);
+                    JarFile jarFile = new JarFile(FileScanningUtil.findJarFile(path));
+                    Enumeration<JarEntry> enumeration = jarFile.entries();
+                    while(enumeration.hasMoreElements()){
+                        JarEntry jarEntry = enumeration.nextElement();
+                        String classPath = jarEntry.getName().replaceAll("/",".");
+                        if(!jarEntry.isDirectory() && jarEntry.getName().contains(extensionFileName)){
+                            try {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(jarFile.getInputStream(jarEntry)));
+                                readExtensionsAndRegister(br);
+                                br.close();
+                            } catch (ClassFormatError e) {
+                                SimpleLogger.log("jar aClass error: " + classPath);
+                            } catch (NoClassDefFoundError e) {
+                                SimpleLogger.log("jar aClass error: " + classPath);
+                                throw new RuntimeException("jar aClass error: " + classPath, e);
+                            }
+                        }
+                    }
+                }else{
+                    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(resource.toURI()))));
+                    readExtensionsAndRegister(br);
+                    br.close();
                 }
+                System.out.println("resource: " +resource.toString());
             }
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private File findFile() {
-        URL url = this.getClass().getClassLoader().getResource("META-INF/services/javax.enterprise.inject.spi.Extension");
-        if(url == null){
-            return null;
-        }
-        File file = new File(url.getFile());
-        if(!file.exists()){
-            url = this.getClass().getClassLoader().getResource("META-INF/services/javax.enterprise.inject.spi.Extension");
-            if(url == null){
-                return null;
-            }
-            file = new File(url.getFile());
-            if(!file.exists()){
-                throw new RuntimeException("file not found "+file);
+    private void readExtensionsAndRegister(BufferedReader br) throws IOException {
+        String strLine;
+        while ((strLine = br.readLine()) != null) {
+            try{
+                evaluateMethodAndPutToCache(strLine);
+            }catch (Exception e){
             }
         }
-        return file;
     }
 
     private void evaluateMethodAndPutToCache(String strLine) throws ClassNotFoundException {
         String classToLookup = strLine;
-        classToLookup.trim();
+        classToLookup = classToLookup.trim();
         Class aClass = Class.forName(classToLookup);
         List<Method> methods = ReflectionUtils.findMethods(aClass);
         for(Method method:methods){
             Class[] parameters = method.getParameterTypes();
             Annotation[][] parameterAnnotations = method.getParameterAnnotations();
             if(parameterAnnotations.length != 1){
-                if(parameterAnnotations[0].length != 1){
-                    return;
+                if(parameterAnnotations.length == 0){
+                    continue;
+                }else if(parameterAnnotations[0].length != 1){
+                    continue;
                 }
             }
             for(int i=0;i<parameters.length;i++){
@@ -137,7 +163,6 @@ public class CDIExtensions {
                     if(parameter.equals(AfterBeanDiscovery.class)){
                         this.phaseMethods.get(Phase.AfterBeanDiscovery).add(new MethodClassHolder(aClass, method));
                     }
-
                     if(parameter.equals(BeforeBeanDiscovery.class)){
                         this.phaseMethods.get(Phase.BeforeBeanDiscovery).add(new MethodClassHolder(aClass, method));
                     }
