@@ -6,6 +6,7 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 
 /**
@@ -19,7 +20,7 @@ public class DBPool {
 
     // protected static final LinkedList<Connection> AVAILABLE_CONNECTIONS = new LinkedList<Connection>();
 
-    private static InheritableThreadLocal<Connection> threadLocal = new InheritableThreadLocal<Connection>();
+    private static InheritableThreadLocal<ConnectionHolder> threadLocal = new InheritableThreadLocal<ConnectionHolder>();
 
     private static boolean useThreadReusableConnection = true;
 
@@ -28,7 +29,7 @@ public class DBPool {
         return getConnection(dataSourceName, dataSourceDriver);
     }
 
-    public static synchronized Connection  getConnection(
+    public static Connection getConnection(
             String username, String password, String dataSourceName) throws SQLException {
         DataSourceDriver dataSourceDriver = initiateDriver(dataSourceName, username, password);
         return getConnection(dataSourceName, dataSourceDriver);
@@ -46,21 +47,33 @@ public class DBPool {
     }
 
 
-    private static synchronized Connection  getConnection(
+    private static Connection  getConnection(
             String dataSourceName, DataSourceDriver dataSourceDriver) throws SQLException {
         if(useThreadReusableConnection && threadLocal.get() != null){
-            Connection connection = threadLocal.get();
-            System.out.println("Reused Connection "+connection.toString());
-            return connection;
+            final ConnectionHolder connection = threadLocal.get();
+            // System.out.println("Reused Connection "+connection.toString());
+            if(!connection.reCreate()){
+                return connection.connection;
+            }else{
+                threadLocal.remove();
+                new Thread(){
+                    @Override
+                    public void run() {
+                        try{
+                            connection.connection.close();
+                        }catch (Throwable e){}
+                    }
+                }.start();
+            }
         }
 
         Connection connection = createConnectionProxy(dataSourceDriver);
 
         if(useThreadReusableConnection){
-            System.out.println("Create Reusable Connection "+connection.toString());
-            threadLocal.set(connection);
+            // System.out.println("Create Reusable Connection "+connection.toString());
+            threadLocal.set(new ConnectionHolder(connection));
         }else{
-            System.out.println("Create Connection "+connection.toString());
+            // System.out.println("Create Connection "+connection.toString());
         }
         return connection;
 
@@ -84,7 +97,7 @@ public class DBPool {
                     if (method.getName().equals("close")) {
                         // conn.close();
                         // threadLocal.remove();
-                        System.out.println("Release Connection "+proxy.toString());
+                        // System.out.println("Release Connection "+proxy.toString());
                         return null;
                     }
                     return method.invoke(conn, args);
@@ -99,6 +112,23 @@ public class DBPool {
             // return conn;
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+
+    private static class ConnectionHolder {
+        private Date startDate = new Date();
+        private Connection connection;
+
+        private ConnectionHolder(Connection connection) {
+            this.connection = connection;
+        }
+
+        public boolean reCreate(){
+            if((new Date().getTime() - startDate.getTime()) > 30000 ){
+                return true;
+            }
+            return false;
         }
     }
 

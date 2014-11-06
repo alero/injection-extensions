@@ -77,9 +77,9 @@ public class CDIExtensions {
                 Object instance = methodClassHolder.getaClass().newInstance();
                 // Not possible to inject dependencies before the container is built
                 // register.getInjectContainer().injectDependencies(instance);
-                if(methodClassHolder.getMethod().getParameterTypes().length == 1){
+                if(methodClassHolder.getMethod().getParameterTypes().length == 1) {
                     methodClassHolder.getMethod().invoke(instance, inject);
-                }else {
+                } else {
                    // TODO: figure out what to do some day
                 }
             } catch (IllegalAccessException e) {
@@ -125,7 +125,6 @@ public class CDIExtensions {
                     readExtensionsAndRegister(br);
                     br.close();
                 }
-                System.out.println("resource: " +resource.toString());
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
