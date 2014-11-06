@@ -177,9 +177,12 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
                 try{
                     classes.add(Class.forName(classPath));
                 } catch (ClassNotFoundException e) {
-                    SimpleLogger.log("jar aClass error: " + classPath);
+                    SimpleLogger.log("classpath aClass error: " + classPath);
                 } catch (ClassFormatError e) {
-                    SimpleLogger.log("jar aClass error: " + classPath);
+                    SimpleLogger.log("classpath aClass error: " + classPath);
+                } catch (NoClassDefFoundError e) {
+                    SimpleLogger.log("classpath aClass error: " + classPath);
+                    // throw new RuntimeException("jar aClass error: " + classPath, e);
                 }
             }
         }
@@ -236,7 +239,7 @@ public abstract class InjectionRegisterScanBase extends InjectionRegisterModule 
                             SimpleLogger.log("jar aClass error: " + classPath);
                         } catch (NoClassDefFoundError e) {
                             SimpleLogger.log("jar aClass error: " + classPath);
-                            throw new RuntimeException("jar aClass error: " + classPath, e);
+                            // throw new RuntimeException("jar aClass error: " + classPath, e);
                         }
                     }
                 }
