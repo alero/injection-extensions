@@ -5,7 +5,7 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>tdd</artifactId>
     <packaging>jar</packaging>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4.3.1-SNAPSHOT</version>
     <name>TDD for EJB</name>
 	<description>A Container with EJB3 annotation support and JUnit utilities for EJB3 needs</description>
     <url>http://code.google.com/p/injection-extensions/</url>
@@ -110,9 +110,14 @@
         <dependency>
             <groupId>org.hrodberaht</groupId>
             <artifactId>inject</artifactId>
-            <version>1.4-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.hrodberaht.inject.extension</groupId>
+            <artifactId>cdi-light</artifactId>
+            <version>1.4.3-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -138,6 +143,14 @@
             <artifactId>mockito-all</artifactId>
             <version>1.8.5</version>
             <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>provided</scope>
+            <version>1.1.4.Final</version>
             <optional>true</optional>
         </dependency>
 
