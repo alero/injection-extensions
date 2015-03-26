@@ -5,7 +5,7 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>cdi-light</artifactId>
     <packaging>jar</packaging>
-    <version>1.4.1</version>
+    <version>1.4.3.1-SNAPSHOT</version>
     <name>Partial CDI implementation for supporting useful Container with applications</name>
 	<description>A Container extension with CDI annotation support</description>
     <url>http://code.google.com/p/injection-extensions/</url>
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>org.hrodberaht.inject.extension</groupId>
             <artifactId>cdi-test</artifactId>
-            <version>${project.version}</version>
+            <version>1.4.3.1-SNAPSHOT</version>
             <optional>true</optional>
         </dependency>
 
