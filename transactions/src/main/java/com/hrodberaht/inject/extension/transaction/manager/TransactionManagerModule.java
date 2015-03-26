@@ -55,6 +55,10 @@ public class TransactionManagerModule extends ExtendedModule {
                         public Class getInstanceType() {
                             return Connection.class;
                         }
+
+                        public boolean newObjectOnInstance() {
+                            return false;
+                        }
                     };
                     register(Connection.class).withFactory(injectionFactory);
                 }

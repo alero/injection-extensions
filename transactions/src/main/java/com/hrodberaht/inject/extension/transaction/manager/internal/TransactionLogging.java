@@ -12,13 +12,13 @@ public class TransactionLogging {
     public static boolean enableLogging = false;
     
     public static void log(String message, Object... args) {
-        if(enableLogging){
+        if(enableLogging) {
             System.out.println(java.text.MessageFormat.format(message, args));
         }
     }
 
     public static void log(Throwable e) {
-        if(enableLogging){
+        if(enableLogging) {
             e.printStackTrace(System.out);
         }
     }

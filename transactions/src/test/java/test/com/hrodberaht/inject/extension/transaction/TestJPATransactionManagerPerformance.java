@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *  To run these tests with load time weaving add the weaver to the JRE like this.
  *  -javaagent:C:/Users/Robert/.m2/repository/org/aspectj/aspectjweaver/1.7.1/aspectjweaver-1.7.1.jar
  *   If the path contains a space do it like this
- *  -javaagent:"C:\Users\Robert Work\.m2\repository\org\aspectj\aspectjweaver\1.7.1\aspectjweaver-1.7.1.jar"
+ *  -javaagent:"C:\Users\alexbrob\.m2\repository\org\aspectj\aspectjweaver\1.7.1\aspectjweaver-1.7.1.jar"
  */
 
 @InjectionContainerContext(ModuleContainerForTests.class)

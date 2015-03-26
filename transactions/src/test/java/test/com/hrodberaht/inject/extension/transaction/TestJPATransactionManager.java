@@ -73,6 +73,7 @@ public class TestJPATransactionManager {
     public void testCreateManagerInOneTransaction() {
 
         Person person = StubUtil.createPerson();
+
         Person foundPerson = application.depthyTransactions(person);
 
         assertEquals(foundPerson.getName(), person.getName());
