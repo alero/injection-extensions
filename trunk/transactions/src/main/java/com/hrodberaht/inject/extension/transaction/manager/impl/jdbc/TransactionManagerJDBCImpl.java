@@ -51,6 +51,10 @@ public class TransactionManagerJDBCImpl extends TransactionManagerBase<Connectio
         return Connection.class;
     }
 
+    public boolean newObjectOnInstance() {
+        return false;
+    }
+
     @Override
     protected void closeNative(Connection nativeTransaction) {
         try {

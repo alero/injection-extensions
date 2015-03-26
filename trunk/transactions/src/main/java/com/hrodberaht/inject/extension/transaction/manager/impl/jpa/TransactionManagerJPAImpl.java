@@ -209,6 +209,10 @@ public class TransactionManagerJPAImpl extends TransactionManagerBase<EntityMana
         return EntityManager.class;
     }
 
+    public boolean newObjectOnInstance() {
+        return false;
+    }
+
     @Override
     public void closeNative(EntityManager nativeTransaction) {
         nativeTransaction.close();
