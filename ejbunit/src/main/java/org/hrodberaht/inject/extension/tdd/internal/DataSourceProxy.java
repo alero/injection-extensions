@@ -10,10 +10,12 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Unit Test EJB (using @Inject)
@@ -160,6 +162,10 @@ public class DataSourceProxy implements DataSourceProxyInterface {
 
     public int getLoginTimeout() throws SQLException {
         return 600;
+    }
+
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return null;
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
