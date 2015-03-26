@@ -45,6 +45,10 @@ public abstract class CDIContainerConfigBase extends ContainerConfigBase<Injecti
         initInjectionPoint();
     }
 
+    protected void copyOriginalRegistryToActive() {
+        activeRegister = originalRegister;
+    }
+
     protected CDIContainerConfigBase() {
         initInjectionPoint();
     }
