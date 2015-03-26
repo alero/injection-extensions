@@ -5,7 +5,7 @@
     <groupId>org.hrodberaht.inject.extension</groupId>
     <artifactId>cdi-test</artifactId>
     <packaging>jar</packaging>
-    <version>1.4.1</version>
+    <version>1.4.3.1-SNAPSHOT</version>
     <name>Example classes for CDI to scan and discover</name>
 	<description>A Container extension with CDI annotation support</description>
     <url>http://code.google.com/p/injection-extensions/</url>
